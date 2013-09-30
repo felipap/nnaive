@@ -1,0 +1,1260 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"border-right",
+				"border-top-right-radius"
+			],
+			[
+				"turma",
+				"turmacidadabrasil"
+			],
+			[
+				"text-",
+				"text-transform"
+			],
+			[
+				"font",
+				"font-family"
+			],
+			[
+				"font-",
+				"font-size"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"b",
+				"border-spacing"
+			],
+			[
+				"creat",
+				"createRadialGradient"
+			],
+			[
+				"spac",
+				"letter-spacing"
+			],
+			[
+				"spa",
+				"word-spacing"
+			],
+			[
+				"cons",
+				"consumer_key"
+			],
+			[
+				"fill",
+				"fillColor"
+			],
+			[
+				"closes",
+				"closestMagnet"
+			],
+			[
+				"rand",
+				"randLoc"
+			],
+			[
+				"time",
+				"timestep"
+			],
+			[
+				"get",
+				"getContext"
+			],
+			[
+				"alig",
+				"vertical-align"
+			],
+			[
+				"inli",
+				"inline-block"
+			],
+			[
+				"mon",
+				"mongodb"
+			],
+			[
+				"topic",
+				"topics_followed"
+			],
+			[
+				"oauth_ac",
+				"oauth_access_token_secret"
+			],
+			[
+				"max",
+				"maxHeight"
+			],
+			[
+				"Bra",
+				"BrainFlower"
+			],
+			[
+				"par",
+				"parseASSIGN"
+			],
+			[
+				"parse",
+				"parseKEYGROUP"
+			],
+			[
+				"Scale",
+				"scale-list"
+			],
+			[
+				"avre",
+				"average-damp"
+			],
+			[
+				"vect",
+				"vector-set"
+			],
+			[
+				"Vector",
+				"vector-set"
+			],
+			[
+				"mark",
+				"mark-flag"
+			],
+			[
+				"vector",
+				"vectore-st"
+			],
+			[
+				"vector-s",
+				"vectore-set"
+			],
+			[
+				"fet",
+				"fethc"
+			],
+			[
+				"lookup-va",
+				"lookup-variable-value"
+			],
+			[
+				"look",
+				"lookup-variable-value"
+			],
+			[
+				"un",
+				"error-unknown-procedure"
+			],
+			[
+				"error",
+				"error-unknown-procedure"
+			],
+			[
+				"con",
+				"cons-stream"
+			],
+			[
+				"enum",
+				"enum-interval"
+			],
+			[
+				"magn",
+				"magnitude-rectangular"
+			],
+			[
+				"man",
+				"magnitude"
+			],
+			[
+				"imag",
+				"imag-part-rectangular"
+			],
+			[
+				"real",
+				"real-part-polar"
+			],
+			[
+				"same",
+				"SAME-VAR"
+			],
+			[
+				"simpl",
+				"simplify-parts"
+			],
+			[
+				"in",
+				"instantiates"
+			],
+			[
+				"initial",
+				"initialPop"
+			],
+			[
+				"grid",
+				"gridSize"
+			],
+			[
+				"clear",
+				"clearRect"
+			],
+			[
+				"ini",
+				"initialPop"
+			],
+			[
+				"mouse",
+				"mouseOverCanvas"
+			],
+			[
+				"init",
+				"initializeBoard"
+			],
+			[
+				"can",
+				"canvasStop"
+			],
+			[
+				"board",
+				"boardState"
+			],
+			[
+				"last",
+				"lastHoveredSquare"
+			],
+			[
+				"detect",
+				"detectMouseOver"
+			],
+			[
+				"detec",
+				"detectSpacebar"
+			],
+			[
+				"de",
+				"detectMouse"
+			],
+			[
+				"Event",
+				"EventListener"
+			],
+			[
+				"_get",
+				"_getMousePos"
+			],
+			[
+				"out",
+				"outCanvas"
+			],
+			[
+				"grd",
+				"GridSquare"
+			],
+			[
+				"ne",
+				"neighbours"
+			],
+			[
+				"render",
+				"renderState"
+			],
+			[
+				"set",
+				"setTimeout"
+			],
+			[
+				"count",
+				"countNeighbours"
+			],
+			[
+				"add",
+				"addEventListener"
+			],
+			[
+				"Grid",
+				"GridSquare"
+			],
+			[
+				"il",
+				"inline-block"
+			],
+			[
+				"end",
+				"endspaceless"
+			],
+			[
+				"csr",
+				"csrf_token"
+			],
+			[
+				"query",
+				"querySelector"
+			],
+			[
+				"REST",
+				"RESTHandler"
+			],
+			[
+				"Rai",
+				"RaisableRedirect"
+			],
+			[
+				"get_user",
+				"get_user_or_redirect"
+			],
+			[
+				"methodMap",
+				"methodMapGeneral"
+			],
+			[
+				"url",
+				"urlFillers"
+			],
+			[
+				"obj",
+				"objSpecifier"
+			],
+			[
+				"getRa",
+				"getRandColor"
+			],
+			[
+				"stroke",
+				"strokeStyle"
+			],
+			[
+				"fon",
+				"font-weight"
+			],
+			[
+				"file",
+				"fileNameGenerator"
+			],
+			[
+				"Car",
+				"CarouselItem"
+			],
+			[
+				"AW",
+				"AWS_SECRET_ACCESS_KEY"
+			],
+			[
+				"Carousel",
+				"CarouselItemForm"
+			],
+			[
+				"MEDI",
+				"MEDIA_URL"
+			],
+			[
+				"MEDIA",
+				"MEDIA_ROOT"
+			],
+			[
+				"AWS",
+				"AWS_STORAGE_BUCKET_NAME"
+			],
+			[
+				"Mid",
+				"MIDDLEWARE_CLASSES"
+			],
+			[
+				"MIDDL",
+				"MIDDLEWARE_CLASSES"
+			],
+			[
+				"TEMPL",
+				"TEMPLATE_DIRS"
+			],
+			[
+				"static",
+				"staticfiles"
+			],
+			[
+				"bord",
+				"border-bottom"
+			],
+			[
+				"Plu",
+				"PluginPage_Team"
+			],
+			[
+				"plu",
+				"plugin_pool"
+			],
+			[
+				"Proje",
+				"ProjectItem"
+			],
+			[
+				"Project",
+				"ProjectItemForm"
+			],
+			[
+				"WAN",
+				"WANTED_HEIGHT"
+			],
+			[
+				"WA",
+				"WANTED_HEIGHT"
+			],
+			[
+				"NewsFeed",
+				"NewsFeedPluginModel"
+			],
+			[
+				"News",
+				"NewsFeedPlugin"
+			],
+			[
+				"Caro",
+				"CarouselItemAdmin"
+			],
+			[
+				"NewsI",
+				"NewsItemAdmin"
+			],
+			[
+				"_test",
+				"_testVictory_diagonal"
+			],
+			[
+				"R",
+				"REQUIRED_LENGTH"
+			],
+			[
+				"M",
+				"printMatrix"
+			],
+			[
+				"print",
+				"printMatrix"
+			],
+			[
+				"lo",
+				"loadPageTable"
+			],
+			[
+				"cheap",
+				"cheap_table"
+			],
+			[
+				"we",
+				"white-space"
+			],
+			[
+				"update",
+				"updateTweetBox"
+			],
+			[
+				"wrap",
+				"wrap-right"
+			],
+			[
+				"disable",
+				"disableTweet"
+			],
+			[
+				"ine",
+				"inline-block"
+			],
+			[
+				"sub",
+				"substituteHash"
+			],
+			[
+				"lyrics",
+				"lyrics-box"
+			],
+			[
+				"border",
+				"border-top"
+			],
+			[
+				"music",
+				"music-info-wrapper"
+			],
+			[
+				"rende",
+				"renderHTML"
+			],
+			[
+				"scrollTo",
+				"scrollToContent"
+			],
+			[
+				"scroll",
+				"scrollToContent"
+			],
+			[
+				"search-",
+				"search-music"
+			],
+			[
+				"remove",
+				"removePunctuation"
+			],
+			[
+				"sea",
+				"search-music"
+			],
+			[
+				"searc",
+				"search-artist"
+			],
+			[
+				"Searc",
+				"SearchBar"
+			],
+			[
+				"mont",
+				"monthlyRankURL"
+			],
+			[
+				"top",
+				"topArtists"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 2090,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "nnaive.run",
+			"settings":
+			{
+				"buffer_size": 442,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coffee/bots.coffee",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n$(function (window) {\n\n	var canvas = $(\"canvas#nnaive\");\n\n});",
+			"file": "js/bots.js",
+			"file_size": 1,
+			"file_write_time": 130248644994475300,
+			"settings":
+			{
+				"buffer_size": 62,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/CoffeeScript/CoffeeScript.sublime-build",
+	"command_palette":
+	{
+		"height": 308.0,
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Preferences: Browse Packages"
+			],
+			[
+				"",
+				"BracketHighlighter: Fold Bracket Content"
+			],
+			[
+				"bracket",
+				"BracketHighlighter: Jump to Right Bracket"
+			],
+			[
+				"bracketh",
+				"BracketHighlighter: Jump to Right Bracket"
+			],
+			[
+				"brack",
+				"BracketHighlighter: Match Brackets (ignore threshold)"
+			],
+			[
+				"jade",
+				"HTML2Jade: Convert file"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"add",
+				"Project: Add Folder"
+			],
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"super",
+				"Convert Case: Upper Case"
+			],
+			[
+				"supe",
+				"Convert Case: Upper Case"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: add",
+				"Package Control: Add Repository"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 118.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/felipe/Projects/nnaive/nnaive.run",
+		"/home/felipe/Projects/nnaive/css/main.less",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/footer.html",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/osite.html",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/home.less",
+		"/home/felipe/Projects/heroku-tc/turmacidada/wsgi.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/pages/home.html",
+		"/media/hdd/Backup/tumblr-custom-css.jun23.css",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/home.css",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/home_fblikebox.css",
+		"/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/felipe/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/felipe/Projects/heroku-tc/Procfile",
+		"/home/felipe/Projects/heroku-tc/turmacidada/website/models.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/website/admin.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/website/templatetags/custom_template_tags.py",
+		"/home/felipe/Projects/arduino/sketch_jul06_ino/sketch_jul06_ino.ino",
+		"/home/felipe/Cpp/unix-source/chapter12/Str.h",
+		"/home/felipe/Cpp/unix-source/chapter12/Str.cc",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/macros.less",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/font-awesome.css",
+		"/home/felipe/Cpp/unix-source/chapter06/analysis.cc",
+		"/home/felipe/Cpp/unix-source/chapter06/analysis.h",
+		"/home/felipe/Projects/heroku-tc/turmacidada/settings/__init__.py",
+		"/home/felipe/Projects/magnet-project/css/macros.less",
+		"/home/felipe/Projects/magnet-project/index.html",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/base.less",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/base.html",
+		"/home/felipe/Projects/game-of-life/index.html",
+		"/home/felipe/Cpp/unix-source/chapter12/main3.cc",
+		"/home/felipe/Cpp/unix-source/chapter12/main2.cc",
+		"/home/felipe/Projects/magnet-project/js/plugins.js",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/home.css.bak",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/base.css.bak",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/robots.txt",
+		"/home/felipe/Projects/magnet-project/css/main.css",
+		"/home/felipe/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/felipe/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/felipe/Projects/magnet-project/css/fonts.less",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/font.css",
+		"/home/felipe/Projects/magnet-project/css/font.css",
+		"/home/felipe/Cpp/Chapter4/4-7.cpp",
+		"/home/felipe/Cpp/unix-source/chapter06/ext_fails1.cc",
+		"/home/felipe/Projects/magnet-project/js/main.js",
+		"/home/felipe/Projects/magnet-project/css/main.less",
+		"/home/felipe/Projects/httprequest.c",
+		"/home/felipe/Projects/meavisa/views/panel.html",
+		"/home/felipe/Projects/heroku-tc/turmacidada/settings/common.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/projectslist.html",
+		"/home/felipe/Projects/heroku-tc/turmacidada/website/views.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/pages/projects.html",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/404.html",
+		"/home/felipe/Projects/heroku-tc/runtime.txt",
+		"/home/felipe/Projects/heroku-tc/turmacidada/settings/dev.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/settings/keys.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/settings/prod.py",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/base.css",
+		"/home/felipe/Projects/magnet-project/js/jquery.flexslider.js",
+		"/home/felipe/Projects/magnet-project/js/jquery.flexslider-min.js",
+		"/home/felipe/Projects/meavisa/package.json",
+		"/home/felipe/Projects/meavisa/db.js",
+		"/home/felipe/Projects/meavisa/apis.js",
+		"/home/felipe/Projects/meavisa/keys.js",
+		"/home/felipe/Projects/meavisa/pages.js",
+		"/home/felipe/Projects/meavisa/app.js",
+		"/home/felipe/Projects/meavisa/update.js",
+		"/home/felipe/Projects/magnet-project/js/stiffexperimentation.js",
+		"/home/felipe/Projects/magnet-project/js/stiffexperimentation2.js",
+		"/home/felipe/Projects/meavisa/pack.js",
+		"/home/felipe/Projects/magnet-project/js/magnetic.js",
+		"/home/felipe/Projects/magnet-project/css/magnetic.less",
+		"/home/felipe/Projects/magnet-project/js/magnet.new.js",
+		"/home/felipe/Projects/magnet-project/js/magnetic3.js",
+		"/home/felipe/.local/share/Trash/files/test.js",
+		"/home/felipe/.local/share/Trash/files/server.js",
+		"/home/felipe/.local/share/Trash/files/pi.js",
+		"/home/felipe/Desktop/meavisa/db.js",
+		"/home/felipe/Desktop/meavisa/views/index.html",
+		"/home/felipe/Desktop/meavisa/app.js",
+		"/home/felipe/Desktop/meavisa/apis.js",
+		"/home/felipe/Desktop/meavisa/views/panel.html",
+		"/home/felipe/Desktop/meavisa/pages.js",
+		"/home/felipe/test.js",
+		"/home/felipe/Desktop/meavisa/bot.js",
+		"/home/felipe/Desktop/meavisa/routes/index.js",
+		"/home/felipe/Desktop/meavisa/views/layout.jade",
+		"/home/felipe/Desktop/meavisa/views/index.jade",
+		"/home/felipe/Desktop/meavisa/server.js",
+		"/home/felipe/Desktop/meavisa/package.json",
+		"/home/felipe/Desktop/meavisa/html/index.html",
+		"/home/felipe/Desktop/meavisa/mongo.js",
+		"/home/felipe/Desktop/lisp-with-coffee/index.html",
+		"/home/felipe/Desktop/meavisa/login.html",
+		"/home/felipe/Desktop/coffeescheme/index.html",
+		"/home/felipe/Projects/cipher/src/basic.c",
+		"/home/felipe/Projects/cipher/src/basic.h",
+		"/home/felipe/Projects/cipher/src/basic.py",
+		"/home/felipe/Projects/cipher/src/dumb.py",
+		"/home/felipe/Projects/cipher/src/helpers.c",
+		"/home/felipe/Projects/cipher/src/mapObj.c",
+		"/home/felipe/Projects/cipher/src/mapObj.h",
+		"/home/felipe/Projects/decrypter/src/mapObj.h",
+		"/home/felipe/Projects/decrypter/src/mapObj.c",
+		"/home/felipe/Projects/decrypter/README.md",
+		"/home/felipe/Projects/decrypter/src/basic.py",
+		"/home/felipe/Projects/decrypter/src/helpers.c",
+		"/home/felipe/Projects/decrypter/basic.py",
+		"/home/felipe/Projects/decrypter/src/basic.c",
+		"/home/felipe/Projects/decrypter/src/basic.h",
+		"/home/felipe/Projects/decrypter/src/helper.c",
+		"/home/felipe/Projects/decrypter/src/dumbpy",
+		"/home/felipe/Projects/decrypter/basic.h",
+		"/home/felipe/Projects/decrypter/basic.c",
+		"/home/felipe/Projects/decrypter/mapObj.c",
+		"/home/felipe/Projects/decrypter/mapObj.h",
+		"/home/felipe/Projects/Tumblr content/update-two-papers.md",
+		"/home/felipe/Projects/pi.is/js/main.js",
+		"/home/felipe/Projects/pi.is/css/normalize.css",
+		"/home/felipe/Projects/pi.is/js/pi.js",
+		"/home/felipe/Projects/pi.is/main.css",
+		"/home/felipe/Projects/pi.is/pi.js",
+		"/home/felipe/Projects/pi.is/main.less",
+		"/home/felipe/Desktop/trabalhinho/pesquisa.html",
+		"/home/felipe/Desktop/trabalhinho/inicio.html",
+		"/home/felipe/Desktop/trabalhinho/registrar.html",
+		"/home/felipe/Desktop/trabalhinho/main.css",
+		"/home/felipe/Desktop/trabalhinho/procurar.html",
+		"/home/felipe/Desktop/trabalhinho/Estilo.css"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"blog",
+			"boto",
+			"500",
+			"404",
+			"box-shadow",
+			"7",
+			"box",
+			"datetime",
+			"4",
+			"5",
+			"div",
+			"self.age",
+			"born",
+			"140",
+			"models.Date",
+			"birth",
+			"margin-bottom:",
+			"margin-bottom",
+			"blank",
+			"TreeManager",
+			"6>",
+			"6",
+			"margin: 20px",
+			"h6",
+			"box",
+			"top:",
+			"none",
+			"@p",
+			"3px",
+			"; ",
+			"link",
+			"background:",
+			"news",
+			"h4",
+			"h3",
+			"h4",
+			"totalHeight",
+			"150px",
+			"20px",
+			"hover",
+			"span",
+			"h3",
+			"span",
+			"h4",
+			"span",
+			"relative",
+			"absolute",
+			"h4",
+			"relative",
+			"3",
+			"10px",
+			"asdasd",
+			"a",
+			"asd",
+			"DIV ",
+			"h2",
+			",",
+			"h3",
+			"3",
+			"#",
+			"like-box",
+			"facebook",
+			"40px",
+			".like-box",
+			".fan_box ",
+			".facebook",
+			"fb-like-box",
+			"like-box",
+			" ",
+			"fb",
+			"fb.",
+			"FB.init",
+			"fb.init",
+			"data-",
+			"data-href",
+			" data",
+			"blog",
+			"google-",
+			"plus",
+			"class=\"\"",
+			"class=\"\" ",
+			"class=\"\"",
+			"language",
+			"compress",
+			"compressor",
+			"compress",
+			"{",
+			"%",
+			"s3cache",
+			"compressor",
+			"boto",
+			"4",
+			"ALLOWED_HOSTS",
+			"ALLOWED_HOSTS = []",
+			"ALLOWED",
+			"media",
+			"767",
+			"container",
+			"650px",
+			"@media",
+			"width",
+			"enviar",
+			"stro",
+			"Curso Técnico de Informática",
+			"ensino médio",
+			"form",
+			"00",
+			"A00",
+			"construction-banner",
+			"const-banner",
+			"ga",
+			"required ",
+			"d><td",
+			"<td",
+			"td>",
+			"not",
+			"with ",
+			"back",
+			"5",
+			"header",
+			"canvas",
+			"body",
+			"data-stellar",
+			"lutas",
+			"slider-nav",
+			"strong>",
+			"strong",
+			"b>"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"<div class=\"content\" onClick=\"window.location.href='{{nitem.link}}'\">\n							{% if nitem.thumbnail %}\n								<img width=\"100\" src=\"{{ MEDIA_URL }}{{ nitem.thumbnail }}\" class=\"main-img\">\n							<div style=\"\"><h3>{{ nitem.date }}</h3></div>\n							asd\n							{% endif %}\n							<div class=\"text\">\n								<span class=\"title\">{{ nitem.date }}, {{ nitem.title }}<br></span>\n								{{ nitem.description|safe }}\n							</div>\n						</div>",
+			".live",
+			".on",
+			" ",
+			"",
+			"\\s",
+			" ",
+			"CLOSURE",
+			"ATOM?",
+			"\\n\\n",
+			"{{",
+			"\\{\\{\\1\\}\\}",
+			"Mustache.render",
+			"",
+			"\"",
+			"REST",
+			"content",
+			"class=\"box-title\"",
+			"REQLEN",
+			"REQlen",
+			"REQUIRED_LENGTH",
+			"l",
+			"c",
+			"4",
+			"i2 in",
+			"i in",
+			"i to",
+			"n-cols",
+			"element",
+			"",
+			"turmacidada",
+			"mimi",
+			"tc",
+			"",
+			"url(/static/",
+			",",
+			"chooseMovement",
+			"matrix[E(col, line)]",
+			"updateCostMap",
+			"fixCostMap",
+			"isSolved",
+			"fillNewMap",
+			"fillMap",
+			"h4",
+			"'",
+			"\"",
+			"'",
+			".container.result",
+			"ms",
+			"moz",
+			"button",
+			"song",
+			"images/fonts/",
+			"Patua",
+			"Fredoka One",
+			"Fredoka(\\1)One",
+			"something",
+			"vimeo",
+			"facebook",
+			".videoclip",
+			"li",
+			"artist.",
+			"medium",
+			".container",
+			"box-wrapper-wrapper",
+			"obj.",
+			"music",
+			"",
+			"exceed",
+			"Selector.",
+			"this.unselectWords",
+			"Não aplica",
+			"row_size",
+			"",
+			"print",
+			"",
+			"color",
+			"print _make_colored(\"last fetched: %s\" %  fetched_data, 'NICEBLUE')",
+			"print \"last fetched: %s\" % parsed_data",
+			"print _make_colored(\"$",
+			"m',",
+			"',",
+			":",
+			" += ",
+			"autofill=0",
+			"autofill='0'",
+			"filter",
+			"super_filter",
+			"",
+			"educação_a_distância",
+			"educação_presencial",
+			"DataParser",
+			"QueryAssembler",
+			"",
+			")",
+			"\"\"\"\\n\\n\\t\\tcursor = self.cursor\\n\\t",
+			"\"\"\"\\n\\n\\t\\tcursor = self.cursor\\n\\t\\t",
+			"\"\"\"\\n\\n\\tcursor = self.cursor\\n",
+			"",
+			"super_filter",
+			"keyindex",
+			"'educação presencial'",
+			"nat_jurídica",
+			"tabela. ",
+			"year=",
+			"UTF",
+			"UF",
+			"uf",
+			"existia_no_ano",
+			"select=['qtde_de_cursos', ",
+			"where=['tecnológico', ",
+			"select=[",
+			"))",
+			"show(tg",
+			"select=['tecnológico', ",
+			"select=['tecnológico',",
+			"body",
+			"entry",
+			"",
+			"mod_ensino",
+			"ul",
+			"li",
+			"83",
+			"82",
+			"81",
+			"73",
+			"72",
+			"Dnode"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2090,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2071,
+								2071
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 91.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "nnaive.run",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 442,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								326,
+								326
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Shell-Unix-Generic.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "coffee/bots.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/bots.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 62,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								62,
+								62
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 29.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 22.0
+	},
+	"project": "nnaive.sublime-project",
+	"replace":
+	{
+		"height": 74.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+			[
+				"",
+				"~/Projects/meavisa/meavisa.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 174.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Setup production for magnet-project
+gnome-terminal -x sh -c "cd ~/Projects/nnaive/css && bash watch.sh" 2>&- # & disown
+cd ~/Projects/nnaive
+nautilus . & disown
+gnome-terminal -x sh -c "python -m SimpleHTTPServer" # & disown
+sudo modprobe pcspkr
+sleep 3
+gnome-terminal -x sh -c "cd ~/Projects/nnaive/js && coffee -bcw *.coffee" 2>&- # & disown
