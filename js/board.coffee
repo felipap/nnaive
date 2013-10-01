@@ -2,73 +2,104 @@
 # board.coffee for nnaive
 
 painter =
+	applyCanvasOptions : (context, options) ->
+		if options.fill is true
+			if 'color' of options then context.fillStyle = options.color
+		else
+			if 'color' of options then context.strokeStyle = options.color
+			if 'width' of options then context.lineWidth = options.width
+
 	###### Canvas manipulation functions
-	fillCircle : (context, position, radius=2, color="black") ->
-		context.fillStyle = color
+	fillCircle : (context, position, radius=2, options={}) ->
+		this.applyCanvasOptions(context, options)
 		context.beginPath()
 		context.arc(position.x, position.y, radius, 0, 2*Math.PI, true)
 		context.fill()
 
-	drawCircle : (context, position, radius=2, color="black") ->
-		context.strokeStyle = color
+	drawCircle : (context, position, radius=2, options={}) ->
+		this.applyCanvasOptions(context, options)
 		context.beginPath()
 		context.arc(position.x, position.y, radius, 0, 2*Math.PI, true)
 		context.stroke()
 
-	drawLine : (context, p1, p2, lineWidth=1, color="black") -> 
-		context.strokeStyle = color
-		context.lineWidth = lineWidth
+	drawLine : (context, p1, p2, options={}) ->
+		this.applyCanvasOptions(context, options)
 		context.beginPath()
 		context.moveTo p1.x, p1.y
 		context.lineTo p2.x, p2.y
 		context.stroke()
 
-	drawTriangle : (context, p1, p2, p3, lineWidth=1, color="black") ->
-		context.strokeStyle = color
-		context.lineWidth = lineWidth
+	drawTriangle : (context, p1, p2, p3, options={}) ->
+		this.applyCanvasOptions(context, options)
 		context.beginPath()
 		context.moveTo p1.x, p1.y
 		context.lineTo p2.x, p2.y
 		context.lineTo p3.x, p3.y
-		context.lineTo p1.x, p1.y
+		context.closePath()
 		context.stroke()
 
-	drawPolygon : (context, points, lineWidth=1, color="black", angle=0) ->
-		context.fillStyle = '#F00'
+	drawCenteredPolygon : (context, center, points, angle=0, options={}) ->
+		this.applyCanvasOptions(context, options)
+		angle = 0
+		context.save()
+		context.translate(center.x, center.y)
+		context.rotate(angle)
+		context.beginPath()
+		context.moveTo(points[0].x, points[0].y)
+		for point in points[1..]
+			context.lineTo(point.x,point.y)
+		context.closePath()
+		if options.fill
+			context.fill()
+		else context.stroke()
+		context.restore()
+
+	# Draws a polygon.
+	# Won't take angle arg, because it is necessary to have the rotation center.
+	# For that, use drawCenteredPolygo
+	drawPolygon : (context, points, options={}) ->
+		this.applyCanvasOptions(context, options)
 		context.beginPath()
 		context.moveTo(points[0].x, points[0].y)
 		for point in points[1..]
 			context.lineTo(point.x,point.y)
 		context.lineTo(points[0].x, points[0].y)
 		context.closePath()
-		context.fill()
+		if options.fill
+			context.fill()
+		else context.stroke
 
-	drawRectangle : (context, p1, p2, lineWidth=1, color="black") ->
-		# context.strokeStyle = 'black'
-		context.rect(p1.x, p1.y, p2.x-p1.x, p2.y-p2.y)
-		context.stroke()
+	# Fills a rectangle between two points.
+	drawRectangle : (context, p1, p2, angle=0, options={}) ->
+		this.applyCanvasOptions(context, options)
+		context.beginPath()
+		if angle isnt 0
+			context.save()
+			context.translate((p1.x+p2.x)/2, (p1.y+p2.y)/2) # Translate center of canvas to center of figure.
+			context.rotate(angle)
+			context.rect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
+			context.restore()
+		else
+			context.rect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
+		if options.fill
+			context.fill()
+		else context.stroke()
 
-	fillRectangle : (context, p1, p2, color="black", angle=0) ->
-		context.fillStyle = color
+	# Draws a rectangle using the center and size (x:width,y:height) as paramenters. 
+	drawSizedRect : (context, point, size, angle=0, options={}) ->
+		this.applyCanvasOptions(context, options)
+		context.beginPath()
 		if angle
 			context.save()
 			context.translate(point.x, point.y) # Translate center of canvas to center of figure.
 			context.rotate(angle)
-			context.fillRect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
+			context.rect(-size.x/2, -size.y/2, size.x, size.y)
 			context.restore()
-		else # optimize for angle=0?
-			context.fillRect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
-
-	fillCenteredRect : (context, point, size, color="black", angle=0) ->
-		context.fillStyle = color
-		if angle
-			context.save()
-			context.translate(point.x, point.y) # Translate center of canvas to center of figure.
-			context.rotate(angle)
-			context.fillRect(-size.x/2, -size.y/2, size.x, size.y)
-			context.restore()
-		else # optimize for angle=0?
-			context.fillRect(point.x-size.x/2, point.y-size.y/2, size.x, size.y)
+		else
+			context.rect(point.x-size.x/2, point.y-size.y/2, size.x, size.y)
+		if options.fill
+			context.fill()
+		else context.stroke()
 
 mm = (min, num, max) -> # restricts num to min max bounds.
 	Math.max(min, Math.min(max, num))
@@ -91,7 +122,7 @@ getResultant = (m, objects, distDecay=2, reppel=2) ->
 		dfx = Math.abs(Math.cos(alpha))*F*rx
 		dfy = Math.abs(Math.sin(alpha))*F*ry
 		# Draw point-to-point vector.
-		painter.drawLine(context, m.position, obj.position, mm(0, F*5000,200), "grey")
+		painter.drawLine(context, m.position, obj.position, {color: "grey", width: mm(0, F*5000,200)})
 		# Multiplier
 		multiplier = m.getMultiplier(obj)
 		# Test if too close.
@@ -103,7 +134,7 @@ getResultant = (m, objects, distDecay=2, reppel=2) ->
 		fx += dfx * multiplier
 		fy += dfy * multiplier
 	# Draw resultant.
-	painter.drawLine(context, m.position, {x: m.position.x+fx*10000, y: m.position.y+fy*10000}, 1, "red")
+	painter.drawLine(context, m.position, {x: m.position.x+fx*10000, y: m.position.y+fy*10000}, {color: "red"})
 	return {x: fx, y: fy, angle: Math.atan(dy/dx)}
 
 class Drawable
@@ -123,10 +154,9 @@ class Drawable
 		@acc = {x: 0, y: 0}
 
 		angle = Math.random()*Math.PI*2
-		# speed = 0
 		# @shift = {x: Math.cos(angle)*speed, y: Math.sin(angle)*speed}
 		@vel.x = (Math.random()>0.5?1:-1)*100*Math.random()
-		# @vel.y = 0.1*Math.random()-0.1/2
+		@vel.y = 0.1*Math.random()-0.1/2
 		
 		@defineWalk()
 	
@@ -172,23 +202,21 @@ class Drawable
 
 class Triangle extends Drawable
 
-	@p1 = @p2 = @p3 = null
+	size: 10
 
 	constructor: (@position) ->
-		@p1 = {x: -60*Math.random(), y: -60*Math.random()}
-		@p2 = {x: 60*Math.random(), y: 60*Math.random()}
-		@p3 = {x: 60*Math.random(), y: 60*Math.random()}
+		@size = 30
+		r3 = Math.sqrt(3)
+		@p1 = {x: 0, y: -1.154700*@size}
+		@p2 = {x: -@size, y: 0.5773*@size}
+		@p3 = {x: @size, y: 0.5773*@size}
 	
 	setPoints: (@p1, @p2, @p3) ->
 
 	tic: (step) ->
 
 	render: (context) ->
-		# Calculate absolute position from relative points.
-		_p1 = {x: @p1.x+@position.x, y: @p1.y+@position.y}
-		_p2 = {x: @p2.x+@position.x, y: @p2.y+@position.y}
-		_p3 = {x: @p3.x+@position.x, y: @p3.y+@position.y}
-		painter.drawTriangle(context, _p1, _p2, _p3)
+		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:@color, width:1})
 
 class Circle extends Drawable
 	
@@ -197,7 +225,6 @@ class Circle extends Drawable
 	constructor: (@position) ->
 
 	render: (context) ->
-		# Calculate something.
 		painter.drawCircle(context, @position, @size)
 
 window.lastAdded = null
@@ -213,7 +240,7 @@ class Square extends Drawable
 		super
 
 	render: (context) =>
-		painter.fillCenteredRect(context, @position, {x:@size,y:@size}, @color, @angle)
+		painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:@color, fill:false, width:1})
 
 class Bot extends Square
 	
@@ -232,13 +259,16 @@ class Bot extends Square
 		if @ is window.lastAdded
 			console.log
 
-class FixedPole extends Circle
+class FixedPole extends Triangle
 
 	color: "#08e"
 	size: 50
+	angularSpeed: .0002
 
 	tic: (step) ->
+		step = 20
 		@size = window.vars.polesize
+		@angle += @angularSpeed * step 
 
 ################################################################################
 ################################################################################
@@ -270,7 +300,7 @@ class Board
 			item.render(context)
 
 	tic: (step) ->
-		#context.clearRect(0, 0, @canvas.width, @canvas.height)
-		painter.fillRectangle(context, {x:0,y:0},{x:@canvas.width,y:@canvas.height}, "rgba(255,255,255,.02)")
+		# context.clearRect(0, 0, @canvas.width, @canvas.height)
+		painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.02)", fill:true})
 		for item in @state
 			item.tic(step)

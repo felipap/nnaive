@@ -5,72 +5,100 @@ var Board, Bot, Circle, Drawable, FixedPole, Square, Triangle, getResultant, mm,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 painter = {
-  fillCircle: function(context, position, radius, color) {
+  applyCanvasOptions: function(context, options) {
+    if (options.fill === true) {
+      if ('color' in options) {
+        return context.fillStyle = options.color;
+      }
+    } else {
+      if ('color' in options) {
+        context.strokeStyle = options.color;
+      }
+      if ('width' in options) {
+        return context.lineWidth = options.width;
+      }
+    }
+  },
+  fillCircle: function(context, position, radius, options) {
     if (radius == null) {
       radius = 2;
     }
-    if (color == null) {
-      color = "black";
+    if (options == null) {
+      options = {};
     }
-    context.fillStyle = color;
+    this.applyCanvasOptions(context, options);
     context.beginPath();
     context.arc(position.x, position.y, radius, 0, 2 * Math.PI, true);
     return context.fill();
   },
-  drawCircle: function(context, position, radius, color) {
+  drawCircle: function(context, position, radius, options) {
     if (radius == null) {
       radius = 2;
     }
-    if (color == null) {
-      color = "black";
+    if (options == null) {
+      options = {};
     }
-    context.strokeStyle = color;
+    this.applyCanvasOptions(context, options);
     context.beginPath();
     context.arc(position.x, position.y, radius, 0, 2 * Math.PI, true);
     return context.stroke();
   },
-  drawLine: function(context, p1, p2, lineWidth, color) {
-    if (lineWidth == null) {
-      lineWidth = 1;
+  drawLine: function(context, p1, p2, options) {
+    if (options == null) {
+      options = {};
     }
-    if (color == null) {
-      color = "black";
-    }
-    context.strokeStyle = color;
-    context.lineWidth = lineWidth;
+    this.applyCanvasOptions(context, options);
     context.beginPath();
     context.moveTo(p1.x, p1.y);
     context.lineTo(p2.x, p2.y);
     return context.stroke();
   },
-  drawTriangle: function(context, p1, p2, p3, lineWidth, color) {
-    if (lineWidth == null) {
-      lineWidth = 1;
+  drawTriangle: function(context, p1, p2, p3, options) {
+    if (options == null) {
+      options = {};
     }
-    if (color == null) {
-      color = "black";
-    }
-    context.strokeStyle = color;
-    context.lineWidth = lineWidth;
+    this.applyCanvasOptions(context, options);
     context.beginPath();
     context.moveTo(p1.x, p1.y);
     context.lineTo(p2.x, p2.y);
     context.lineTo(p3.x, p3.y);
-    context.lineTo(p1.x, p1.y);
+    context.closePath();
     return context.stroke();
   },
-  drawPolygon: function(context, points, lineWidth, color, angle) {
+  drawCenteredPolygon: function(context, center, points, angle, options) {
     var point, _i, _len, _ref;
-    if (lineWidth == null) {
-      lineWidth = 1;
-    }
-    if (color == null) {
-      color = "black";
-    }
     if (angle == null) {
       angle = 0;
     }
-    context.fillStyle = '#F00';
+    if (options == null) {
+      options = {};
+    }
+    this.applyCanvasOptions(context, options);
+    angle = 0;
+    context.save();
+    context.translate(center.x, center.y);
+    context.rotate(angle);
+    context.beginPath();
+    context.moveTo(points[0].x, points[0].y);
+    _ref = points.slice(1);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      point = _ref[_i];
+      context.lineTo(point.x, point.y);
+    }
+    context.closePath();
+    if (options.fill) {
+      context.fill();
+    } else {
+      context.stroke();
+    }
+    return context.restore();
+  },
+  drawPolygon: function(context, points, options) {
+    var point, _i, _len, _ref;
+    if (options == null) {
+      options = {};
+    }
+    this.applyCanvasOptions(context, options);
     context.beginPath();
     context.moveTo(points[0].x, points[0].y);
     _ref = points.slice(1);
@@ -80,52 +108,58 @@ painter = {
     }
     context.lineTo(points[0].x, points[0].y);
     context.closePath();
-    return context.fill();
+    if (options.fill) {
+      return context.fill();
+    } else {
+      return context.stroke;
+    }
   },
-  drawRectangle: function(context, p1, p2, lineWidth, color) {
-    if (lineWidth == null) {
-      lineWidth = 1;
-    }
-    if (color == null) {
-      color = "black";
-    }
-    context.rect(p1.x, p1.y, p2.x - p1.x, p2.y - p2.y);
-    return context.stroke();
-  },
-  fillRectangle: function(context, p1, p2, color, angle) {
-    if (color == null) {
-      color = "black";
-    }
+  drawRectangle: function(context, p1, p2, angle, options) {
     if (angle == null) {
       angle = 0;
     }
-    context.fillStyle = color;
+    if (options == null) {
+      options = {};
+    }
+    this.applyCanvasOptions(context, options);
+    context.beginPath();
+    if (angle !== 0) {
+      context.save();
+      context.translate((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+      context.rotate(angle);
+      context.rect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+      context.restore();
+    } else {
+      context.rect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+    }
+    if (options.fill) {
+      return context.fill();
+    } else {
+      return context.stroke();
+    }
+  },
+  drawSizedRect: function(context, point, size, angle, options) {
+    if (angle == null) {
+      angle = 0;
+    }
+    if (options == null) {
+      options = {};
+    }
+    this.applyCanvasOptions(context, options);
+    context.beginPath();
     if (angle) {
       context.save();
       context.translate(point.x, point.y);
       context.rotate(angle);
-      context.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
-      return context.restore();
+      context.rect(-size.x / 2, -size.y / 2, size.x, size.y);
+      context.restore();
     } else {
-      return context.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+      context.rect(point.x - size.x / 2, point.y - size.y / 2, size.x, size.y);
     }
-  },
-  fillCenteredRect: function(context, point, size, color, angle) {
-    if (color == null) {
-      color = "black";
-    }
-    if (angle == null) {
-      angle = 0;
-    }
-    context.fillStyle = color;
-    if (angle) {
-      context.save();
-      context.translate(point.x, point.y);
-      context.rotate(angle);
-      context.fillRect(-size.x / 2, -size.y / 2, size.x, size.y);
-      return context.restore();
+    if (options.fill) {
+      return context.fill();
     } else {
-      return context.fillRect(point.x - size.x / 2, point.y - size.y / 2, size.x, size.y);
+      return context.stroke();
     }
   }
 };
@@ -157,7 +191,10 @@ getResultant = function(m, objects, distDecay, reppel) {
     alpha = Math.atan(dy / dx);
     dfx = Math.abs(Math.cos(alpha)) * F * rx;
     dfy = Math.abs(Math.sin(alpha)) * F * ry;
-    painter.drawLine(context, m.position, obj.position, mm(0, F * 5000, 200), "grey");
+    painter.drawLine(context, m.position, obj.position, {
+      color: "grey",
+      width: mm(0, F * 5000, 200)
+    });
     multiplier = m.getMultiplier(obj);
     if (d2 < Math.pow(obj.size + m.size, 2) * 2) {
       dfx = -reppel * dfx;
@@ -169,7 +206,9 @@ getResultant = function(m, objects, distDecay, reppel) {
   painter.drawLine(context, m.position, {
     x: m.position.x + fx * 10000,
     y: m.position.y + fy * 10000
-  }, 1, "red");
+  }, {
+    color: "red"
+  });
   return {
     x: fx,
     y: fy,
@@ -225,6 +264,7 @@ Drawable = (function() {
     this.vel.x = (Math.random() > (typeof 0.5 === "function" ? 0.5({
       1: -1
     }) : void 0)) * 100 * Math.random();
+    this.vel.y = 0.1 * Math.random() - 0.1 / 2;
     this.defineWalk();
   }
 
@@ -275,21 +315,24 @@ Drawable = (function() {
 Triangle = (function(_super) {
   __extends(Triangle, _super);
 
-  Triangle.p1 = Triangle.p2 = Triangle.p3 = null;
+  Triangle.prototype.size = 10;
 
   function Triangle(position) {
+    var r3;
     this.position = position;
+    this.size = 30;
+    r3 = Math.sqrt(3);
     this.p1 = {
-      x: -60 * Math.random(),
-      y: -60 * Math.random()
+      x: 0,
+      y: -1.154700 * this.size
     };
     this.p2 = {
-      x: 60 * Math.random(),
-      y: 60 * Math.random()
+      x: -this.size,
+      y: 0.5773 * this.size
     };
     this.p3 = {
-      x: 60 * Math.random(),
-      y: 60 * Math.random()
+      x: this.size,
+      y: 0.5773 * this.size
     };
   }
 
@@ -302,20 +345,10 @@ Triangle = (function(_super) {
   Triangle.prototype.tic = function(step) {};
 
   Triangle.prototype.render = function(context) {
-    var _p1, _p2, _p3;
-    _p1 = {
-      x: this.p1.x + this.position.x,
-      y: this.p1.y + this.position.y
-    };
-    _p2 = {
-      x: this.p2.x + this.position.x,
-      y: this.p2.y + this.position.y
-    };
-    _p3 = {
-      x: this.p3.x + this.position.x,
-      y: this.p3.y + this.position.y
-    };
-    return painter.drawTriangle(context, _p1, _p2, _p3);
+    return painter.drawCenteredPolygon(context, this.position, [this.p1, this.p2, this.p3], this.angle, {
+      color: this.color,
+      width: 1
+    });
   };
 
   return Triangle;
@@ -359,10 +392,14 @@ Square = (function(_super) {
   }
 
   Square.prototype.render = function(context) {
-    return painter.fillCenteredRect(context, this.position, {
+    return painter.drawSizedRect(context, this.position, {
       x: this.size,
       y: this.size
-    }, this.color, this.angle);
+    }, this.angle, {
+      color: this.color,
+      fill: false,
+      width: 1
+    });
   };
 
   return Square;
@@ -414,13 +451,17 @@ FixedPole = (function(_super) {
 
   FixedPole.prototype.size = 50;
 
+  FixedPole.prototype.angularSpeed = .0002;
+
   FixedPole.prototype.tic = function(step) {
-    return this.size = window.vars.polesize;
+    step = 20;
+    this.size = window.vars.polesize;
+    return this.angle += this.angularSpeed * step;
   };
 
   return FixedPole;
 
-})(Circle);
+})(Triangle);
 
 Board = (function() {
   Board.prototype.addObject = function(object) {
@@ -466,13 +507,16 @@ Board = (function() {
 
   Board.prototype.tic = function(step) {
     var item, _i, _len, _ref1, _results;
-    painter.fillRectangle(context, {
+    painter.drawRectangle(context, {
       x: 0,
       y: 0
     }, {
       x: this.canvas.width,
       y: this.canvas.height
-    }, "rgba(255,255,255,.02)");
+    }, 0, {
+      color: "rgba(255,255,255,.02)",
+      fill: true
+    });
     _ref1 = this.state;
     _results = [];
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
