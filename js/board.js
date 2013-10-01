@@ -186,16 +186,16 @@ getResultant = function(m, objects, distDecay, reppel) {
     });
     multiplier = m.getMultiplier(obj);
     if (d2 < Math.pow(obj.size + m.size, 2)) {
-      fx += -reppel * dfx;
-      fy += -reppel * dfy;
+      fx += -Math.pow(reppel, distDecay) * dfx;
+      fy += -Math.pow(reppel, distDecay) * dfy;
     } else {
       fx += dfx * multiplier;
       fy += dfy * multiplier;
     }
   }
   painter.drawLine(context, m.position, {
-    x: m.position.x + fx * 10000000,
-    y: m.position.y + fy * 10000000
+    x: m.position.x + fx * Math.pow(5000, distDecay),
+    y: m.position.y + fy * Math.pow(5000, distDecay)
   }, {
     color: "red"
   });
@@ -260,7 +260,7 @@ Drawable = (function() {
     this.vel.y = max * Math.random() - max / 2;
     this.angularSpeed *= (this.vel.x < 0 ? -1 : 1);
     this.twalk = Math.max(50, Math.floor(500 * Math.random()));
-    return this.angularSpeed = mm(0.00001, Math.random() * 0.00001, 0.00002);
+    return this.angle = 2;
   };
 
   Drawable.prototype.tic = function(step) {
@@ -272,18 +272,18 @@ Drawable = (function() {
     };
     this.position.x += this.vel.x * step + (0.5 * this._acc.x * step * step);
     this.position.y += this.vel.y * step + (0.5 * this._acc.y * step * step);
-    this.acc = getResultant(this, game.board.state);
+    this.acc = getResultant(this, game.board.state, 3);
     this.acc.x *= 1 / this.mass;
     this.acc.y *= 1 / this.mass;
-    this.vel.x += (this._acc.x + this.acc.x) / 2 * step * window.vars.rest / 100;
-    this.vel.y += (this._acc.y + this.acc.y) / 2 * step * window.vars.rest / 100;
+    this.vel.x += (this._acc.x + this.acc.x) / 2 * step * window.vars.rest / 100 * Math.pow((this.acc.angle - this.angle) / 2 / Math.PI, 2);
+    this.vel.y += (this._acc.y + this.acc.y) / 2 * step * window.vars.rest / 100 * Math.pow((this.acc.angle - this.angle) / 2 / Math.PI, 2);
     wholevel = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
     this.vel.x = 1 * this.vel.x + 0.01 * wholevel * Math.cos(this.angle);
     this.vel.y = 1 * this.vel.y + 0.01 * wholevel * Math.sin(this.angle);
     if (!this.twalk--) {
       this.defineWalk();
     }
-    this.angle += (this.acc.angle - this.angle) * .2;
+    this.angle += (this.acc.angle - this.angle) * .01;
     if (canvas.height - this.position.y < 10 || this.position.y < 10) {
       this.vel.y *= -0.5;
     }

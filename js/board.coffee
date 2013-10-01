@@ -124,14 +124,14 @@ getResultant = (m, objects, distDecay=2, reppel=2) ->
 		# Test if too close
 		if d2 < Math.pow(obj.size+m.size,2)
 			# console.log('too close', obj.size, m.size, Math.pow(obj.size+m.size,2), d2)
-			fx += -reppel*dfx
-			fy += -reppel*dfy
+			fx += -Math.pow(reppel, distDecay)*dfx
+			fy += -Math.pow(reppel, distDecay)*dfy
 		else  
 			fx += dfx * multiplier
 			fy += dfy * multiplier
 
 	# Draw resultant.
-	painter.drawLine(context, m.position, {x: m.position.x+fx*10000000, y: m.position.y+fy*10000000}, {color: "red"})
+	painter.drawLine(context, m.position, {x: m.position.x+fx*Math.pow(5000,distDecay), y: m.position.y+fy*Math.pow(5000,distDecay)}, {color: "red"})
 	return {x: fx, y: fy, angle: (if fx then Math.atan(fy/fx) else 0)+(if fx<0 then Math.PI else 0)}
 
 class Drawable
@@ -164,7 +164,8 @@ class Drawable
 		@vel.y = max*Math.random()-max/2
 		@angularSpeed *= (if @vel.x<0 then -1 else 1)
 		@twalk = Math.max(50, Math.floor(500*Math.random()))
-		@angularSpeed = mm(0.00001, Math.random()*0.00001, 0.00002)
+		# @angularSpeed = mm(0.00001, Math.random()*0.00001, 0.00002)
+		@angle = 2
 
 	tic: (step) ->
 		step = window.vars.step # 100
@@ -172,12 +173,12 @@ class Drawable
 		@_acc = {x: @acc.x, y: @acc.y}
 		@position.x += @vel.x*step+(0.5*@_acc.x*step*step)
 		@position.y += @vel.y*step+(0.5*@_acc.y*step*step)
-		@acc = getResultant(@, game.board.state)
+		@acc = getResultant(@, game.board.state,3)
 		@acc.x *= 1/@mass # add multipliers here
 		@acc.y *= 1/@mass
 		# Update velocity with average acceleration
-		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 100
-		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 100
+		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 100 *  Math.pow((@acc.angle-@angle)/2/Math.PI,2)
+		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 100 *  Math.pow((@acc.angle-@angle)/2/Math.PI,2)
 
 		wholevel = Math.sqrt(@vel.x*@vel.x + @vel.y*@vel.y)
 		# # console.log(@angle, '\t', Math.sin(@angle))
@@ -187,7 +188,7 @@ class Drawable
 			@defineWalk()
 		# if @ is lastAdded
 		# 	console.log(@acc.angle)
-		@angle += (@acc.angle-@angle)*.2
+		@angle += (@acc.angle-@angle)*.01
 		# @angle += -@angularSpeed * step * window.vars.anglemom # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
 
 		# Eat, please.
