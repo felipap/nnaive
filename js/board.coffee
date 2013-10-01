@@ -33,7 +33,7 @@ painter =
 		context.lineTo p1.x, p1.y
 		context.stroke()
 
-	drawPolygon : (context, points, lineWidth=1, color="black") ->
+	drawPolygon : (context, points, lineWidth=1, color="black", angle=0) ->
 		context.fillStyle = '#F00'
 		context.beginPath()
 		context.moveTo(points[0].x, points[0].y)
@@ -75,25 +75,26 @@ getResultant = (m, objects) ->
 		# Delta calculations. 
 		dx = m.position.x - obj.position.x
 		dy = m.position.y - obj.position.y
-		# Vector correction.
+		# Vector direction corrections.
 		rx = if dx > 0 then -1 else 1
 		ry = if dy > 0 then -1 else 1
 		# Distance calculation.
 		d2 = Math.pow(m.position.x-obj.position.x,2)+Math.pow(m.position.y-obj.position.y,2)
 		# Force is inversely proportional to the distance².
 		F = 1/d2
-		# Draw point-to-point vector.
-		painter.drawLine(context, m.position, obj.position, mm(0, F*5000,200), "grey")
 		# Calculate vector projections. (update to shortcut functions?)
 		alpha = Math.atan(dy/dx)
 		dfx = Math.abs(Math.cos(alpha))*F*rx
 		dfy = Math.abs(Math.sin(alpha))*F*ry
+		# Draw point-to-point vector.
+		painter.drawLine(context, m.position, obj.position, mm(0, F*5000,200), "grey")
 		# Multiplier
 		multiplier = m.getMultiplier(obj)
 		# Test if too close.
 		if d2 < Math.pow(obj.size+m.size,2)
-			dfx = -dfx
-			dfy = -dfy
+			# console.log('too close', obj.size, m.size, Math.pow(obj.size+m.size,2), d2)
+			dfx = -2*dfx
+			dfy = -2*dfy
 		# Update projections.
 		fx += dfx * multiplier
 		fy += dfy * multiplier
@@ -121,7 +122,7 @@ class Drawable
 		# @shift = {x: Math.cos(angle)*speed, y: Math.sin(angle)*speed}
 	
 	getMultiplier: (obj) ->
-		console.log('getting', obj.type, @multipliers)
+		# console.log('getting', obj.type, @multipliers)
 		return @multipliers[obj.type] or 1
 
 	tic: (step) ->
@@ -141,7 +142,7 @@ class Drawable
 		@velocity.x += avg_acceleration.x * step * window.vars.rest / 10
 		@velocity.y += avg_acceleration.y * step * window.vars.rest / 10
 
-		@angle += @angularSpeed * step * Math.min(@velocity.x*@velocity.y, 2) / @mass
+		@angle += @angularSpeed * step * Math.pow(Math.abs(@velocity.x)+Math.abs(@velocity.y), 4) / @mass
 		
 		@position.x = mm(0, @position.x, window.canvas.width)
 		@position.y = mm(0, @position.y, window.canvas.height)
@@ -170,9 +171,9 @@ class Triangle extends Drawable
 
 class Circle extends Drawable
 	
-	@size = null
+	size: 20
 	
-	constructor: (@position, @size = 20) ->
+	constructor: (@position) ->
 
 	render: (context) ->
 		# Calculate something.
@@ -203,7 +204,7 @@ class Bot extends Square
 		'FixedPole': -1,
 	]
 	color: "red"
-	@angularSpeed: 0.002
+	angularSpeed: 2
 
 	constructor: (@position) ->
 		super
@@ -216,9 +217,11 @@ class Bot extends Square
 
 class FixedPole extends Circle
 
-	@color = "#08e"
+	color: "#08e"
+	size: 20
 
 	tic: (step) ->
+		@size = window.vars.polesize
 
 ################################################################################
 ################################################################################
@@ -232,13 +235,17 @@ class Board
 		window.context = @canvas.getContext("2d")
 		
 		window.vars = {}
-		vars = ['rest']
+		vars = ['rest', 'polesize']
 		for name in vars
-			window.vars[name] = $(".control#"+name+" input").attr('value');
-			$(".control#"+name+" input").bind 'change', (event) ->
-				value = Math.max(0.1, event.target.value/100)
-				event.target.parentElement.querySelector('span').innerHTML = value
-				window.vars[name] = value
+			window.vars[name] = parseInt($(".control#"+name+" input").attr('value'))
+			do ->
+				# scope
+				n = name
+				$(".control#"+name+" input").bind 'change', (event) =>
+					window.e = event
+					value = Math.max(0.1, parseInt(event.target.value)/parseInt(event.target.dataset.divisor or 1))
+					event.target.parentElement.querySelector('span').innerHTML = value
+					window.vars[n] = value
 		@state = [] # Objects to be drawn.
 
 	render: (context) ->

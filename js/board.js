@@ -59,13 +59,16 @@ painter = {
     context.lineTo(p1.x, p1.y);
     return context.stroke();
   },
-  drawPolygon: function(context, points, lineWidth, color) {
+  drawPolygon: function(context, points, lineWidth, color, angle) {
     var point, _i, _len, _ref;
     if (lineWidth == null) {
       lineWidth = 1;
     }
     if (color == null) {
       color = "black";
+    }
+    if (angle == null) {
+      angle = 0;
     }
     context.fillStyle = '#F00';
     context.beginPath();
@@ -134,14 +137,14 @@ getResultant = function(m, objects) {
     ry = dy > 0 ? -1 : 1;
     d2 = Math.pow(m.position.x - obj.position.x, 2) + Math.pow(m.position.y - obj.position.y, 2);
     F = 1 / d2;
-    painter.drawLine(context, m.position, obj.position, mm(0, F * 5000, 200), "grey");
     alpha = Math.atan(dy / dx);
     dfx = Math.abs(Math.cos(alpha)) * F * rx;
     dfy = Math.abs(Math.sin(alpha)) * F * ry;
+    painter.drawLine(context, m.position, obj.position, mm(0, F * 5000, 200), "grey");
     multiplier = m.getMultiplier(obj);
     if (d2 < Math.pow(obj.size + m.size, 2)) {
-      dfx = -dfx;
-      dfy = -dfy;
+      dfx = -2 * dfx;
+      dfy = -2 * dfy;
     }
     fx += dfx * multiplier;
     fy += dfy * multiplier;
@@ -200,7 +203,6 @@ Drawable = (function() {
   }
 
   Drawable.prototype.getMultiplier = function(obj) {
-    console.log('getting', obj.type, this.multipliers);
     return this.multipliers[obj.type] || 1;
   };
 
@@ -222,7 +224,7 @@ Drawable = (function() {
     };
     this.velocity.x += avg_acceleration.x * step * window.vars.rest / 10;
     this.velocity.y += avg_acceleration.y * step * window.vars.rest / 10;
-    this.angle += this.angularSpeed * step * Math.min(this.velocity.x * this.velocity.y, 2) / this.mass;
+    this.angle += this.angularSpeed * step * Math.pow(Math.abs(this.velocity.x) + Math.abs(this.velocity.y), 4) / this.mass;
     this.position.x = mm(0, this.position.x, window.canvas.width);
     return this.position.y = mm(0, this.position.y, window.canvas.height);
   };
@@ -286,11 +288,10 @@ Triangle = (function(_super) {
 Circle = (function(_super) {
   __extends(Circle, _super);
 
-  Circle.size = null;
+  Circle.prototype.size = 20;
 
-  function Circle(position, size) {
+  function Circle(position) {
     this.position = position;
-    this.size = size != null ? size : 20;
   }
 
   Circle.prototype.render = function(context) {
@@ -351,7 +352,7 @@ Bot = (function(_super) {
 
   Bot.prototype.color = "red";
 
-  Bot.angularSpeed = 0.002;
+  Bot.prototype.angularSpeed = 2;
 
   function Bot(position) {
     this.position = position;
@@ -378,9 +379,13 @@ FixedPole = (function(_super) {
     return _ref;
   }
 
-  FixedPole.color = "#08e";
+  FixedPole.prototype.color = "#08e";
 
-  FixedPole.prototype.tic = function(step) {};
+  FixedPole.prototype.size = 20;
+
+  FixedPole.prototype.tic = function(step) {
+    return this.size = window.vars.polesize;
+  };
 
   return FixedPole;
 
@@ -392,20 +397,27 @@ Board = (function() {
   };
 
   function Board(canvas) {
-    var name, vars, _i, _len;
+    var name, vars, _fn, _i, _len;
     this.canvas = canvas;
     window.context = this.canvas.getContext("2d");
     window.vars = {};
-    vars = ['rest'];
+    vars = ['rest', 'polesize'];
+    _fn = function() {
+      var n,
+        _this = this;
+      n = name;
+      return $(".control#" + name + " input").bind('change', function(event) {
+        var value;
+        window.e = event;
+        value = Math.max(0.1, parseInt(event.target.value) / parseInt(event.target.dataset.divisor || 1));
+        event.target.parentElement.querySelector('span').innerHTML = value;
+        return window.vars[n] = value;
+      });
+    };
     for (_i = 0, _len = vars.length; _i < _len; _i++) {
       name = vars[_i];
-      window.vars[name] = $(".control#" + name + " input").attr('value');
-      $(".control#" + name + " input").bind('change', function(event) {
-        var value;
-        value = Math.max(0.1, event.target.value / 100);
-        event.target.parentElement.querySelector('span').innerHTML = value;
-        return window.vars[name] = value;
-      });
+      window.vars[name] = parseInt($(".control#" + name + " input").attr('value'));
+      _fn();
     }
     this.state = [];
   }
