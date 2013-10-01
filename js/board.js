@@ -74,7 +74,6 @@ painter = {
       options = {};
     }
     this.applyCanvasOptions(context, options);
-    angle = 0;
     context.save();
     context.translate(center.x, center.y);
     context.rotate(angle);
@@ -224,23 +223,23 @@ Drawable = (function() {
   Drawable.prototype.mass = 1;
 
   Drawable.prototype.position = {
-    x: null,
-    y: null
+    x: 0,
+    y: 0
   };
 
-  Drawable.prototype.velocity = {
-    x: null,
-    y: null
+  Drawable.prototype.vel = {
+    x: 0,
+    y: 0
   };
 
-  Drawable.prototype.acceleration = {
-    x: null,
-    y: null
+  Drawable.prototype.acc = {
+    x: 0,
+    y: 0
   };
 
   Drawable.prototype.shift = {
-    x: null,
-    y: null
+    x: 0,
+    y: 0
   };
 
   Drawable.prototype.angle = 0;
@@ -264,6 +263,7 @@ Drawable = (function() {
     this.vel.x = (Math.random() > (typeof 0.5 === "function" ? 0.5({
       1: -1
     }) : void 0)) * 100 * Math.random();
+    console.log(this.vel.y);
     this.vel.y = 0.1 * Math.random() - 0.1 / 2;
     this.defineWalk();
   }
@@ -273,11 +273,7 @@ Drawable = (function() {
   };
 
   Drawable.prototype.defineWalk = function() {
-    var max;
     console.log('Defining twalk.');
-    max = 0.1;
-    this.vel.x = max * Math.random() - max / 2;
-    this.vel.y = max * Math.random() - max / 2;
     return this.twalk = Math.max(100, 200 * Math.random());
   };
 
@@ -318,10 +314,7 @@ Triangle = (function(_super) {
   Triangle.prototype.size = 10;
 
   function Triangle(position) {
-    var r3;
     this.position = position;
-    this.size = 30;
-    r3 = Math.sqrt(3);
     this.p1 = {
       x: 0,
       y: -1.154700 * this.size
@@ -397,7 +390,7 @@ Square = (function(_super) {
       y: this.size
     }, this.angle, {
       color: this.color,
-      fill: false,
+      fill: true,
       width: 1
     });
   };
@@ -411,7 +404,7 @@ Bot = (function(_super) {
 
   Bot.prototype.type = 'Bot';
 
-  Bot.prototype.color = 'red';
+  Bot.prototype.color = '#A2A';
 
   Bot.prototype.multipliers = {
     'Bot': -2,
@@ -420,7 +413,7 @@ Bot = (function(_super) {
 
   Bot.prototype.size = 10;
 
-  Bot.prototype.angularSpeed = .0001;
+  Bot.prototype.angularSpeed = .002;
 
   function Bot(position) {
     this.position = position;
@@ -449,7 +442,7 @@ FixedPole = (function(_super) {
 
   FixedPole.prototype.color = "#08e";
 
-  FixedPole.prototype.size = 50;
+  FixedPole.prototype.size = 20;
 
   FixedPole.prototype.angularSpeed = .0002;
 

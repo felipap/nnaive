@@ -40,7 +40,6 @@ painter =
 
 	drawCenteredPolygon : (context, center, points, angle=0, options={}) ->
 		this.applyCanvasOptions(context, options)
-		angle = 0
 		context.save()
 		context.translate(center.x, center.y)
 		context.rotate(angle)
@@ -141,10 +140,10 @@ class Drawable
 	type: 'Drawable'
 	multipliers: {}
 	mass : 1
-	position : {x:null, y:null}
-	velocity : {x:null, y:null}
-	acceleration : {x:null, y:null}
-	shift: {x:null, y:null}
+	position : {x:0, y:0}
+	vel : {x:0, y:0}
+	acc : {x:0, y:0}
+	shift: {x:0, y:0}
 	angle: 0
 	angularSpeed: 0
 	twalk: 0
@@ -156,6 +155,7 @@ class Drawable
 		angle = Math.random()*Math.PI*2
 		# @shift = {x: Math.cos(angle)*speed, y: Math.sin(angle)*speed}
 		@vel.x = (Math.random()>0.5?1:-1)*100*Math.random()
+		console.log(@vel.y)
 		@vel.y = 0.1*Math.random()-0.1/2
 		
 		@defineWalk()
@@ -165,9 +165,9 @@ class Drawable
 
 	defineWalk: ->
 		console.log('Defining twalk.')
-		max = 0.1
-		@vel.x = max*Math.random()-max/2
-		@vel.y = max*Math.random()-max/2
+		# max = 0.1
+		# @vel.x = max*Math.random()-max/2
+		# @vel.y = max*Math.random()-max/2
 		@twalk = Math.max(100, 200*Math.random())
 
 	tic: (step) ->
@@ -205,8 +205,6 @@ class Triangle extends Drawable
 	size: 10
 
 	constructor: (@position) ->
-		@size = 30
-		r3 = Math.sqrt(3)
 		@p1 = {x: 0, y: -1.154700*@size}
 		@p2 = {x: -@size, y: 0.5773*@size}
 		@p3 = {x: @size, y: 0.5773*@size}
@@ -240,15 +238,15 @@ class Square extends Drawable
 		super
 
 	render: (context) =>
-		painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:@color, fill:false, width:1})
+		painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:@color, fill:true, width:1})
 
 class Bot extends Square
 	
 	type: 'Bot'
-	color: 'red'
+	color: '#A2A'
 	multipliers: {'Bot': -2,'FixedPole': -1}
 	size: 10
-	angularSpeed: .0001
+	angularSpeed: .002
 
 	constructor: (@position) ->
 		super
@@ -262,7 +260,7 @@ class Bot extends Square
 class FixedPole extends Triangle
 
 	color: "#08e"
-	size: 50
+	size: 20
 	angularSpeed: .0002
 
 	tic: (step) ->
