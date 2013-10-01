@@ -7,7 +7,7 @@ painter =
 			if 'color' of options then context.fillStyle = options.color
 		else
 			if 'color' of options then context.strokeStyle = options.color
-			if 'width' of options then context.lineWidth = options.width
+			context.lineWidth = options.width or 1
 
 	###### Canvas manipulation functions
 
@@ -29,9 +29,9 @@ painter =
 	drawTriangle : (context, p1, p2, p3, options={}) ->
 		this.applyCanvasOptions(context, options)
 		context.beginPath()
-		context.moveTo p1.x, p1.y
-		context.lineTo p2.x, p2.y
-		context.lineTo p3.x, p3.y
+		context.moveTo(p1.x, p1.y)
+		context.lineTo(p2.x, p2.y)
+		context.lineTo(p3.x, p3.y)
 		context.closePath()
 		context.stroke()
 
@@ -131,8 +131,8 @@ getResultant = (m, objects, distDecay=2, reppel=2) ->
 			fy += dfy * multiplier
 
 	# Draw resultant.
-	painter.drawLine(context, m.position, {x: m.position.x+fx*10000, y: m.position.y+fy*10000}, {color: "red"})
-	return {x: fx, y: fy, angle: Math.atan(dy/dx)}
+	painter.drawLine(context, m.position, {x: m.position.x+fx*10000000, y: m.position.y+fy*10000000}, {color: "red"})
+	return {x: fx, y: fy, angle: (if fx then Math.atan(fy/fx) else 0)+(if fx<0 then Math.PI else 0)}
 
 class Drawable
 	type: 'Drawable'
@@ -146,12 +146,10 @@ class Drawable
 		@vel = {x:0, y:0}
 		@acc = {x:0, y:0}
 		@twalk = 0
-		
-		angle = Math.random()*Math.PI*2
-		@vel.x = (Math.random()>0.5?1:-1)*100*Math.random()
-		@vel.y = (Math.random()>0.5?1:-1)*100*Math.random()
-		
+		@angle = Math.random()*Math.PI*2
+
 		@defineWalk()
+		
 		@factor = {x: Math.random()>0.5?1:-1, y:Math.random()>0.5?1:-1}
 	
 	getMultiplier: (obj) ->
@@ -164,7 +162,9 @@ class Drawable
 		max = 0.05
 		@vel.x = max*Math.random()-max/2
 		@vel.y = max*Math.random()-max/2
-		@twalk = Math.max(100, Math.floor(200*Math.random()))
+		@angularSpeed *= (if @vel.x<0 then -1 else 1)
+		@twalk = Math.max(50, Math.floor(500*Math.random()))
+		@angularSpeed = mm(0.00001, Math.random()*0.00001, 0.00002)
 
 	tic: (step) ->
 		step = window.vars.step # 100
@@ -176,22 +176,28 @@ class Drawable
 		@acc.x *= 1/@mass # add multipliers here
 		@acc.y *= 1/@mass
 		# Update velocity with average acceleration
-		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 10
-		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 10
+		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 100
+		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 100
 
 		wholevel = Math.sqrt(@vel.x*@vel.x + @vel.y*@vel.y)
 		# # console.log(@angle, '\t', Math.sin(@angle))
-		@vel.x = 0.99*@vel.x+0.01*wholevel*Math.cos(@angle)#*(@vel.x>0?1:-1)
-		@vel.y = 0.99*@vel.y+0.01*wholevel*Math.sin(@angle)#*(@vel.y>0?1:-1)
+		@vel.x = 1*@vel.x+0.01*wholevel*Math.cos(@angle)#*(@vel.x>0?1:-1)
+		@vel.y = 1*@vel.y+0.01*wholevel*Math.sin(@angle)#*(@vel.y>0?1:-1)
 		if not @twalk--
 			@defineWalk()
+		# if @ is lastAdded
+		# 	console.log(@acc.angle)
+		@angle += (@acc.angle-@angle)*.2
+		# @angle += -@angularSpeed * step * window.vars.anglemom # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
 
+		# Eat, please.
+		# for p in food
+
+		# Bounce, please.
 		if canvas.height - @position.y < 10 or @position.y < 10
-			@vel.y *= -1
+			@vel.y *= -0.5
 		if canvas.width - @position.x < 10 or @position.x < 10
-			@vel.x *= -1
-
-		@angle += @angularSpeed * step * window.vars.anglemom # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
+			@vel.x *= -0.5
 		
 		# Limit particle to canvas bounds.
 		@position.x = mm(0, @position.x, window.canvas.width)
@@ -202,45 +208,47 @@ class Drawable
 class Triangle extends Drawable
 
 	constructor: (@position) ->
-		@p1 = {x: 0, y: -1.154700*@size}
-		@p2 = {x: -@size, y: 0.5773*@size}
-		@p3 = {x: @size, y: 0.5773*@size}
 	
-	setPoints: (@p1, @p2, @p3) ->
-
 	tic: (step) ->
 
 	render: (context) ->
-		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:@color, width:1})
+		@p1 = {x: 0, y: -1.154700*@size}
+		@p2 = {x: -@size, y: 0.5773*@size}
+		@p3 = {x: @size, y: 0.5773*@size}
+		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:@color})
 
 class Circle extends Drawable
 	
-	constructor: (@position) ->
+	color: "black"
+	size: 10
 
 	render: (context) ->
-		painter.drawCircle(context, @position, @size, {color: @color, fill: true})
+		# painter.drawCircle(context, @position, @size, {color: @color, fill: true})
+		painter.drawCircle(context, @position, @size, {color: '#AD0', fill: true})
+		
+		@p1 = {x: @size/2, y: 0}
+		@p2 = {x: -@size*2/3, y: @size/3}
+		@p3 = {x: -@size*2/3, y: -@size/3}
+
+		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:'black', fill:true})
 
 window.lastAdded = null
 
 class Square extends Drawable
 
-	type: 'Square'
-	endPoint: null
 	color: "black"
 	size: 15
 
-	constructor: (@position) ->
-		super
-
 	render: (context) =>
-		painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:@color, fill:true, width:1})
+		painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:@color, fill:true})
+		# painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:'white', fill:false, width:1})
 
-class Bot extends Square
+class Bot extends Circle
 	
 	type: 'Bot'
 	color: '#A2A'
-	multipliers: {'Bot': -1,'FixedPole': .5}
-	size: 10
+	multipliers: {'Bot': 0.01,'FixedPole': .5}
+	size: 20
 	angularSpeed: .00001
 
 	constructor: (@position) ->
@@ -256,7 +264,7 @@ class FixedPole extends Triangle
 
 	type: 'FixedPole'
 	color: "#08e"
-	size: 10
+	size: 30
 	angularSpeed: .0002
 
 	tic: (step) ->
@@ -276,7 +284,7 @@ class Board
 		window.context = @canvas.getContext("2d")
 		
 		window.vars = {}
-		vars = ['rest', 'polesize', 'anglemom', 'step']
+		vars = _.map($(".control"), (i)-> i.id );
 		for name in vars
 			window.vars[name] = parseInt($(".control#"+name+" input").attr('value'))
 			do ->
@@ -294,7 +302,7 @@ class Board
 			item.render(context)
 
 	tic: (step) ->
-		# context.clearRect(0, 0, @canvas.width, @canvas.height)
-		painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.05)", fill:true})
+		context.clearRect(0, 0, @canvas.width, @canvas.height)
+		#painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.1)", fill:true})
 		for item in @state
 			item.tic(step)
