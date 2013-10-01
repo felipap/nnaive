@@ -19,18 +19,6 @@ painter = {
       }
     }
   },
-  fillCircle: function(context, position, radius, options) {
-    if (radius == null) {
-      radius = 2;
-    }
-    if (options == null) {
-      options = {};
-    }
-    this.applyCanvasOptions(context, options);
-    context.beginPath();
-    context.arc(position.x, position.y, radius, 0, 2 * Math.PI, true);
-    return context.fill();
-  },
   drawCircle: function(context, position, radius, options) {
     if (radius == null) {
       radius = 2;
@@ -41,7 +29,11 @@ painter = {
     this.applyCanvasOptions(context, options);
     context.beginPath();
     context.arc(position.x, position.y, radius, 0, 2 * Math.PI, true);
-    return context.stroke();
+    if (options.fill) {
+      return context.fill();
+    } else {
+      return context.stroke();
+    }
   },
   drawLine: function(context, p1, p2, options) {
     if (options == null) {
@@ -195,12 +187,13 @@ getResultant = function(m, objects, distDecay, reppel) {
       width: mm(0, F * 5000, 200)
     });
     multiplier = m.getMultiplier(obj);
-    if (d2 < Math.pow(obj.size + m.size, 2) * 2) {
-      dfx = -reppel * dfx;
-      dfy = -reppel * dfy;
+    if (d2 < Math.pow(obj.size + m.size, 2)) {
+      fx += -reppel * dfx;
+      fy += -reppel * dfy;
+    } else {
+      fx += dfx * multiplier;
+      fy += dfy * multiplier;
     }
-    fx += dfx * multiplier;
-    fy += dfy * multiplier;
   }
   painter.drawLine(context, m.position, {
     x: m.position.x + fx * 10000,
@@ -222,31 +215,14 @@ Drawable = (function() {
 
   Drawable.prototype.mass = 1;
 
+  Drawable.prototype.angle = 0;
+
   Drawable.prototype.position = {
     x: 0,
     y: 0
   };
 
-  Drawable.prototype.vel = {
-    x: 0,
-    y: 0
-  };
-
-  Drawable.prototype.acc = {
-    x: 0,
-    y: 0
-  };
-
-  Drawable.prototype.shift = {
-    x: 0,
-    y: 0
-  };
-
-  Drawable.prototype.angle = 0;
-
   Drawable.prototype.angularSpeed = 0;
-
-  Drawable.prototype.twalk = 0;
 
   function Drawable(position) {
     var angle;
@@ -259,27 +235,44 @@ Drawable = (function() {
       x: 0,
       y: 0
     };
+    this.twalk = 0;
     angle = Math.random() * Math.PI * 2;
     this.vel.x = (Math.random() > (typeof 0.5 === "function" ? 0.5({
       1: -1
     }) : void 0)) * 100 * Math.random();
-    console.log(this.vel.y);
-    this.vel.y = 0.1 * Math.random() - 0.1 / 2;
+    this.vel.y = (Math.random() > (typeof 0.5 === "function" ? 0.5({
+      1: -1
+    }) : void 0)) * 100 * Math.random();
     this.defineWalk();
+    this.factor = {
+      x: Math.random() > (typeof 0.5 === "function" ? 0.5({
+        1: -1,
+        y: Math.random() > (typeof 0.5 === "function" ? 0.5({
+          1: -1
+        }) : void 0)
+      }) : void 0)
+    };
   }
 
   Drawable.prototype.getMultiplier = function(obj) {
-    return this.multipliers[obj.type] || 1;
+    if (obj.type in this.multipliers) {
+      return this.multipliers[obj.type];
+    }
+    return 1;
   };
 
   Drawable.prototype.defineWalk = function() {
+    var max;
     console.log('Defining twalk.');
-    return this.twalk = Math.max(100, 200 * Math.random());
+    max = 0.05;
+    this.vel.x = max * Math.random() - max / 2;
+    this.vel.y = max * Math.random() - max / 2;
+    return this.twalk = Math.max(100, Math.floor(200 * Math.random()));
   };
 
   Drawable.prototype.tic = function(step) {
     var wholevel;
-    step = 200;
+    step = window.vars.step;
     this._acc = {
       x: this.acc.x,
       y: this.acc.y
@@ -289,15 +282,21 @@ Drawable = (function() {
     this.acc = getResultant(this, game.board.state);
     this.acc.x *= 1 / this.mass;
     this.acc.y *= 1 / this.mass;
-    this.vel.x += (this._acc.x + this.acc.x) / 2 * step * window.vars.rest / 1000;
-    this.vel.y += (this._acc.y + this.acc.y) / 2 * step * window.vars.rest / 1000;
+    this.vel.x += (this._acc.x + this.acc.x) / 2 * step * window.vars.rest / 10;
+    this.vel.y += (this._acc.y + this.acc.y) / 2 * step * window.vars.rest / 10;
     wholevel = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
-    this.vel.x = wholevel * Math.cos(this.angle);
-    this.vel.y = wholevel * Math.sin(this.angle);
+    this.vel.x = 0.99 * this.vel.x + 0.01 * wholevel * Math.cos(this.angle);
+    this.vel.y = 0.99 * this.vel.y + 0.01 * wholevel * Math.sin(this.angle);
     if (!this.twalk--) {
       this.defineWalk();
     }
-    this.angle += this.angularSpeed * step;
+    if (canvas.height - this.position.y < 10 || this.position.y < 10) {
+      this.vel.y *= -1;
+    }
+    if (canvas.width - this.position.x < 10 || this.position.x < 10) {
+      this.vel.x *= -1;
+    }
+    this.angle += this.angularSpeed * step * window.vars.anglemom;
     this.position.x = mm(0, this.position.x, window.canvas.width);
     return this.position.y = mm(0, this.position.y, window.canvas.height);
   };
@@ -310,8 +309,6 @@ Drawable = (function() {
 
 Triangle = (function(_super) {
   __extends(Triangle, _super);
-
-  Triangle.prototype.size = 10;
 
   function Triangle(position) {
     this.position = position;
@@ -351,14 +348,15 @@ Triangle = (function(_super) {
 Circle = (function(_super) {
   __extends(Circle, _super);
 
-  Circle.prototype.size = 20;
-
   function Circle(position) {
     this.position = position;
   }
 
   Circle.prototype.render = function(context) {
-    return painter.drawCircle(context, this.position, this.size);
+    return painter.drawCircle(context, this.position, this.size, {
+      color: this.color,
+      fill: true
+    });
   };
 
   return Circle;
@@ -407,13 +405,13 @@ Bot = (function(_super) {
   Bot.prototype.color = '#A2A';
 
   Bot.prototype.multipliers = {
-    'Bot': -2,
-    'FixedPole': -1
+    'Bot': -1,
+    'FixedPole': .5
   };
 
   Bot.prototype.size = 10;
 
-  Bot.prototype.angularSpeed = .002;
+  Bot.prototype.angularSpeed = .00001;
 
   function Bot(position) {
     this.position = position;
@@ -440,9 +438,11 @@ FixedPole = (function(_super) {
     return _ref;
   }
 
+  FixedPole.prototype.type = 'FixedPole';
+
   FixedPole.prototype.color = "#08e";
 
-  FixedPole.prototype.size = 20;
+  FixedPole.prototype.size = 10;
 
   FixedPole.prototype.angularSpeed = .0002;
 
@@ -466,7 +466,7 @@ Board = (function() {
     this.canvas = canvas;
     window.context = this.canvas.getContext("2d");
     window.vars = {};
-    vars = ['rest', 'polesize'];
+    vars = ['rest', 'polesize', 'anglemom', 'step'];
     _fn = function() {
       var n,
         _this = this;
@@ -507,7 +507,7 @@ Board = (function() {
       x: this.canvas.width,
       y: this.canvas.height
     }, 0, {
-      color: "rgba(255,255,255,.02)",
+      color: "rgba(255,255,255,.05)",
       fill: true
     });
     _ref1 = this.state;

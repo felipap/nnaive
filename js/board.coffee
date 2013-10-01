@@ -10,17 +10,14 @@ painter =
 			if 'width' of options then context.lineWidth = options.width
 
 	###### Canvas manipulation functions
-	fillCircle : (context, position, radius=2, options={}) ->
-		this.applyCanvasOptions(context, options)
-		context.beginPath()
-		context.arc(position.x, position.y, radius, 0, 2*Math.PI, true)
-		context.fill()
 
 	drawCircle : (context, position, radius=2, options={}) ->
 		this.applyCanvasOptions(context, options)
 		context.beginPath()
 		context.arc(position.x, position.y, radius, 0, 2*Math.PI, true)
-		context.stroke()
+		if options.fill
+			context.fill()
+		else context.stroke()
 
 	drawLine : (context, p1, p2, options={}) ->
 		this.applyCanvasOptions(context, options)
@@ -124,14 +121,15 @@ getResultant = (m, objects, distDecay=2, reppel=2) ->
 		painter.drawLine(context, m.position, obj.position, {color: "grey", width: mm(0, F*5000,200)})
 		# Multiplier
 		multiplier = m.getMultiplier(obj)
-		# Test if too close.
-		if d2 < Math.pow(obj.size+m.size,2)*2
+		# Test if too close
+		if d2 < Math.pow(obj.size+m.size,2)
 			# console.log('too close', obj.size, m.size, Math.pow(obj.size+m.size,2), d2)
-			dfx = -reppel*dfx
-			dfy = -reppel*dfy
-		# Update projections.
-		fx += dfx * multiplier
-		fy += dfy * multiplier
+			fx += -reppel*dfx
+			fy += -reppel*dfy
+		else  
+			fx += dfx * multiplier
+			fy += dfy * multiplier
+
 	# Draw resultant.
 	painter.drawLine(context, m.position, {x: m.position.x+fx*10000, y: m.position.y+fy*10000}, {color: "red"})
 	return {x: fx, y: fy, angle: Math.atan(dy/dx)}
@@ -140,39 +138,36 @@ class Drawable
 	type: 'Drawable'
 	multipliers: {}
 	mass : 1
-	position : {x:0, y:0}
-	vel : {x:0, y:0}
-	acc : {x:0, y:0}
-	shift: {x:0, y:0}
 	angle: 0
+	position: {x:0, y:0}
 	angularSpeed: 0
-	twalk: 0
 	
 	constructor: (@position) ->
-		@vel =	{x: 0, y: 0}
-		@acc = {x: 0, y: 0}
-
+		@vel = {x:0, y:0}
+		@acc = {x:0, y:0}
+		@twalk = 0
+		
 		angle = Math.random()*Math.PI*2
-		# @shift = {x: Math.cos(angle)*speed, y: Math.sin(angle)*speed}
 		@vel.x = (Math.random()>0.5?1:-1)*100*Math.random()
-		console.log(@vel.y)
-		@vel.y = 0.1*Math.random()-0.1/2
+		@vel.y = (Math.random()>0.5?1:-1)*100*Math.random()
 		
 		@defineWalk()
+		@factor = {x: Math.random()>0.5?1:-1, y:Math.random()>0.5?1:-1}
 	
 	getMultiplier: (obj) ->
-		return @multipliers[obj.type] or 1
+		if obj.type of @multipliers
+			return @multipliers[obj.type]
+		return 1
 
 	defineWalk: ->
 		console.log('Defining twalk.')
-		# max = 0.1
-		# @vel.x = max*Math.random()-max/2
-		# @vel.y = max*Math.random()-max/2
-		@twalk = Math.max(100, 200*Math.random())
+		max = 0.05
+		@vel.x = max*Math.random()-max/2
+		@vel.y = max*Math.random()-max/2
+		@twalk = Math.max(100, Math.floor(200*Math.random()))
 
 	tic: (step) ->
-		step = 200
-
+		step = window.vars.step # 100
 		# Verlet Integration
 		@_acc = {x: @acc.x, y: @acc.y}
 		@position.x += @vel.x*step+(0.5*@_acc.x*step*step)
@@ -181,18 +176,22 @@ class Drawable
 		@acc.x *= 1/@mass # add multipliers here
 		@acc.y *= 1/@mass
 		# Update velocity with average acceleration
-		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 1000
-		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 1000
+		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 10
+		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 10
 
 		wholevel = Math.sqrt(@vel.x*@vel.x + @vel.y*@vel.y)
-		# console.log(@angle, '\t', Math.sin(@angle))
-		@vel.x = wholevel*Math.cos(@angle)
-		@vel.y = wholevel*Math.sin(@angle)
-
+		# # console.log(@angle, '\t', Math.sin(@angle))
+		@vel.x = 0.99*@vel.x+0.01*wholevel*Math.cos(@angle)#*(@vel.x>0?1:-1)
+		@vel.y = 0.99*@vel.y+0.01*wholevel*Math.sin(@angle)#*(@vel.y>0?1:-1)
 		if not @twalk--
 			@defineWalk()
 
-		@angle += @angularSpeed * step # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
+		if canvas.height - @position.y < 10 or @position.y < 10
+			@vel.y *= -1
+		if canvas.width - @position.x < 10 or @position.x < 10
+			@vel.x *= -1
+
+		@angle += @angularSpeed * step * window.vars.anglemom # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
 		
 		# Limit particle to canvas bounds.
 		@position.x = mm(0, @position.x, window.canvas.width)
@@ -201,8 +200,6 @@ class Drawable
 	render: (context) ->
 
 class Triangle extends Drawable
-
-	size: 10
 
 	constructor: (@position) ->
 		@p1 = {x: 0, y: -1.154700*@size}
@@ -218,12 +215,10 @@ class Triangle extends Drawable
 
 class Circle extends Drawable
 	
-	size: 20
-	
 	constructor: (@position) ->
 
 	render: (context) ->
-		painter.drawCircle(context, @position, @size)
+		painter.drawCircle(context, @position, @size, {color: @color, fill: true})
 
 window.lastAdded = null
 
@@ -244,9 +239,9 @@ class Bot extends Square
 	
 	type: 'Bot'
 	color: '#A2A'
-	multipliers: {'Bot': -2,'FixedPole': -1}
+	multipliers: {'Bot': -1,'FixedPole': .5}
 	size: 10
-	angularSpeed: .002
+	angularSpeed: .00001
 
 	constructor: (@position) ->
 		super
@@ -259,8 +254,9 @@ class Bot extends Square
 
 class FixedPole extends Triangle
 
+	type: 'FixedPole'
 	color: "#08e"
-	size: 20
+	size: 10
 	angularSpeed: .0002
 
 	tic: (step) ->
@@ -280,7 +276,7 @@ class Board
 		window.context = @canvas.getContext("2d")
 		
 		window.vars = {}
-		vars = ['rest', 'polesize']
+		vars = ['rest', 'polesize', 'anglemom', 'step']
 		for name in vars
 			window.vars[name] = parseInt($(".control#"+name+" input").attr('value'))
 			do ->
@@ -299,6 +295,6 @@ class Board
 
 	tic: (step) ->
 		# context.clearRect(0, 0, @canvas.width, @canvas.height)
-		painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.02)", fill:true})
+		painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.05)", fill:true})
 		for item in @state
 			item.tic(step)
