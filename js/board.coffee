@@ -48,28 +48,32 @@ painter =
 		context.rect(p1.x, p1.y, p2.x-p1.x, p2.y-p2.y)
 		context.stroke()
 
-	# fillRectangle : (context, p1, p2, color="black") ->
-	# 	context.fillStyle = color
-	# 	context.fillRect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
-
-	fillRectangle : (context, point, size, color="black", angle=0) ->
+	fillRectangle : (context, p1, p2, color="black", angle=0) ->
 		context.fillStyle = color
 		if angle
 			context.save()
 			context.translate(point.x, point.y) # Translate center of canvas to center of figure.
 			context.rotate(angle)
-			context.fillRect(-size/2, -size/2, size, size)
+			context.fillRect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
 			context.restore()
 		else # optimize for angle=0?
-			context.fillRect(point.x-size/2, point.y-size/2, size, size)
+			context.fillRect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
 
-mm = (min, num, max) -> # min max
+	fillCenteredRect : (context, point, size, color="black", angle=0) ->
+		context.fillStyle = color
+		if angle
+			context.save()
+			context.translate(point.x, point.y) # Translate center of canvas to center of figure.
+			context.rotate(angle)
+			context.fillRect(-size.x/2, -size.y/2, size.x, size.y)
+			context.restore()
+		else # optimize for angle=0?
+			context.fillRect(point.x-size.x/2, point.y-size.y/2, size.x, size.y)
+
+mm = (min, num, max) -> # restricts num to min max bounds.
 	Math.max(min, Math.min(max, num))
 
-xy = (x,y) -> x:x, y:y
-
-
-getResultant = (m, objects) ->
+getResultant = (m, objects, distDecay=2, reppel=2) ->
 	fx = fy = 0
 	for obj in objects when obj isnt m
 		# Delta calculations. 
@@ -78,10 +82,10 @@ getResultant = (m, objects) ->
 		# Vector direction corrections.
 		rx = if dx > 0 then -1 else 1
 		ry = if dy > 0 then -1 else 1
-		# Distance calculation.
+		# Distance calculation. (squared)
 		d2 = Math.pow(m.position.x-obj.position.x,2)+Math.pow(m.position.y-obj.position.y,2)
-		# Force is inversely proportional to the distance².
-		F = 1/d2
+		# Force is inversely proportional to the distance^distDecay.
+		F = 1/(if distDecay is 2 then d2 else Math.pow(d2,distDecay/2)) 
 		# Calculate vector projections. (update to shortcut functions?)
 		alpha = Math.atan(dy/dx)
 		dfx = Math.abs(Math.cos(alpha))*F*rx
@@ -91,16 +95,16 @@ getResultant = (m, objects) ->
 		# Multiplier
 		multiplier = m.getMultiplier(obj)
 		# Test if too close.
-		if d2 < Math.pow(obj.size+m.size,2)
+		if d2 < Math.pow(obj.size+m.size,2)*2
 			# console.log('too close', obj.size, m.size, Math.pow(obj.size+m.size,2), d2)
-			dfx = -2*dfx
-			dfy = -2*dfy
+			dfx = -reppel*dfx
+			dfy = -reppel*dfy
 		# Update projections.
 		fx += dfx * multiplier
 		fy += dfy * multiplier
 	# Draw resultant.
 	painter.drawLine(context, m.position, {x: m.position.x+fx*10000, y: m.position.y+fy*10000}, 1, "red")
-	return {x: fx, y: fy}
+	return {x: fx, y: fy, angle: Math.atan(dy/dx)}
 
 class Drawable
 	type: 'Drawable'
@@ -112,38 +116,55 @@ class Drawable
 	shift: {x:null, y:null}
 	angle: 0
 	angularSpeed: 0
+	twalk: 0
 	
 	constructor: (@position) ->
-		@velocity =	{x: 0, y: 0}
-		@acceleration = {x: 0, y: 0}
+		@vel =	{x: 0, y: 0}
+		@acc = {x: 0, y: 0}
 
-		# angle = Math.random()*Math.PI*2
+		angle = Math.random()*Math.PI*2
 		# speed = 0
 		# @shift = {x: Math.cos(angle)*speed, y: Math.sin(angle)*speed}
+		@vel.x = (Math.random()>0.5?1:-1)*100*Math.random()
+		# @vel.y = 0.1*Math.random()-0.1/2
+		
+		@defineWalk()
 	
 	getMultiplier: (obj) ->
-		# console.log('getting', obj.type, @multipliers)
 		return @multipliers[obj.type] or 1
 
-	tic: (step) ->
-		step = 20
-		# Verlet Integration
-		@_acceleration = {x: @acceleration.x, y: @acceleration.y}
-		@position.x += @velocity.x*step+(0.5*@_acceleration.x*step*step)
-		@position.y += @velocity.y*step+(0.5*@_acceleration.y*step*step)
-		
-		@acceleration = getResultant(@, game.board.state)
-		@acceleration.x *= 1/@mass # add multipliers here
-		@acceleration.y *= 1/@mass
-		avg_acceleration =
-			x : (@_acceleration.x+@acceleration.x)/2
-			y : (@_acceleration.y+@acceleration.y)/2
-		
-		@velocity.x += avg_acceleration.x * step * window.vars.rest / 10
-		@velocity.y += avg_acceleration.y * step * window.vars.rest / 10
+	defineWalk: ->
+		console.log('Defining twalk.')
+		max = 0.1
+		@vel.x = max*Math.random()-max/2
+		@vel.y = max*Math.random()-max/2
+		@twalk = Math.max(100, 200*Math.random())
 
-		@angle += @angularSpeed * step * Math.pow(Math.abs(@velocity.x)+Math.abs(@velocity.y), 4) / @mass
+	tic: (step) ->
+		step = 200
+
+		# Verlet Integration
+		@_acc = {x: @acc.x, y: @acc.y}
+		@position.x += @vel.x*step+(0.5*@_acc.x*step*step)
+		@position.y += @vel.y*step+(0.5*@_acc.y*step*step)
+		@acc = getResultant(@, game.board.state)
+		@acc.x *= 1/@mass # add multipliers here
+		@acc.y *= 1/@mass
+		# Update velocity with average acceleration
+		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 1000
+		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 1000
+
+		wholevel = Math.sqrt(@vel.x*@vel.x + @vel.y*@vel.y)
+		# console.log(@angle, '\t', Math.sin(@angle))
+		@vel.x = wholevel*Math.cos(@angle)
+		@vel.y = wholevel*Math.sin(@angle)
+
+		if not @twalk--
+			@defineWalk()
+
+		@angle += @angularSpeed * step # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
 		
+		# Limit particle to canvas bounds.
 		@position.x = mm(0, @position.x, window.canvas.width)
 		@position.y = mm(0, @position.y, window.canvas.height)
 
@@ -192,19 +213,15 @@ class Square extends Drawable
 		super
 
 	render: (context) =>
-		vertex1 = {x: @position.x-@size, y: @position.y-@size}
-		vertex2 = {x: @position.x+@size, y: @position.y+@size}
-		painter.fillRectangle(context, @position, @size, @color, @angle)
+		painter.fillCenteredRect(context, @position, {x:@size,y:@size}, @color, @angle)
 
 class Bot extends Square
 	
 	type: 'Bot'
-	multipliers: [ 
-		'Bot': -2,
-		'FixedPole': -1,
-	]
-	color: "red"
-	angularSpeed: 2
+	color: 'red'
+	multipliers: {'Bot': -2,'FixedPole': -1}
+	size: 10
+	angularSpeed: .0001
 
 	constructor: (@position) ->
 		super
@@ -218,7 +235,7 @@ class Bot extends Square
 class FixedPole extends Circle
 
 	color: "#08e"
-	size: 20
+	size: 50
 
 	tic: (step) ->
 		@size = window.vars.polesize
@@ -253,6 +270,7 @@ class Board
 			item.render(context)
 
 	tic: (step) ->
-		context.clearRect(0, 0, @canvas.width, @canvas.height)
+		#context.clearRect(0, 0, @canvas.width, @canvas.height)
+		painter.fillRectangle(context, {x:0,y:0},{x:@canvas.width,y:@canvas.height}, "rgba(255,255,255,.02)")
 		for item in @state
 			item.tic(step)
