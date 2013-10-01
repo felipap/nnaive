@@ -52,17 +52,6 @@ painter =
 	# 	context.fillStyle = color
 	# 	context.fillRect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
 
-	# fillRectangle : (context, p1, p2, color="black", angle=0) ->
-	# 	context.fillStyle = color
-	# 	if angle
-	# 		context.save()
-	# 		context.translate(p1.x+10, p1.y+10) # Translate center of canvas to center of figure.
-	# 		context.rotate(angle)
-	# 		context.fillRect(-10, -10, 20, 20)
-	# 		context.restore()
-	# 	else
-	# 		context.fillRect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
-
 	fillRectangle : (context, point, size, color="black", angle=0) ->
 		context.fillStyle = color
 		if angle
@@ -99,21 +88,22 @@ getResultant = (m, objects) ->
 		alpha = Math.atan(dy/dx)
 		dfx = Math.abs(Math.cos(alpha))*F*rx
 		dfy = Math.abs(Math.sin(alpha))*F*ry
-		# obj.getMultiplier( )
+		# Multiplier
+		multiplier = m.getMultiplier(obj)
 		# Test if too close.
 		if d2 < Math.pow(obj.size+m.size,2)
 			dfx = -dfx
 			dfy = -dfy
 		# Update projections.
-		fx += dfx
-		fy += dfy
+		fx += dfx * multiplier
+		fy += dfy * multiplier
 	# Draw resultant.
 	painter.drawLine(context, m.position, {x: m.position.x+fx*10000, y: m.position.y+fy*10000}, 1, "red")
 	return {x: fx, y: fy}
 
 class Drawable
 	type: 'Drawable'
-	multipliers = {}
+	multipliers: {}
 	mass : 1
 	position : {x:null, y:null}
 	velocity : {x:null, y:null}
@@ -130,14 +120,14 @@ class Drawable
 		# speed = 0
 		# @shift = {x: Math.cos(angle)*speed, y: Math.sin(angle)*speed}
 	
-	getMultiplier: (type) ->
-		return @multipliers[type]
+	getMultiplier: (obj) ->
+		console.log('getting', obj.type, @multipliers)
+		return @multipliers[obj.type] or 1
 
 	tic: (step) ->
 		step = 20
-		@mass = window.vars.mass
 		# Verlet Integration
-		@_acceleration = {x: @acceleration.x, y: @acceleration.y }
+		@_acceleration = {x: @acceleration.x, y: @acceleration.y}
 		@position.x += @velocity.x*step+(0.5*@_acceleration.x*step*step)
 		@position.y += @velocity.y*step+(0.5*@_acceleration.y*step*step)
 		
@@ -192,6 +182,7 @@ window.lastAdded = null
 
 class Square extends Drawable
 
+	type: 'Square'
 	endPoint: null
 	color: "black"
 	size: 15
@@ -206,12 +197,13 @@ class Square extends Drawable
 
 class Bot extends Square
 	
-	multipliers = [
-		Square:2,
-		FixedPole:-1,
+	type: 'Bot'
+	multipliers: [ 
+		'Bot': -2,
+		'FixedPole': -1,
 	]
 	color: "red"
-	@angularSpeed = 0.002
+	@angularSpeed: 0.002
 
 	constructor: (@position) ->
 		super
@@ -228,9 +220,8 @@ class FixedPole extends Circle
 
 	tic: (step) ->
 
-
-################################################################
-################################################################
+################################################################################
+################################################################################
 
 class Board
 
@@ -241,7 +232,7 @@ class Board
 		window.context = @canvas.getContext("2d")
 		
 		window.vars = {}
-		vars = ['rest', 'mass']
+		vars = ['rest']
 		for name in vars
 			window.vars[name] = $(".control#"+name+" input").attr('value');
 			$(".control#"+name+" input").bind 'change', (event) ->

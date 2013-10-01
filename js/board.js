@@ -121,7 +121,7 @@ xy = function(x, y) {
 };
 
 getResultant = function(m, objects) {
-  var F, alpha, d2, dfx, dfy, dx, dy, fx, fy, obj, rx, ry, _i, _len;
+  var F, alpha, d2, dfx, dfy, dx, dy, fx, fy, multiplier, obj, rx, ry, _i, _len;
   fx = fy = 0;
   for (_i = 0, _len = objects.length; _i < _len; _i++) {
     obj = objects[_i];
@@ -138,12 +138,13 @@ getResultant = function(m, objects) {
     alpha = Math.atan(dy / dx);
     dfx = Math.abs(Math.cos(alpha)) * F * rx;
     dfy = Math.abs(Math.sin(alpha)) * F * ry;
+    multiplier = m.getMultiplier(obj);
     if (d2 < Math.pow(obj.size + m.size, 2)) {
       dfx = -dfx;
       dfy = -dfy;
     }
-    fx += dfx;
-    fy += dfy;
+    fx += dfx * multiplier;
+    fy += dfy * multiplier;
   }
   painter.drawLine(context, m.position, {
     x: m.position.x + fx * 10000,
@@ -156,11 +157,9 @@ getResultant = function(m, objects) {
 };
 
 Drawable = (function() {
-  var multipliers;
-
   Drawable.prototype.type = 'Drawable';
 
-  multipliers = {};
+  Drawable.prototype.multipliers = {};
 
   Drawable.prototype.mass = 1;
 
@@ -200,14 +199,14 @@ Drawable = (function() {
     };
   }
 
-  Drawable.prototype.getMultiplier = function(type) {
-    return this.multipliers[type];
+  Drawable.prototype.getMultiplier = function(obj) {
+    console.log('getting', obj.type, this.multipliers);
+    return this.multipliers[obj.type] || 1;
   };
 
   Drawable.prototype.tic = function(step) {
     var avg_acceleration;
     step = 20;
-    this.mass = window.vars.mass;
     this._acceleration = {
       x: this.acceleration.x,
       y: this.acceleration.y
@@ -307,6 +306,8 @@ window.lastAdded = null;
 Square = (function(_super) {
   __extends(Square, _super);
 
+  Square.prototype.type = 'Square';
+
   Square.prototype.endPoint = null;
 
   Square.prototype.color = "black";
@@ -337,14 +338,14 @@ Square = (function(_super) {
 })(Drawable);
 
 Bot = (function(_super) {
-  var multipliers;
-
   __extends(Bot, _super);
 
-  multipliers = [
+  Bot.prototype.type = 'Bot';
+
+  Bot.prototype.multipliers = [
     {
-      Square: 2,
-      FixedPole: -1
+      'Bot': -2,
+      'FixedPole': -1
     }
   ];
 
@@ -395,7 +396,7 @@ Board = (function() {
     this.canvas = canvas;
     window.context = this.canvas.getContext("2d");
     window.vars = {};
-    vars = ['rest', 'mass'];
+    vars = ['rest'];
     for (_i = 0, _len = vars.length; _i < _len; _i++) {
       name = vars[_i];
       window.vars[name] = $(".control#" + name + " input").attr('value');
