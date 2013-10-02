@@ -272,11 +272,11 @@ Drawable = (function() {
     };
     this.position.x += this.vel.x * step + (0.5 * this._acc.x * step * step);
     this.position.y += this.vel.y * step + (0.5 * this._acc.y * step * step);
-    this.acc = getResultant(this, game.board.state, 3);
+    this.acc = getResultant(this, game.board.state);
     this.acc.x *= 1 / this.mass;
     this.acc.y *= 1 / this.mass;
-    this.vel.x += (this._acc.x + this.acc.x) / 2 * step * window.vars.rest / 100;
-    this.vel.y += (this._acc.y + this.acc.y) / 2 * step * window.vars.rest / 100;
+    this.vel.x += (this._acc.x + this.acc.x) / 2 * step * window.vars.rest;
+    this.vel.y += (this._acc.y + this.acc.y) / 2 * step * window.vars.rest;
     wholevel = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
     this.vel.x = 1 * this.vel.x + 0.01 * wholevel * Math.cos(this.angle);
     this.vel.y = 1 * this.vel.y + 0.01 * wholevel * Math.sin(this.angle);
