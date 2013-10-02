@@ -407,8 +407,8 @@ Bot = (function(_super) {
   Bot.prototype.color = '#A2A';
 
   Bot.prototype.multipliers = {
-    'Bot': 0.01,
-    'FixedPole': .5
+//    'Bot': 0.01,
+//    'FixedPole': .5
   };
 
   Bot.prototype.size = 20;
