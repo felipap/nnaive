@@ -178,20 +178,19 @@ class Drawable
 
 		@position.x += @vel.x*step # *(@_acc.x*step*step/2)
 		@position.y += @vel.y*step # *(@_acc.y*step*step/2)
-		@vel.x += @acc.x*0.2
-		@vel.y += @acc.y*0.2
+		@vel.x += @acc.x*0.05
+		@vel.y += @acc.y*0.05
 
 		@vel.x *= 0.9
 		@vel.y *= 0.9
 		
-		angle = if @acc.x then Math.atan2(@acc.y,@acc.x) else @angle
-		@angle = angle
+		angle = if @vel.x and @vel.y then Math.atan2(@vel.y,@vel.x) else @angle
+		@angle += angle*step/1000
+		console.log(angle, @angle)
 
 		# Bounce, please.
-		if canvas.height - @position.y < 0 or @position.y < 0
-			@vel.y *= -0.5
-		if canvas.width - @position.x < 0 or @position.x < 0
-			@vel.x *= -0.5
+		if canvas.height- @position.y < 0 or @position.y < 0 then @vel.y *= -0.5
+		if canvas.width - @position.x < 0 or @position.x < 0 then @vel.x *= -0.5
 		# Limit particle to canvas bounds.
 		@position.x = mm(0, @position.x, window.canvas.width)
 		@position.y = mm(0, @position.y, window.canvas.height)
@@ -258,7 +257,7 @@ class Circle extends Drawable
 	render: (context) ->
 		# painter.drawCircle(context, @position, @size, {color: @color, fill: true})
 		painter.drawCircle(context, @position, @size, {color: '#0D8', fill: true})
-		
+
 		@p1 = {x: @size/2, y: 0}
 		@p2 = {x: -@size*2/3, y: @size/3}
 		@p3 = {x: -@size*2/3, y: -@size/3}
@@ -290,23 +289,24 @@ class Bot extends Circle
 
 	tic: (step) ->
 		super
-		if @ is window.lastAdded
-			console.log
-
-		if window.leftPressed then @thrust.a = 0.2 else @thrust.a = 0
-		if window.upPressed then @thrust.b = 0.2 else @thrust.b = 0
-		if window.rightPressed then @thrust.c = 0.2 else @thrust.c = 0
-		if window.downPressed then @thrust.d = 0.2 else @thrust.d = 0
+		if window.leftPressed then @thrust.a = 0.5 else @thrust.a = 0
+		if window.upPressed then @thrust.b = 0.5 else @thrust.b = 0
+		if window.rightPressed then @thrust.c = 0.5 else @thrust.c = 0
+		if window.downPressed then @thrust.d = 0.5 else @thrust.d = 0
 
 	render: (context) ->
 		super
-		context.lineWidth = @size-4
+		context.lineWidth = @size-6
 		angles = {a:[Math.PI, Math.PI*3/2], d:[Math.PI/2, Math.PI], c:[0, Math.PI/2], b:[Math.PI*3/2, 0]}
+		context.save()
+		context.translate(@position.x, @position.y)
+		context.rotate(@angle)
 		for t, a of angles
 			context.beginPath()
 			context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
-			context.arc(@position.x, @position.y, @size/2, a[0], a[1]);
+			context.arc(0, 0, @size/2+6, a[0], a[1]);
 			context.stroke()
+		context.restore()
 
 
 class FixedPole extends Triangle

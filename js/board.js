@@ -267,12 +267,13 @@ Drawable = (function() {
     };
     this.position.x += this.vel.x * step;
     this.position.y += this.vel.y * step;
-    this.vel.x += this.acc.x * 0.2;
-    this.vel.y += this.acc.y * 0.2;
+    this.vel.x += this.acc.x * 0.05;
+    this.vel.y += this.acc.y * 0.05;
     this.vel.x *= 0.9;
     this.vel.y *= 0.9;
-    angle = this.acc.x ? Math.atan2(this.acc.y, this.acc.x) : this.angle;
-    this.angle = angle;
+    angle = this.vel.x && this.vel.y ? Math.atan2(this.vel.y, this.vel.x) : this.angle;
+    this.angle += angle * step / 1000;
+    console.log(angle, this.angle);
     if (canvas.height - this.position.y < 0 || this.position.y < 0) {
       this.vel.y *= -0.5;
     }
@@ -439,50 +440,49 @@ Bot = (function(_super) {
 
   Bot.prototype.tic = function(step) {
     Bot.__super__.tic.apply(this, arguments);
-    if (this === window.lastAdded) {
-      console.log;
-    }
     if (window.leftPressed) {
-      this.thrust.a = 0.2;
+      this.thrust.a = 0.5;
     } else {
       this.thrust.a = 0;
     }
     if (window.upPressed) {
-      this.thrust.b = 0.2;
+      this.thrust.b = 0.5;
     } else {
       this.thrust.b = 0;
     }
     if (window.rightPressed) {
-      this.thrust.c = 0.2;
+      this.thrust.c = 0.5;
     } else {
       this.thrust.c = 0;
     }
     if (window.downPressed) {
-      return this.thrust.d = 0.2;
+      return this.thrust.d = 0.5;
     } else {
       return this.thrust.d = 0;
     }
   };
 
   Bot.prototype.render = function(context) {
-    var a, angles, t, _results;
+    var a, angles, t;
     Bot.__super__.render.apply(this, arguments);
-    context.lineWidth = this.size - 4;
+    context.lineWidth = this.size - 6;
     angles = {
       a: [Math.PI, Math.PI * 3 / 2],
       d: [Math.PI / 2, Math.PI],
       c: [0, Math.PI / 2],
       b: [Math.PI * 3 / 2, 0]
     };
-    _results = [];
+    context.save();
+    context.translate(this.position.x, this.position.y);
+    context.rotate(this.angle);
     for (t in angles) {
       a = angles[t];
       context.beginPath();
       context.strokeStyle = "rgba(0,0,0," + this.thrust[t] + ")";
-      context.arc(this.position.x, this.position.y, this.size / 2, a[0], a[1]);
-      _results.push(context.stroke());
+      context.arc(0, 0, this.size / 2 + 6, a[0], a[1]);
+      context.stroke();
     }
-    return _results;
+    return context.restore();
   };
 
   return Bot;
