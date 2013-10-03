@@ -4,20 +4,12 @@ var Board, Bot, Circle, Drawable, FixedPole, Square, Triangle, getResultant, mm,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-$(function() {
-  return window.ctx = context;
-});
-
 painter = {
   applyCanvasOptions: function(context, options) {
     if (options.fill === true) {
-      if ('color' in options) {
-        return context.fillStyle = options.color;
-      }
+      return context.fillStyle = options.color || 'black';
     } else {
-      if ('color' in options) {
-        context.strokeStyle = options.color;
-      }
+      context.strokeStyle = options.color || 'blue';
       return context.lineWidth = options.width || 1;
     }
   },
@@ -47,16 +39,6 @@ painter = {
     context.lineTo(p2.x, p2.y);
     return context.stroke();
   },
-  /*
-  	context.beginPath()
-  	// context.moveTo(20,20)
-  	// context.lineTo(100,20)
-  	context.moveTo(150,20)
-  	context.arcTo(150,20,150,70,50)
-  	//context.lineTo(150,120)
-  	context.stroke()
-  */
-
   drawTriangle: function(context, p1, p2, p3, options) {
     if (options == null) {
       options = {};
@@ -172,7 +154,7 @@ mm = function(min, num, max) {
 };
 
 getResultant = function(m, objects, distDecay, reppel) {
-  var F, alpha, d2, dfx, dfy, dx, dy, fx, fy, multiplier, obj, rx, ry, _i, _len;
+  var F, alpha, d2, dfx, dfy, dx, dy, fx, fy, multiplier, obj, _i, _len;
   if (distDecay == null) {
     distDecay = 2;
   }
@@ -187,11 +169,9 @@ getResultant = function(m, objects, distDecay, reppel) {
     }
     dx = m.position.x - obj.position.x;
     dy = m.position.y - obj.position.y;
-    rx = dx > 0 ? -1 : 1;
-    ry = dy > 0 ? -1 : 1;
     d2 = Math.pow(m.position.x - obj.position.x, 2) + Math.pow(m.position.y - obj.position.y, 2);
     F = m.mass * obj.mass / (distDecay === 2 ? d2 : Math.pow(d2, distDecay / 2));
-    alpha = Math.atan(dy / dx);
+    alpha = Math.atan2(dy, dx);
     dfx = Math.abs(Math.cos(alpha)) * F * rx;
     dfy = Math.abs(Math.sin(alpha)) * F * ry;
     painter.drawLine(context, m.position, obj.position, {
@@ -249,6 +229,12 @@ Drawable = (function() {
     this.twalk = 0;
     this.angle = Math.random() * Math.PI * 2;
     this.defineWalk();
+    this.thrust = {
+      a: .2,
+      b: .2,
+      c: .2,
+      d: .2
+    };
     this.factor = {
       x: Math.random() > (typeof 0.5 === "function" ? 0.5({
         1: -1,
@@ -269,7 +255,32 @@ Drawable = (function() {
   Drawable.prototype.defineWalk = function() {};
 
   Drawable.prototype.tic = function(step) {
-    return step = window.vars.step;
+    var angle;
+    step = window.vars.step;
+    this._acc = {
+      x: this.acc.x,
+      y: this.acc.y
+    };
+    this.acc = {
+      x: this.thrust.a + this.thrust.d - this.thrust.b - this.thrust.c,
+      y: this.thrust.a - this.thrust.d + this.thrust.b - this.thrust.c
+    };
+    this.position.x += this.vel.x * step;
+    this.position.y += this.vel.y * step;
+    this.vel.x += this.acc.x * 0.2;
+    this.vel.y += this.acc.y * 0.2;
+    this.vel.x *= 0.9;
+    this.vel.y *= 0.9;
+    angle = this.acc.x ? Math.atan2(this.acc.y, this.acc.x) : this.angle;
+    this.angle = angle;
+    if (canvas.height - this.position.y < 0 || this.position.y < 0) {
+      this.vel.y *= -0.5;
+    }
+    if (canvas.width - this.position.x < 0 || this.position.x < 0) {
+      this.vel.x *= -0.5;
+    }
+    this.position.x = mm(0, this.position.x, window.canvas.width);
+    return this.position.y = mm(0, this.position.y, window.canvas.height);
   };
 
   Drawable.prototype.ticMove = function(step) {
@@ -429,13 +440,49 @@ Bot = (function(_super) {
   Bot.prototype.tic = function(step) {
     Bot.__super__.tic.apply(this, arguments);
     if (this === window.lastAdded) {
-      return console.log;
+      console.log;
+    }
+    if (window.leftPressed) {
+      this.thrust.a = 0.2;
+    } else {
+      this.thrust.a = 0;
+    }
+    if (window.upPressed) {
+      this.thrust.b = 0.2;
+    } else {
+      this.thrust.b = 0;
+    }
+    if (window.rightPressed) {
+      this.thrust.c = 0.2;
+    } else {
+      this.thrust.c = 0;
+    }
+    if (window.downPressed) {
+      return this.thrust.d = 0.2;
+    } else {
+      return this.thrust.d = 0;
     }
   };
 
   Bot.prototype.render = function(context) {
+    var a, angles, t, _results;
     Bot.__super__.render.apply(this, arguments);
-    return context.arcTo(100, 100, 120, 120, 5);
+    context.lineWidth = this.size - 4;
+    angles = {
+      a: [Math.PI, Math.PI * 3 / 2],
+      d: [Math.PI / 2, Math.PI],
+      c: [0, Math.PI / 2],
+      b: [Math.PI * 3 / 2, 0]
+    };
+    _results = [];
+    for (t in angles) {
+      a = angles[t];
+      context.beginPath();
+      context.strokeStyle = "rgba(0,0,0," + this.thrust[t] + ")";
+      context.arc(this.position.x, this.position.y, this.size / 2, a[0], a[1]);
+      _results.push(context.stroke());
+    }
+    return _results;
   };
 
   return Bot;
@@ -514,6 +561,7 @@ Board = (function() {
 
   Board.prototype.tic = function(step) {
     var item, _i, _len, _ref3, _results;
+    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     _ref3 = this.state;
     _results = [];
     for (_i = 0, _len = _ref3.length; _i < _len; _i++) {

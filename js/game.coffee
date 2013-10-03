@@ -96,14 +96,14 @@ window.onload = ->
 
 $("body").keydown (e) ->
 	switch e.keyCode or e.keyCode
-		when 37 then leftPressed = true; console.log('leftPressed')
-		when 38 then upPressed = true; console.log('upPressed')
-		when 39 then rightPressed = true; console.log('rightPressed')
-		when 40 then downPressed = true; console.log('downPressed')
+		when 37 then window.leftPressed = true
+		when 38 then window.upPressed = true
+		when 39 then window.rightPressed = true
+		when 40 then window.downPressed = true
 
 $("body").keyup (e) ->
 	switch e.keyCode or e.keyCode
-		when 37 then leftPressed = false
-		when 38 then upPressed = false
-		when 39 then rightPressed = false
-		when 40 then downPressed = false
+		when 37 then window.leftPressed = false
+		when 38 then window.upPressed = false
+		when 39 then window.rightPressed = false
+		when 40 then window.downPressed = false

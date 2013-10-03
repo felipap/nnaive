@@ -1,13 +1,12 @@
 
 # board.coffee for nnaive
 
-setTimeout(-> window.ctx = context,400)
 painter =
 	applyCanvasOptions : (context, options) ->
 		if options.fill is true
-			if 'color' of options then context.fillStyle = options.color
+			context.fillStyle = options.color or 'black'
 		else
-			if 'color' of options then context.strokeStyle = options.color
+			context.strokeStyle = options.color or 'blue'
 			context.lineWidth = options.width or 1
 
 	###### Canvas manipulation functions
@@ -26,15 +25,7 @@ painter =
 		context.moveTo p1.x, p1.y
 		context.lineTo p2.x, p2.y
 		context.stroke()
-	###
-	context.beginPath()
-	// context.moveTo(20,20)
-	// context.lineTo(100,20)
-	context.moveTo(150,20)
-	context.arcTo(150,20,150,70,50)
-	//context.lineTo(150,120)
-	context.stroke()
-	###
+
 	drawTriangle : (context, p1, p2, p3, options={}) ->
 		this.applyCanvasOptions(context, options)
 		context.beginPath()
@@ -116,14 +107,14 @@ getResultant = (m, objects, distDecay=2, reppel=2) ->
 		dx = m.position.x - obj.position.x
 		dy = m.position.y - obj.position.y
 		# Vector direction corrections.
-		rx = if dx > 0 then -1 else 1
-		ry = if dy > 0 then -1 else 1
+		# rx = if dx > 0 then -1 else 1
+		# ry = if dy > 0 then -1 else 1
 		# Distance calculation. (squared)
 		d2 = Math.pow(m.position.x-obj.position.x,2)+Math.pow(m.position.y-obj.position.y,2)
 		# Force is inversely proportional to the distance^distDecay.
 		F = m.mass*obj.mass/(if distDecay is 2 then d2 else Math.pow(d2,distDecay/2)) 
 		# Calculate vector projections. (update to shortcut functions?)
-		alpha = Math.atan(dy/dx)
+		alpha = Math.atan2(dy,dx)
 		dfx = Math.abs(Math.cos(alpha))*F*rx
 		dfy = Math.abs(Math.sin(alpha))*F*ry
 		# Draw point-to-point vector.
@@ -160,7 +151,7 @@ class Drawable
 		@angle = Math.random()*Math.PI*2
 
 		@defineWalk()
-		#@thrust {a:0,b:0,c:0,d:0}
+		@thrust = {a:.2,b:.2,c:.2,d:.2}
 		
 		@factor = {x: Math.random()>0.5?1:-1, y:Math.random()>0.5?1:-1}
 	
@@ -181,6 +172,29 @@ class Drawable
 	tic: (step) ->
 		step = window.vars.step
 
+		# speed = 20
+		@_acc = {x: @acc.x, y: @acc.y}
+		@acc = {x: @thrust.a+@thrust.d-@thrust.b-@thrust.c, y:(@thrust.a-@thrust.d+@thrust.b-@thrust.c)}
+
+		@position.x += @vel.x*step # *(@_acc.x*step*step/2)
+		@position.y += @vel.y*step # *(@_acc.y*step*step/2)
+		@vel.x += @acc.x*0.2
+		@vel.y += @acc.y*0.2
+
+		@vel.x *= 0.9
+		@vel.y *= 0.9
+		
+		angle = if @acc.x then Math.atan2(@acc.y,@acc.x) else @angle
+		@angle = angle
+
+		# Bounce, please.
+		if canvas.height - @position.y < 0 or @position.y < 0
+			@vel.y *= -0.5
+		if canvas.width - @position.x < 0 or @position.x < 0
+			@vel.x *= -0.5
+		# Limit particle to canvas bounds.
+		@position.x = mm(0, @position.x, window.canvas.width)
+		@position.y = mm(0, @position.y, window.canvas.height)
 
 	ticMove: (step) ->
 		step = window.vars.step # 100
@@ -279,9 +293,21 @@ class Bot extends Circle
 		if @ is window.lastAdded
 			console.log
 
+		if window.leftPressed then @thrust.a = 0.2 else @thrust.a = 0
+		if window.upPressed then @thrust.b = 0.2 else @thrust.b = 0
+		if window.rightPressed then @thrust.c = 0.2 else @thrust.c = 0
+		if window.downPressed then @thrust.d = 0.2 else @thrust.d = 0
+
 	render: (context) ->
 		super
-		context.arcTo(100, 100, 120, 120, 5)
+		context.lineWidth = @size-4
+		angles = {a:[Math.PI, Math.PI*3/2], d:[Math.PI/2, Math.PI], c:[0, Math.PI/2], b:[Math.PI*3/2, 0]}
+		for t, a of angles
+			context.beginPath()
+			context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
+			context.arc(@position.x, @position.y, @size/2, a[0], a[1]);
+			context.stroke()
+
 
 class FixedPole extends Triangle
 
@@ -325,7 +351,7 @@ class Board
 			item.render(context)
 
 	tic: (step) ->
-		# context.clearRect(0, 0, @canvas.width, @canvas.height)
+		context.clearRect(0, 0, @canvas.width, @canvas.height)
 		#painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.1)", fill:true})
 		for item in @state
 			item.tic(step)

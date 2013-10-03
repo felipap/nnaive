@@ -106,33 +106,27 @@ window.onload = function() {
 };
 
 $("body").keydown(function(e) {
-  var downPressed, leftPressed, rightPressed, upPressed;
   switch (e.keyCode || e.keyCode) {
     case 37:
-      leftPressed = true;
-      return console.log('leftPressed');
+      return window.leftPressed = true;
     case 38:
-      upPressed = true;
-      return console.log('upPressed');
+      return window.upPressed = true;
     case 39:
-      rightPressed = true;
-      return console.log('rightPressed');
+      return window.rightPressed = true;
     case 40:
-      downPressed = true;
-      return console.log('downPressed');
+      return window.downPressed = true;
   }
 });
 
 $("body").keyup(function(e) {
-  var downPressed, leftPressed, rightPressed, upPressed;
   switch (e.keyCode || e.keyCode) {
     case 37:
-      return leftPressed = false;
+      return window.leftPressed = false;
     case 38:
-      return upPressed = false;
+      return window.upPressed = false;
     case 39:
-      return rightPressed = false;
+      return window.rightPressed = false;
     case 40:
-      return downPressed = false;
+      return window.downPressed = false;
   }
 });
