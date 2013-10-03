@@ -176,26 +176,26 @@ getResultant = function(m, objects, distDecay, reppel) {
     rx = dx > 0 ? -1 : 1;
     ry = dy > 0 ? -1 : 1;
     d2 = Math.pow(m.position.x - obj.position.x, 2) + Math.pow(m.position.y - obj.position.y, 2);
-    F = 1 / (distDecay === 2 ? d2 : Math.pow(d2, distDecay / 2));
+    F = m.mass * obj.mass / (distDecay === 2 ? d2 : Math.pow(d2, distDecay / 2));
     alpha = Math.atan(dy / dx);
     dfx = Math.abs(Math.cos(alpha)) * F * rx;
     dfy = Math.abs(Math.sin(alpha)) * F * ry;
     painter.drawLine(context, m.position, obj.position, {
-      color: "grey",
-      width: mm(0, F * 5000, 200)
+      color: "#444",
+      width: mm(0, F * 50000, 100)
     });
     multiplier = m.getMultiplier(obj);
     if (d2 < Math.pow(obj.size + m.size, 2)) {
-      fx += -Math.pow(reppel, distDecay) * dfx;
-      fy += -Math.pow(reppel, distDecay) * dfy;
+      fx += -Math.pow(reppel, 1) * dfx;
+      fy += -Math.pow(reppel, 1) * dfy;
     } else {
       fx += dfx * multiplier;
       fy += dfy * multiplier;
     }
   }
   painter.drawLine(context, m.position, {
-    x: m.position.x + fx * Math.pow(5000, distDecay),
-    y: m.position.y + fy * Math.pow(5000, distDecay)
+    x: m.position.x + fx * Math.pow(500000, 1),
+    y: m.position.y + fy * Math.pow(500000, 1)
   }, {
     color: "red"
   });
@@ -252,19 +252,10 @@ Drawable = (function() {
     return 1;
   };
 
-  Drawable.prototype.defineWalk = function() {
-    var max;
-    console.log('Defining twalk.');
-    max = 0.05;
-    this.vel.x = max * Math.random() - max / 2;
-    this.vel.y = max * Math.random() - max / 2;
-    this.angularSpeed *= (this.vel.x < 0 ? -1 : 1);
-    this.twalk = Math.max(50, Math.floor(500 * Math.random()));
-    return this.angle = 2;
-  };
+  Drawable.prototype.defineWalk = function() {};
 
   Drawable.prototype.tic = function(step) {
-    var wholevel;
+    var factor, wholevel;
     step = window.vars.step;
     this._acc = {
       x: this.acc.x,
@@ -272,18 +263,19 @@ Drawable = (function() {
     };
     this.position.x += this.vel.x * step + (0.5 * this._acc.x * step * step);
     this.position.y += this.vel.y * step + (0.5 * this._acc.y * step * step);
-    this.acc = getResultant(this, game.board.state, 3);
+    this.acc = getResultant(this, game.board.state, 2, 4);
     this.acc.x *= 1 / this.mass;
     this.acc.y *= 1 / this.mass;
-    this.vel.x += (this._acc.x + this.acc.x) / 2 * step * window.vars.rest / 100 * Math.pow((this.acc.angle - this.angle) / 2 / Math.PI, 2);
-    this.vel.y += (this._acc.y + this.acc.y) / 2 * step * window.vars.rest / 100 * Math.pow((this.acc.angle - this.angle) / 2 / Math.PI, 2);
+    factor = step * window.vars.rest;
+    this.vel.x += (this._acc.x + this.acc.x) / 2 * factor;
+    this.vel.y += (this._acc.y + this.acc.y) / 2 * factor;
     wholevel = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
     this.vel.x = 1 * this.vel.x + 0.01 * wholevel * Math.cos(this.angle);
     this.vel.y = 1 * this.vel.y + 0.01 * wholevel * Math.sin(this.angle);
     if (!this.twalk--) {
       this.defineWalk();
     }
-    this.angle += (this.acc.angle - this.angle) * .01;
+    this.angle += (this.acc.angle - this.angle) * 0.2;
     if (canvas.height - this.position.y < 10 || this.position.y < 10) {
       this.vel.y *= -0.5;
     }
@@ -345,7 +337,7 @@ Circle = (function(_super) {
 
   Circle.prototype.render = function(context) {
     painter.drawCircle(context, this.position, this.size, {
-      color: '#AD0',
+      color: '#0D8',
       fill: true
     });
     this.p1 = {
@@ -361,7 +353,7 @@ Circle = (function(_super) {
       y: -this.size / 3
     };
     return painter.drawCenteredPolygon(context, this.position, [this.p1, this.p2, this.p3], this.angle, {
-      color: 'black',
+      color: 'white',
       fill: true
     });
   };
@@ -405,11 +397,6 @@ Bot = (function(_super) {
   Bot.prototype.type = 'Bot';
 
   Bot.prototype.color = '#A2A';
-
-  Bot.prototype.multipliers = {
-    'Bot': 0.01,
-    'FixedPole': .5
-  };
 
   Bot.prototype.size = 20;
 

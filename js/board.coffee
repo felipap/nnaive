@@ -112,26 +112,28 @@ getResultant = (m, objects, distDecay=2, reppel=2) ->
 		# Distance calculation. (squared)
 		d2 = Math.pow(m.position.x-obj.position.x,2)+Math.pow(m.position.y-obj.position.y,2)
 		# Force is inversely proportional to the distance^distDecay.
-		F = 1/(if distDecay is 2 then d2 else Math.pow(d2,distDecay/2)) 
+		F = m.mass*obj.mass/(if distDecay is 2 then d2 else Math.pow(d2,distDecay/2)) 
 		# Calculate vector projections. (update to shortcut functions?)
 		alpha = Math.atan(dy/dx)
 		dfx = Math.abs(Math.cos(alpha))*F*rx
 		dfy = Math.abs(Math.sin(alpha))*F*ry
 		# Draw point-to-point vector.
-		painter.drawLine(context, m.position, obj.position, {color: "grey", width: mm(0, F*5000,200)})
+		painter.drawLine(context, m.position, obj.position, {color: "#444", width: mm(0, F*50000,100)})
 		# Multiplier
 		multiplier = m.getMultiplier(obj)
 		# Test if too close
 		if d2 < Math.pow(obj.size+m.size,2)
 			# console.log('too close', obj.size, m.size, Math.pow(obj.size+m.size,2), d2)
-			fx += -Math.pow(reppel, distDecay)*dfx
-			fy += -Math.pow(reppel, distDecay)*dfy
+			fx += -Math.pow(reppel, 1)*dfx
+			fy += -Math.pow(reppel, 1)*dfy
 		else  
 			fx += dfx * multiplier
 			fy += dfy * multiplier
 
 	# Draw resultant.
-	painter.drawLine(context, m.position, {x: m.position.x+fx*Math.pow(5000,distDecay), y: m.position.y+fy*Math.pow(5000,distDecay)}, {color: "red"})
+	painter.drawLine(context, m.position, {\
+		x: m.position.x+fx*Math.pow(500000,1),\
+		y: m.position.y+fy*Math.pow(500000,1)}, {color: "red"})
 	return {x: fx, y: fy, angle: (if fx then Math.atan(fy/fx) else 0)+(if fx<0 then Math.PI else 0)}
 
 class Drawable
@@ -158,14 +160,13 @@ class Drawable
 		return 1
 
 	defineWalk: ->
-		console.log('Defining twalk.')
-		max = 0.05
-		@vel.x = max*Math.random()-max/2
-		@vel.y = max*Math.random()-max/2
-		@angularSpeed *= (if @vel.x<0 then -1 else 1)
-		@twalk = Math.max(50, Math.floor(500*Math.random()))
-		# @angularSpeed = mm(0.00001, Math.random()*0.00001, 0.00002)
-		@angle = 2
+		# console.log('Defining twalk.')
+		# max = 0.05
+		# @vel.x = max*Math.random()-max/2
+		# @vel.y = max*Math.random()-max/2
+		# @angularSpeed *= (if @vel.x<0 then -1 else 1)
+		# @twalk = Math.max(50, Math.floor(500*Math.random()))
+		# # @angularSpeed = mm(0.00001, Math.random()*0.00001, 0.00002)
 
 	tic: (step) ->
 		step = window.vars.step # 100
@@ -173,12 +174,15 @@ class Drawable
 		@_acc = {x: @acc.x, y: @acc.y}
 		@position.x += @vel.x*step+(0.5*@_acc.x*step*step)
 		@position.y += @vel.y*step+(0.5*@_acc.y*step*step)
-		@acc = getResultant(@, game.board.state,3)
+		@acc = getResultant(@, game.board.state, 2, 4)
 		@acc.x *= 1/@mass # add multipliers here
 		@acc.y *= 1/@mass
-		# Update velocity with average acceleration
-		@vel.x += (@_acc.x+@acc.x) / 2 * step * window.vars.rest / 100 *  Math.pow((@acc.angle-@angle)/2/Math.PI,2)
-		@vel.y += (@_acc.y+@acc.y) / 2 * step * window.vars.rest / 100 *  Math.pow((@acc.angle-@angle)/2/Math.PI,2)
+
+		factor = step * window.vars.rest
+
+		# Update velocity with average acceleration and defined factor
+		@vel.x += (@_acc.x+@acc.x) / 2 * factor
+		@vel.y += (@_acc.y+@acc.y) / 2 * factor
 
 		wholevel = Math.sqrt(@vel.x*@vel.x + @vel.y*@vel.y)
 		# # console.log(@angle, '\t', Math.sin(@angle))
@@ -188,7 +192,7 @@ class Drawable
 			@defineWalk()
 		# if @ is lastAdded
 		# 	console.log(@acc.angle)
-		@angle += (@acc.angle-@angle)*.01
+		@angle += (@acc.angle-@angle)*0.2
 		# @angle += -@angularSpeed * step * window.vars.anglemom # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
 
 		# Eat, please.
@@ -225,13 +229,13 @@ class Circle extends Drawable
 
 	render: (context) ->
 		# painter.drawCircle(context, @position, @size, {color: @color, fill: true})
-		painter.drawCircle(context, @position, @size, {color: '#AD0', fill: true})
+		painter.drawCircle(context, @position, @size, {color: '#0D8', fill: true})
 		
 		@p1 = {x: @size/2, y: 0}
 		@p2 = {x: -@size*2/3, y: @size/3}
 		@p3 = {x: -@size*2/3, y: -@size/3}
 
-		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:'black', fill:true})
+		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:'white', fill:true})
 
 window.lastAdded = null
 
@@ -248,7 +252,7 @@ class Bot extends Circle
 	
 	type: 'Bot'
 	color: '#A2A'
-	multipliers: {'Bot': 0.01,'FixedPole': .5}
+	#multipliers: {'Bot': 0.01,'FixedPole': .5}
 	size: 20
 	angularSpeed: .00001
 

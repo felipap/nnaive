@@ -41,7 +41,7 @@ Game = (function() {
     window.canvas = this.canvas;
     $(".wrapper").height($(document).height() - 20);
     this.canvas.width = $('.wrapper').width() - 30;
-    this.canvas.height = $('.wrapper').height() - 30;
+    this.canvas.height = $('.wrapper').height();
     context = this.canvas.getContext("2d");
     this.board = new window.Board(this.canvas);
     console.log('board', this.board);

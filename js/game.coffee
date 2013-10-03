@@ -30,7 +30,7 @@ class Game
 		window.canvas = @canvas
 		$(".wrapper").height($(document).height()-20)
 		@canvas.width = $('.wrapper').width() - 30 # window.innerWidth
-		@canvas.height = $('.wrapper').height() - 30 # window.innerHeight
+		@canvas.height = $('.wrapper').height() # window.innerHeight
 		context = @canvas.getContext "2d"
 
 		@board = new window.Board(@canvas)
