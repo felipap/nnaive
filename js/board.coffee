@@ -1,6 +1,7 @@
 
 # board.coffee for nnaive
 
+setTimeout(-> window.ctx = context,400)
 painter =
 	applyCanvasOptions : (context, options) ->
 		if options.fill is true
@@ -25,7 +26,15 @@ painter =
 		context.moveTo p1.x, p1.y
 		context.lineTo p2.x, p2.y
 		context.stroke()
-
+	###
+	context.beginPath()
+	// context.moveTo(20,20)
+	// context.lineTo(100,20)
+	context.moveTo(150,20)
+	context.arcTo(150,20,150,70,50)
+	//context.lineTo(150,120)
+	context.stroke()
+	###
 	drawTriangle : (context, p1, p2, p3, options={}) ->
 		this.applyCanvasOptions(context, options)
 		context.beginPath()
@@ -151,6 +160,7 @@ class Drawable
 		@angle = Math.random()*Math.PI*2
 
 		@defineWalk()
+		#@thrust {a:0,b:0,c:0,d:0}
 		
 		@factor = {x: Math.random()>0.5?1:-1, y:Math.random()>0.5?1:-1}
 	
@@ -169,6 +179,10 @@ class Drawable
 		# # @angularSpeed = mm(0.00001, Math.random()*0.00001, 0.00002)
 
 	tic: (step) ->
+		step = window.vars.step
+
+
+	ticMove: (step) ->
 		step = window.vars.step # 100
 		# Verlet Integration
 		@_acc = {x: @acc.x, y: @acc.y}
@@ -265,6 +279,10 @@ class Bot extends Circle
 		if @ is window.lastAdded
 			console.log
 
+	render: (context) ->
+		super
+		context.arcTo(100, 100, 120, 120, 5)
+
 class FixedPole extends Triangle
 
 	type: 'FixedPole'
@@ -307,7 +325,8 @@ class Board
 			item.render(context)
 
 	tic: (step) ->
-		context.clearRect(0, 0, @canvas.width, @canvas.height)
+		# context.clearRect(0, 0, @canvas.width, @canvas.height)
 		#painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.1)", fill:true})
 		for item in @state
 			item.tic(step)
+

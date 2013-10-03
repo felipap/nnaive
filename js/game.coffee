@@ -94,3 +94,16 @@ window.onload = ->
 	window.game.start()
 	return
 
+$("body").keydown (e) ->
+	switch e.keyCode or e.keyCode
+		when 37 then leftPressed = true; console.log('leftPressed')
+		when 38 then upPressed = true; console.log('upPressed')
+		when 39 then rightPressed = true; console.log('rightPressed')
+		when 40 then downPressed = true; console.log('downPressed')
+
+$("body").keyup (e) ->
+	switch e.keyCode or e.keyCode
+		when 37 then leftPressed = false
+		when 38 then upPressed = false
+		when 39 then rightPressed = false
+		when 40 then downPressed = false

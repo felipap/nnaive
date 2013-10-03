@@ -104,3 +104,35 @@ window.onload = function() {
   window.game = new Game;
   window.game.start();
 };
+
+$("body").keydown(function(e) {
+  var downPressed, leftPressed, rightPressed, upPressed;
+  switch (e.keyCode || e.keyCode) {
+    case 37:
+      leftPressed = true;
+      return console.log('leftPressed');
+    case 38:
+      upPressed = true;
+      return console.log('upPressed');
+    case 39:
+      rightPressed = true;
+      return console.log('rightPressed');
+    case 40:
+      downPressed = true;
+      return console.log('downPressed');
+  }
+});
+
+$("body").keyup(function(e) {
+  var downPressed, leftPressed, rightPressed, upPressed;
+  switch (e.keyCode || e.keyCode) {
+    case 37:
+      return leftPressed = false;
+    case 38:
+      return upPressed = false;
+    case 39:
+      return rightPressed = false;
+    case 40:
+      return downPressed = false;
+  }
+});

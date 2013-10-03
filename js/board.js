@@ -4,6 +4,10 @@ var Board, Bot, Circle, Drawable, FixedPole, Square, Triangle, getResultant, mm,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
+$(function() {
+  return window.ctx = context;
+});
+
 painter = {
   applyCanvasOptions: function(context, options) {
     if (options.fill === true) {
@@ -43,6 +47,16 @@ painter = {
     context.lineTo(p2.x, p2.y);
     return context.stroke();
   },
+  /*
+  	context.beginPath()
+  	// context.moveTo(20,20)
+  	// context.lineTo(100,20)
+  	context.moveTo(150,20)
+  	context.arcTo(150,20,150,70,50)
+  	//context.lineTo(150,120)
+  	context.stroke()
+  */
+
   drawTriangle: function(context, p1, p2, p3, options) {
     if (options == null) {
       options = {};
@@ -255,6 +269,10 @@ Drawable = (function() {
   Drawable.prototype.defineWalk = function() {};
 
   Drawable.prototype.tic = function(step) {
+    return step = window.vars.step;
+  };
+
+  Drawable.prototype.ticMove = function(step) {
     var factor, wholevel;
     step = window.vars.step;
     this._acc = {
@@ -415,6 +433,11 @@ Bot = (function(_super) {
     }
   };
 
+  Bot.prototype.render = function(context) {
+    Bot.__super__.render.apply(this, arguments);
+    return context.arcTo(100, 100, 120, 120, 5);
+  };
+
   return Bot;
 
 })(Circle);
@@ -491,7 +514,6 @@ Board = (function() {
 
   Board.prototype.tic = function(step) {
     var item, _i, _len, _ref3, _results;
-    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     _ref3 = this.state;
     _results = [];
     for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
