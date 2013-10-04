@@ -415,11 +415,12 @@ sigmoid = function(netinput, response) {
 
 parameters = {
   activationResponse: 1,
-  numTics: 500,
+  numTics: 1000,
   popSize: 30,
   crossoverRate: 0.7,
-  mutationRate: 0.3,
-  foodCount: 40
+  mutationRate: 0.05,
+  foodCount: 40,
+  maxMutPerturbation: 0.3
 };
 
 Neuron = (function() {
@@ -633,17 +634,22 @@ GeneticEngine = (function() {
       baby1.push(dad[i]);
       baby2.push(mum[i]);
     }
-    console.log('baby1', baby1, 'baby2', baby2);
+    // console.log('baby1', baby1, 'baby2', baby2);
     return [baby1, baby2];
   };
 
   mutate = function(a) {
-    if (parameters.mutationRate < Math.random()) {
-      var h = Math.random()-Math.random();
-      for (var i=0; i<a.length; i++) {
-        a[i] *= h;
-      }
-    }
+//     if (parameters.mutationRate > Math.random()) {
+//       var h = Math.floor(Math.random()*a.length);
+//       a[h] *= -1;
+//       console.log("mutating, %s", a[h]);
+//     }
+	for (var i=0; i<a.length; i++) {
+		if (parameters.mutationRate > Math.random()) {
+			console.log("mutating")
+			a[i] += (Math.random()-Math.random())*parameters.maxMutPerturbation;
+		}
+	}
     return a;
   };
 
@@ -705,6 +711,8 @@ GeneticEngine = (function() {
       newpop.push(new Bot(baby1));
       newpop.push(new Bot(baby2));
     }
+    
+    this.totalFitness = 0;
     return newpop;
   };
 
@@ -721,7 +729,7 @@ Bot = (function(_super) {
     this.fitness = 0;
     this.nn = new NeuralNet;
     this.nn.putWeights(this.weights);
-    console.log('here:', this.nn.update([0, 0, 0, 0]));
+    //console.log('here:', this.nn.update([0, 0, 0, 0]));
     this.isTop = false;
   }
 
@@ -749,6 +757,7 @@ genEng = new GeneticEngine;
 window.NPL = 4;
 
 window.NL = 3;
+window.corpseCount = 0;
 
 tic = function(step) {
   var bot, _i, _len, _ref4, _results;
@@ -760,13 +769,16 @@ tic = function(step) {
       bot.tic(step);
       if (bot.foundFood()) {
         ++bot.fitness;
+        ++window.corpseCount;
+        $("#flags #stats").html("eaten: "+Math.round(100*window.corpseCount/parameters.popSize)/100);
       }
       _results.push(bot.render(context));
     }
     return _results;
   } else {
-    console.log('reset please');
+    console.log('generation %s', window.genCount, Math.round(100*window.corpseCount/parameters.popSize)/100);
     window.tics = 0;
+    window.corpseCount = 0;
     ++window.genCount;
     return window.pop = genEng.epoch(window.pop);
   }
