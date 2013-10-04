@@ -18,7 +18,9 @@ Game = (function() {
     fpsOut = document.getElementById('fps');
     window.fps = 0;
     return setInterval(function() {
-      return fpsOut.innerHTML = window.fps.toFixed(1);
+      fpsOut.innerHTML = window.fps.toFixed(1);
+      $("#flags #generation").html('generation: ' + window.genCount);
+      return $("#flags #tic").html('tic: ' + window.tics);
     }, 500);
   };
 
@@ -45,24 +47,14 @@ Game = (function() {
     context = this.canvas.getContext("2d");
     this.board = new window.Board(this.canvas);
     console.log('board', this.board);
-    $(this.canvas).bind('click', function(event) {
-      var t;
-      t = new Bot(_this._getMousePos(event));
-      return _this.board.addBot(t);
-    });
-    $(this.canvas).bind('mousedown', function(event) {
-      var t;
-      if (event.button === 2) {
-        t = new FixedPole(_this._getMousePos(event));
-        return _this.board.addObject(t);
-      }
-    });
+    $(this.canvas).bind('click', function(event) {});
+    $(this.canvas).bind('mousedown', function(event) {});
     window.canvasStop = false;
     $(document).keydown(function(event) {
       if (event.keyCode === 32) {
         console.log('spacebar');
         window.canvasStop = !window.canvasStop;
-        return $("#flags").html(window.canvasStop ? "Stopped" : "");
+        return $("#flags #stopped").html(window.canvasStop ? "Stopped" : "");
       }
     });
     return;
@@ -81,7 +73,7 @@ Game = (function() {
     }
     return window.setTimeout(function() {
       return _this.loop();
-    }, 20);
+    }, 1);
   };
 
   Game.prototype.start = function() {

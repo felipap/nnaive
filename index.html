@@ -25,13 +25,18 @@
 						}
 
 						#fps {
-							position: fixed;
+							psosition: fixed;
 						}
 
 						#flags {
 							position: fixed;
 							width: 100px;
-							right: 0;
+							right: left;
+							font-family: Ubuntu, Arial;
+						}
+
+						#flags > div {
+							border: 1px solid #DDD;
 						}
 
 						#controls {
@@ -60,8 +65,12 @@
 				<!--[if lt IE 7]>
 						<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
 				<![endif]-->
-			<div id="fps"></div>
-			<div id="flags"></div>
+			<div id="flags">
+				<div id="fps"></div>
+				<div id="tic"></div>
+				<div id="generation"></div>
+				<div id="stopped"></div>
+			</div>
 			<div class="wrapper">
 				<canvas id="nnaive" oncontextmenu="return false"></canvas>
 			</div>

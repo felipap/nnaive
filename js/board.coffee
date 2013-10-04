@@ -171,7 +171,7 @@ class _Bot extends Circle
 
 	tic: (step) ->
 
-		speed = 500
+		speed = 100
 		@position.x += speed*Math.cos(@angle)*step # *(@_acc.x*step*step/2)
 		@position.y += speed*Math.sin(@angle)*step # *(@_acc.y*step*step/2)
 
@@ -186,10 +186,14 @@ class _Bot extends Circle
 				@closestFood = food
 		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 		@closestFood.color = 'red'
-		
-		nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
-		vel = (nangle-@angle)/5
-		@angle = nangle
+
+		output = @nn.update([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
+				Math.cos(@angle), Math.sin(@angle)])
+		# console.log('output', output)
+		nangle = output[0]-output[1]
+		#nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
+		# vel = (nangle-@angle)/5
+		@angle += nangle
 
 		if window.leftPressed then @angle += 0.2
 		if window.rightPressed then @angle -= 0.2
@@ -236,11 +240,14 @@ sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
 
 parameters =
 	activationResponse: 1 								# for the sigmoid function
-	numTics: 2000										# num of tics per generation
+	numTics: 500										# num of tics per generation
+	popSize: 15
+	crossoverRate: 0.7
+	mutationRate: 0.3 # down to 0.05
 
 class Neuron
 	
-	constructor: (@nInputs=3) ->
+	constructor: (@nInputs=window.NPL) ->
 		# Notice we're deliberately chosing to go for a nInputs+1 sized @weights
 		# array, leaving space for the last item to be the bias weight.
 		@weights = (0 for i in [0..@nInputs]) # Initialize to 0.
@@ -259,7 +266,7 @@ class Neuron
 class NeuronLayer
 	neurons: []
 	
-	constructor: (nNeurons=3) ->
+	constructor: (nNeurons=window.NPL) ->
 		@neurons = (new Neuron for i in [0...nNeurons])
 
 	calculate: (input) ->
@@ -278,7 +285,7 @@ class NeuralNet
 
 	constructor: (layersConf=null) ->
 		if not layersConf
-			@layers = (new NeuronLayer for i in [0...4])
+			@layers = (new NeuronLayer for i in [0...window.NL])
 		else if typeof layersConf is 'number'
 			@layers = (new NeuronLayer for i in [0...nLayers])
 		else # layersConf is Array
@@ -292,20 +299,12 @@ class NeuralNet
 			layer.putWeights(_weights)
 	
 	update: (inputNeurons) ->
-		console.log(@layers)
+		# console.log(@layers)
 		outputs = inputNeurons
 		for layer in @layers
 			outputs = layer.calculate(outputs)
 		return outputs
 
-# class Genoma
-
-class Bot extends _Bot
-	fitness: 0
-	constructor: (@weights) ->
-		super()
-		@nn = new NeuralNet
-		@nn.putWeights(@weights)
 
 class GeneticEngine
 	population = [] # Holds all SGenoma
@@ -314,37 +313,39 @@ class GeneticEngine
 	avgFitness = 0
 	worstFitness = 0
 	bestGenoma = null
-	mutationRate = 0.3 # to 0.05
-	crossoverRate = 0.7
+	# mutationRate = 0.3 # to 0.05
+	# crossoverRate = 0.9
 	genCounter = 0
 
 	# constructor: (popSize) ->
 	# 	#for 
 
-	crossover = (mums, dad) ->
-		if mums is dads or parameters.crossoverRate < Math.random()
-			return [mums[..], dad[..]]
+	crossover = (mum, dad) ->
+		if mum is dad or parameters.crossoverRate < Math.random()
+			return [mum[..], dad[..]]
 		baby1 = []
 		baby2 = []
-		cp = (new Random()).nextInt(mums.length)
+		cp = Math.floor(Math.random()*mum.length)
 		for i in [0...cp]
-			baby1.push(mums[i])
-			baby2.push(dads[i])
-		for i in [cp..mums.length]
-			baby1.push(dads[i])
-			baby2.push(mums[i])
-		return [baby1, babby2]
+			baby1.push(mum[i])
+			baby2.push(dad[i])
+		for i in [cp...mum.length]
+			baby1.push(dad[i])
+			baby2.push(mum[i])
+		console.log('baby1', baby1, 'baby2', baby2)
+		return [baby1, baby2]
 
 	mutate = (a) -> a
 
 	# Returns a random chromossome. (?)
 	getChromoRoulette: (population) ->
-		slice = Math.random()*_.reduce(population,(a,b)->a.fitness+b.fitness)
+		slice = Math.random()*_.reduce(_.pluck(population, 'fitness'),((a,b)->a+b))
 		fitnessCount = 0
 		for g in population
 			fitnessCount += g.fitness
 			if fitnessCount >= slice
 				return g
+		console.log('não', _.reduce(population,(a,b)->a.fitness+b.fitness), population)
 
 	# calculateBestWorstAvgTotal: ->
 
@@ -362,17 +363,32 @@ class GeneticEngine
 		# Push elite (5 best members) to new population. Survive!
 		for g in sorted[sorted.length-5..] # Use parameters.
 			newpop.push(g)
+			g.isTop = true
 		# Generate until population cap is reached.
 		while newpop.length < parameters.popSize
 			mother = @getChromoRoulette(oldpop)
 			father = @getChromoRoulette(oldpop)
-			[baby1, baby2] = crossover(mum.weights, dad.weights)
+			[baby1, baby2] = crossover(mother.weights, father.weights)
 			mutate(baby1)
 			mutate(baby2)
-			newpop.push(Bot(baby1))
-			newpop.push(Bot(baby2))
+			newpop.push(new Bot(baby1))
+			newpop.push(new Bot(baby2))
 		return newpop
 
+
+class Bot extends _Bot
+	
+	constructor: (@weights) ->
+		super()
+		@fitness = 0
+		@nn = new NeuralNet
+		@nn.putWeights(@weights)
+		console.log('here:', @nn.update([0,0,0,0]))
+		@isTop = false
+
+	tic: ->
+		super
+		if @isTop then @color = '#088'
 
 # nn = new NeuralNet
 # output = nn.update([1,0,1])
@@ -383,20 +399,16 @@ class GeneticEngine
 # console.log(nn.update([1,50,1]))
 
 window.tics = 0
-generationCounter = 0
+window.genCount = 0
 
 genEng = new GeneticEngine
 
+window.NPL = 4 			# Neurons-per-layer
+window.NL = 3 			# Number of layers
 
 tic = (step) ->
-	if window.tics is 0
-		window.pop = genEng.makeNew(1, 48)		
-		console.log('gen:',window.pop)
 
 	if ++window.tics < parameters.numTics
-		# for bot in game.board.bots
-		# 	bot.tic(step)
-		# 	yes
 		for bot in window.pop
 			bot.tic(step)
 			if bot.foundFood() then ++bot.fitness
@@ -405,48 +417,36 @@ tic = (step) ->
 	else # Reset and gogo next generation.
 		console.log('reset please')
 		window.tics = 0
-		++generationCounter
-
-
-################################################################################
-################################################################################
+		++window.genCount
+		window.pop = genEng.epoch(window.pop)
 
 
 class Board
 
-	addObject: (object) ->
-		@state.push object
-
-	addBot: (object) ->
-		@bots.push object
-
-	addFood: (object) ->
-		@food.push object
-
 	constructor: (@canvas) ->
+		# window.frame = 0
+		# window.vars = {}
+		# vars = _.map($(".control"), (i)-> i.id );
+		# for name in vars
+		# 	window.vars[name] = parseInt($(".control#"+name+" input").attr('value'))
+		# 	do ->
+		# 		# scope
+		# 		n = name
+		# 		$(".control#"+name+" input").bind 'change', (event) =>
+		# 			window.e = event
+		# 			value = Math.max(0.1, parseInt(event.target.value)/\
+		# 				parseInt(event.target.dataset.divisor or 1))
+		# 			event.target.parentElement.querySelector('span').innerHTML = value
+		# 			window.vars[n] = value
 		window.context = @canvas.getContext("2d")
-		window.frame = 0
-		window.vars = {}
-		vars = _.map($(".control"), (i)-> i.id );
-		for name in vars
-			window.vars[name] = parseInt($(".control#"+name+" input").attr('value'))
-			do ->
-				# scope
-				n = name
-				$(".control#"+name+" input").bind 'change', (event) =>
-					window.e = event
-					value = Math.max(0.1, parseInt(event.target.value)/\
-						parseInt(event.target.dataset.divisor or 1))
-					event.target.parentElement.querySelector('span').innerHTML = value
-					window.vars[n] = value
 		@state = [] # Objects to be drawn.
 		@bots = []
 		@food = []
 
 		# @addBot(new Bot()) for i in [0..10]
-
-		window.lastAdded = null
-		@addFood(new Food()) for i in [0..50]
+		window.pop = genEng.makeNew(parameters.popSize, (window.NPL+1)*window.NPL*window.NL)		
+		console.log('gen:',window.pop)
+		@food.push(new Food()) for i in [0..20]
 
 	render: (context) ->
 		item.render(context) for item in @state

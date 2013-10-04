@@ -13,6 +13,8 @@ class Game
 		window.fps = 0
 		setInterval =>
 			fpsOut.innerHTML = window.fps.toFixed(1)
+			$("#flags #generation").html('generation: '+window.genCount)
+			$("#flags #tic").html('tic: '+window.tics)
 		, 500
 
 	resetFpsCounter = ->
@@ -37,20 +39,20 @@ class Game
 		console.log 'board', @board
 		
 		$(@canvas).bind 'click', (event) =>
-			t = new Bot(@_getMousePos(event))
-			@board.addBot(t)
+			# t = new Bot(@_getMousePos(event))
+			# @board.addBot(t)
 
 		$(@canvas).bind 'mousedown', (event) =>
-			if event.button is 2
-				t = new FixedPole(@_getMousePos(event))
-				@board.addObject(t)
+			# if event.button is 2
+			# 	t = new FixedPole(@_getMousePos(event))
+			# 	@board.addObject(t)
 
 		window.canvasStop = false
 		$(document).keydown (event) =>
 			if event.keyCode == 32
 				console.log('spacebar')
 				window.canvasStop = !window.canvasStop
-				$("#flags").html(if window.canvasStop then "Stopped" else "")
+				$("#flags #stopped").html(if window.canvasStop then "Stopped" else "")
 
 		return
 		@dispatcher = new EventDispatcher(@board, @)
@@ -68,7 +70,7 @@ class Game
 		window.setTimeout =>
 			@loop()
 		#, 1000/@fps
-		, 20
+		, 1
 		#window.AnimateOnFrameRate(->game.loop())
 
 	start: ->
