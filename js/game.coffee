@@ -72,7 +72,6 @@ class Game
 		#window.AnimateOnFrameRate(->game.loop())
 
 	start: ->
-		return
 		addFpsCounter()
 		console.log "Start looping board" # , @board, "with painter", @ 
 		@loop()

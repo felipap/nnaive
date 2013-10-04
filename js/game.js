@@ -85,7 +85,6 @@ Game = (function() {
   };
 
   Game.prototype.start = function() {
-    return;
     addFpsCounter();
     console.log("Start looping board");
     return this.loop();

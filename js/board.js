@@ -89,19 +89,40 @@ NeuralNet = (function() {
 
   NeuralNet.prototype.layers = [];
 
-  function NeuralNet(nLayers) {
-    var i;
-    if (nLayers == null) {
-      nLayers = 1;
+  function NeuralNet(layersConf) {
+    var i, n;
+    if (layersConf == null) {
+      layersConf = null;
     }
-    this.layers = (function() {
-      var _i, _results;
-      _results = [];
-      for (i = _i = 0; 0 <= nLayers ? _i < nLayers : _i > nLayers; i = 0 <= nLayers ? ++_i : --_i) {
-        _results.push(new NeuronLayer);
-      }
-      return _results;
-    })();
+    if (!layersConf) {
+      this.layers = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 4; i = ++_i) {
+          _results.push(new NeuronLayer);
+        }
+        return _results;
+      })();
+    } else if (typeof layersConf === 'number') {
+      this.layers = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; 0 <= nLayers ? _i < nLayers : _i > nLayers; i = 0 <= nLayers ? ++_i : --_i) {
+          _results.push(new NeuronLayer);
+        }
+        return _results;
+      })();
+    } else {
+      this.layers = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = layersConf.length; _i < _len; _i++) {
+          n = layersConf[_i];
+          _results.push(new NeuronLayer(n));
+        }
+        return _results;
+      })();
+    }
   }
 
   NeuralNet.prototype.getWeights = function() {};

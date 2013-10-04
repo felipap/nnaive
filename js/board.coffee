@@ -44,8 +44,13 @@ class NeuralNet
 	neuronsPerHiddenLayer: 0
 	layers: []
 
-	constructor: (nLayers=1) ->
-		@layers = (new NeuronLayer for i in [0...nLayers])
+	constructor: (layersConf=null) ->
+		if not layersConf
+			@layers = (new NeuronLayer for i in [0...4])
+		else if typeof layersConf is 'number'
+			@layers = (new NeuronLayer for i in [0...nLayers])
+		else # layersConf is Array
+			@layers = (new NeuronLayer(n) for n in layersConf)
 	
 	getWeights: () ->
 	
