@@ -48,7 +48,7 @@ Game = (function() {
     $(this.canvas).bind('click', function(event) {
       var t;
       t = new Bot(_this._getMousePos(event));
-      return _this.board.addObject(t);
+      return _this.board.addBot(t);
     });
     $(this.canvas).bind('mousedown', function(event) {
       var t;
@@ -85,7 +85,6 @@ Game = (function() {
   };
 
   Game.prototype.start = function() {
-    return;
     addFpsCounter();
     console.log("Start looping board");
     return this.loop();

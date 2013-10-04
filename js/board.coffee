@@ -1,128 +1,6 @@
 
 # board.coffee for nnaive
 
-sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
-
-params =
-	activationResponse: 1 								# for the sigmoid function
-	numTics: 2000										# num of tics per generation
-
-class Neuron
-	
-	constructor: (@nInputs=3) ->
-		# Notice we're deliberately chosing to go for a nInputs+1 sized @weights
-		# array, leaving space for the last item to be the bias weight.
-		@weights = (0 for i in [0..@nInputs]) # Initialize to 0.
-
-	fire: (input) ->
-		out = 0
-		console.assert(@weights.length is input.length+1)
-		for value, i in input
-			out += value*@weights[i]
-		out += -1*@weights[@weights.length-1]
-		return sigmoid(out, params.activationResponse)
-
-	getWeights: -> @weights
-	putWeights: (weights) -> @weights = weights.splice(0,@nInputs+1) # +1 for bias
-
-class NeuronLayer
-	neurons: []
-	
-	constructor: (nNeurons=3) ->
-		@neurons = (new Neuron for i in [0...nNeurons])
-
-	calculate: (input) ->
-		output = []
-		for neuron in @neurons
-			output.push(neuron.fire(input))
-		return output
-
-	getWeights: -> _.flatten((neuron.getWeights() for neuron in @neurons))
-	putWeights: (weights) ->
-		for neuron in @neurons
-			neuron.putWeights(weights)
-
-class NeuralNet
-	layers: []
-
-	constructor: (layersConf=null) ->
-		if not layersConf
-			@layers = (new NeuronLayer for i in [0...4])
-		else if typeof layersConf is 'number'
-			@layers = (new NeuronLayer for i in [0...nLayers])
-		else # layersConf is Array
-			@layers = (new NeuronLayer(n) for n in layersConf)
-	
-	getWeights: -> _.flatten((layer.getWeights() for layer in @layers))	
-	putWeights: (weights) ->
-		# I'm setting these to work like streams: each neuron splices a bit of it.
-		_weights = weights[..] # Make a copy just in case.
-		for layer in @layers
-			layer.putWeights(_weights)
-	
-	update: (inputNeurons) ->
-		console.log(@layers)
-		outputs = inputNeurons
-		for layer in @layers
-			outputs = layer.calculate(outputs)
-		return outputs
-
-
-class Genoma
-	weights = []
-	fitness = 0
-
-class GeneticAlgorithm
-	cromossomes = [] # Holds all SGenoma
-	totalFitness = 0
-	bestFitness = 0
-	avgFitness = 0
-	worstFitness = 0
-	bestGenoma = null
-	mutationRate = 0.3 # to 0.05
-	crossoverRate = 0.7
-	genCounter = 0
-
-	constructor: (popSize) ->
-		#for 
-
-	crossover: (mum, dad) ->
-
-		return {baby1: baby1, baby2: baby2}
-
-	getChromoRoulette: ->
-
-	grabNBest: (nBest, numCopies, vecPop) ->
-
-	calculateBestWorstAvgTotal: ->
-
-	reset: ->
-
-	epoch: (oldPop) ->
-
-
-nn = new NeuralNet
-output = nn.update([1,0,1])
-
-nn.putWeights([0,1.1,2.2,3.3,4,5.1,6.2,7.3,8,9.1,10.2,11.3,12,13.1,14.2,15.3,16,17.1,18.2,19.3,20,21.1,22.2,23.3,24,25.1,26.2,27.3,28,29.1,30.2,31.3,32,33.1,34.2,35.3,36,37.1,38.2,39.3,40,41.1,42.2,43.3,44,45.1,46.2,47.3])
-ws = nn.getWeights()
-console.log(ws, ws.length)
-console.log(nn.update([1,50,1]))
-
-window.tics = 0
-generationCounter = 0
-
-tic = (step) ->
-	if window.tics++ < param.numTics
-
-	else # Resec
-		window.tics = 0
-		generationCounter++
-
-
-################################################################################
-################################################################################
-
 painter =
 	applyCanvasOptions : (context, options) ->
 		if options.fill is true
@@ -281,7 +159,7 @@ class Food extends Triangle
 			x: Math.random()*canvas.width,
 			y: Math.random()*canvas.height
 
-class Bot extends Circle
+class _Bot extends Circle
 	
 	color: '#A2A'
 	size: 10
@@ -293,7 +171,7 @@ class Bot extends Circle
 
 	tic: (step) ->
 
-		speed = 1500
+		speed = 500
 		@position.x += speed*Math.cos(@angle)*step # *(@_acc.x*step*step/2)
 		@position.y += speed*Math.sin(@angle)*step # *(@_acc.y*step*step/2)
 
@@ -308,12 +186,10 @@ class Bot extends Circle
 				@closestFood = food
 		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 		@closestFood.color = 'red'
+		
 		nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
 		vel = (nangle-@angle)/5
 		@angle = nangle
-
-		if dist2(@position,@closestFood.position) < Math.pow(@size+food.size,2)
-			@closestFood.eat(@)
 
 		if window.leftPressed then @angle += 0.2
 		if window.rightPressed then @angle -= 0.2
@@ -338,6 +214,12 @@ class Bot extends Circle
 			context.stroke()
 		context.restore()
 
+	foundFood: ->
+		if dist2(@position,@closestFood.position) < Math.pow(@size+@closestFood.size,2)
+			@closestFood.eat(@)
+			return yes
+		return no
+
 class FixedPole extends Circle
 	
 	color: 'grey'
@@ -348,6 +230,187 @@ class FixedPole extends Circle
 
 ################################################################################
 ################################################################################
+
+
+sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
+
+parameters =
+	activationResponse: 1 								# for the sigmoid function
+	numTics: 2000										# num of tics per generation
+
+class Neuron
+	
+	constructor: (@nInputs=3) ->
+		# Notice we're deliberately chosing to go for a nInputs+1 sized @weights
+		# array, leaving space for the last item to be the bias weight.
+		@weights = (0 for i in [0..@nInputs]) # Initialize to 0.
+
+	fire: (input) ->
+		out = 0
+		console.assert(@weights.length is input.length+1)
+		for value, i in input
+			out += value*@weights[i]
+		out += -1*@weights[@weights.length-1]
+		return sigmoid(out, parameters.activationResponse)
+
+	getWeights: -> @weights
+	putWeights: (weights) -> @weights = weights.splice(0,@nInputs+1) # +1 for bias
+
+class NeuronLayer
+	neurons: []
+	
+	constructor: (nNeurons=3) ->
+		@neurons = (new Neuron for i in [0...nNeurons])
+
+	calculate: (input) ->
+		output = []
+		for neuron in @neurons
+			output.push(neuron.fire(input))
+		return output
+
+	getWeights: -> _.flatten((neuron.getWeights() for neuron in @neurons))
+	putWeights: (weights) ->
+		for neuron in @neurons
+			neuron.putWeights(weights)
+
+class NeuralNet
+	layers: []
+
+	constructor: (layersConf=null) ->
+		if not layersConf
+			@layers = (new NeuronLayer for i in [0...4])
+		else if typeof layersConf is 'number'
+			@layers = (new NeuronLayer for i in [0...nLayers])
+		else # layersConf is Array
+			@layers = (new NeuronLayer(n) for n in layersConf)
+	
+	getWeights: -> _.flatten((layer.getWeights() for layer in @layers))	
+	putWeights: (weights) ->
+		# I'm setting these to work like streams: each neuron splices a bit of it.
+		_weights = weights[..] # Make a copy just in case.
+		for layer in @layers
+			layer.putWeights(_weights)
+	
+	update: (inputNeurons) ->
+		console.log(@layers)
+		outputs = inputNeurons
+		for layer in @layers
+			outputs = layer.calculate(outputs)
+		return outputs
+
+# class Genoma
+
+class Bot extends _Bot
+	fitness: 0
+	constructor: (@weights) ->
+		super()
+		@nn = new NeuralNet
+		@nn.putWeights(@weights)
+
+class GeneticEngine
+	population = [] # Holds all SGenoma
+	totalFitness = 0
+	bestFitness = 0
+	avgFitness = 0
+	worstFitness = 0
+	bestGenoma = null
+	mutationRate = 0.3 # to 0.05
+	crossoverRate = 0.7
+	genCounter = 0
+
+	# constructor: (popSize) ->
+	# 	#for 
+
+	crossover = (mums, dad) ->
+		if mums is dads or parameters.crossoverRate < Math.random()
+			return [mums[..], dad[..]]
+		baby1 = []
+		baby2 = []
+		cp = (new Random()).nextInt(mums.length)
+		for i in [0...cp]
+			baby1.push(mums[i])
+			baby2.push(dads[i])
+		for i in [cp..mums.length]
+			baby1.push(dads[i])
+			baby2.push(mums[i])
+		return [baby1, babby2]
+
+	mutate = (a) -> a
+
+	# Returns a random chromossome. (?)
+	getChromoRoulette: (population) ->
+		slice = Math.random()*_.reduce(population,(a,b)->a.fitness+b.fitness)
+		fitnessCount = 0
+		for g in population
+			fitnessCount += g.fitness
+			if fitnessCount >= slice
+				return g
+
+	# calculateBestWorstAvgTotal: ->
+
+	makeNew: (popSize, numWeights) ->
+		pop = []
+		for i in [0...popSize]
+			pop.push(new Bot(((Math.random()-Math.random()) for i2 in [0...numWeights])))
+		return pop
+
+	reset: ->
+
+	epoch: (oldpop) ->
+		sorted = _.sortBy(oldpop, (a) -> a.fitness);
+		newpop = []
+		# Push elite (5 best members) to new population. Survive!
+		for g in sorted[sorted.length-5..] # Use parameters.
+			newpop.push(g)
+		# Generate until population cap is reached.
+		while newpop.length < parameters.popSize
+			mother = @getChromoRoulette(oldpop)
+			father = @getChromoRoulette(oldpop)
+			[baby1, baby2] = crossover(mum.weights, dad.weights)
+			mutate(baby1)
+			mutate(baby2)
+			newpop.push(Bot(baby1))
+			newpop.push(Bot(baby2))
+		return newpop
+
+
+# nn = new NeuralNet
+# output = nn.update([1,0,1])
+
+# nn.putWeights([0,1.1,2.2,3.3,4,5.1,6.2,7.3,8,9.1,10.2,11.3,12,13.1,14.2,15.3,16,17.1,18.2,19.3,20,21.1,22.2,23.3,24,25.1,26.2,27.3,28,29.1,30.2,31.3,32,33.1,34.2,35.3,36,37.1,38.2,39.3,40,41.1,42.2,43.3,44,45.1,46.2,47.3])
+# ws = nn.getWeights()
+# console.log(ws, ws.length)
+# console.log(nn.update([1,50,1]))
+
+window.tics = 0
+generationCounter = 0
+
+genEng = new GeneticEngine
+
+
+tic = (step) ->
+	if window.tics is 0
+		window.pop = genEng.makeNew(1, 48)		
+		console.log('gen:',window.pop)
+
+	if ++window.tics < parameters.numTics
+		# for bot in game.board.bots
+		# 	bot.tic(step)
+		# 	yes
+		for bot in window.pop
+			bot.tic(step)
+			if bot.foundFood() then ++bot.fitness
+			bot.render(context)
+
+	else # Reset and gogo next generation.
+		console.log('reset please')
+		window.tics = 0
+		++generationCounter
+
+
+################################################################################
+################################################################################
+
 
 class Board
 
@@ -393,10 +456,9 @@ class Board
 	tic: (step) ->
 		tic(step)
 
-		window.frame++
-		context.clearRect(0, 0, @canvas.width, @canvas.height)
-		# painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height},
-			# 0, {color:"rgba(255,255,255,.1)", fill:true})
+		++window.frame
+		# context.clearRect(0, 0, @canvas.width, @canvas.height)
+		painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
 		item.tic(step) for item in @food
-		item.tic(step) for item in @bots
+		# item.tic(step) for item in @bots
 		item.tic(step) for item in @state

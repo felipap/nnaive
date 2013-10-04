@@ -38,7 +38,7 @@ class Game
 		
 		$(@canvas).bind 'click', (event) =>
 			t = new Bot(@_getMousePos(event))
-			@board.addObject(t)
+			@board.addBot(t)
 
 		$(@canvas).bind 'mousedown', (event) =>
 			if event.button is 2
@@ -72,7 +72,6 @@ class Game
 		#window.AnimateOnFrameRate(->game.loop())
 
 	start: ->
-		return
 		addFpsCounter()
 		console.log "Start looping board" # , @board, "with painter", @ 
 		@loop()
