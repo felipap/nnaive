@@ -638,6 +638,12 @@ GeneticEngine = (function() {
   };
 
   mutate = function(a) {
+    if (parameters.mutationRate < Math.random()) {
+      var h = Math.random()-Math.random();
+      for (var i=0; i<a.length; i++) {
+        a[i] *= h;
+      }
+    }
     return a;
   };
 
