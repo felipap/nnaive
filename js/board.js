@@ -176,13 +176,10 @@ Drawable = (function() {
   Drawable.prototype.angularSpeed = 0;
 
   function Drawable(position) {
-    this.position = position != null ? position : null;
-    if (this.position === null) {
-      this.position = {
-        x: Math.floor(Math.random() * canvas.width),
-        y: Math.floor(Math.random() * canvas.height)
-      };
-    }
+    this.position = position != null ? position : {
+      x: Math.floor(Math.random() * canvas.width),
+      y: Math.floor(Math.random() * canvas.height)
+    };
     this.vel = {
       x: 0,
       y: 0
@@ -191,22 +188,13 @@ Drawable = (function() {
       x: 0,
       y: 0
     };
-    this.twalk = 0;
-    this.angle = Math.random() * Math.PI * 2;
     this.thrust = {
       a: .2,
       b: .2,
       c: .2,
       d: .2
     };
-    this.factor = {
-      x: Math.random() > (typeof 0.5 === "function" ? 0.5({
-        1: -1,
-        y: Math.random() > (typeof 0.5 === "function" ? 0.5({
-          1: -1
-        }) : void 0)
-      }) : void 0)
-    };
+    this.angle = Math.random() * Math.PI * 2;
   }
 
   Drawable.prototype.render = function(context) {};
@@ -283,7 +271,8 @@ Triangle = (function(_super) {
       y: 0.5773 * this.size
     };
     return painter.drawCenteredPolygon(context, this.position, [this.p1, this.p2, this.p3], this.angle, {
-      color: this.color
+      color: this.color,
+      fill: true
     });
   };
 
@@ -295,6 +284,8 @@ Food = (function(_super) {
   __extends(Food, _super);
 
   Food.prototype.size = 5;
+
+  Food.prototype.color = 'blue';
 
   function Food() {
     Food.__super__.constructor.apply(this, arguments);
@@ -333,8 +324,7 @@ Bot = (function(_super) {
 
   Bot.prototype.tic = function(step) {
     var food, nangle, speed, vel, _i, _len, _ref3;
-    step = window.vars.step;
-    speed = 0.2;
+    speed = 1500;
     this.position.x += speed * Math.cos(this.angle) * step;
     this.position.y += speed * Math.sin(this.angle) * step;
     this.position.x = mod(this.position.x, window.canvas.width);

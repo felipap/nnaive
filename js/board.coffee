@@ -108,25 +108,21 @@ class Drawable
 	position: {x:0, y:0}
 	angularSpeed: 0
 	
-	constructor: (@position=null) ->
-		if @position is null
-			@position = {x: Math.floor(Math.random()*canvas.width), y: Math.floor(Math.random()*canvas.height) }
+	constructor: (@position={x:Math.floor(Math.random()*canvas.width),y:Math.floor(Math.random()*canvas.height)}) ->
 		@vel = {x:0, y:0}
 		@acc = {x:0, y:0}
-		@twalk = 0
+		@thrust = {a:.2,b:.2,c:.2,d:.2}
 		@angle = Math.random()*Math.PI*2
 
-		@thrust = {a:.2,b:.2,c:.2,d:.2}
-		
-		@factor = {x: Math.random()>0.5?1:-1, y:Math.random()>0.5?1:-1}
-
 	render: (context) ->
-	tic: (step) -> @angle += @angularSpeed * step
+	
+	tic: (step) -> 
+		@angle += @angularSpeed * step
 
 class Circle extends Drawable
 
 	render: (context) ->
-		painter.drawCircle(context, @position, @size, {color: @color, fill: true})
+		painter.drawCircle(context, @position, @size, {color:@color, fill:true})
 
 class Square extends Drawable
 
@@ -139,11 +135,12 @@ class Triangle extends Drawable
 		@p1 = {x: 0, y: -1.154700*@size}
 		@p2 = {x: -@size, y: 0.5773*@size}
 		@p3 = {x: @size, y: 0.5773*@size}
-		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:@color})
+		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:@color, fill:true})
 
 class Food extends Triangle
 
 	size: 5
+	color: 'blue'
 
 	constructor: ->
 		super
@@ -168,10 +165,8 @@ class Bot extends Circle
 		window.lastAdded = @
 
 	tic: (step) ->
-		step = window.vars.step
 
-		speed = 0.2
-
+		speed = 1500
 		@position.x += speed*Math.cos(@angle)*step # *(@_acc.x*step*step/2)
 		@position.y += speed*Math.sin(@angle)*step # *(@_acc.y*step*step/2)
 
@@ -184,7 +179,6 @@ class Bot extends Circle
 			if dist2(@position,food.position) < dist2(@position,@closestFood.position)
 				@closestFood.color = 'blue'
 				@closestFood = food
-
 		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 		@closestFood.color = 'red'
 		nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
@@ -195,10 +189,8 @@ class Bot extends Circle
 			@closestFood.eat(@)
 
 		if window.leftPressed then @angle += 0.2
-		# if window.upPressed then @thrust.b = 0.5 else @thrust.b = 0
 		if window.rightPressed then @angle -= 0.2
-		# if window.downPressed then @thrust.d = 0.5 else @thrust.d = 0
-
+		
 	render: (context) ->
 		super
 		@p1 = {x: @size/2, y: 0}
