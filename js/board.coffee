@@ -1,47 +1,55 @@
 
 # board.coffee for nnaive
 
-sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
+sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/1))
 
 params =
 	activationResponse: 1
+
+window.counter = 0
 
 class Neuron
 	
 	constructor: (@nInputs=3) ->
 		# Notice we're deliberately chosing to go for a nInputs+1 sized @weights
 		# array, leaving space for the last item to be the bias weight.
-		@weights = (i/10 for i in [0..@nInputs])
+		@weights = ((window.counter++)+i/10 for i in [0..@nInputs])
 
 	fire: (input) ->
 		out = 0
-		console.log(@weights, input)
+		# console.log(@weights, input)
 		console.assert(@weights.length is input.length+1)
 		for value, i in input
-			console.log('\tvalue:', value, i, @weights[i])
+			# console.log('\tvalue:', value, i, @weights[i])
 			out += value*@weights[i]
-		#out += -1*@weights[@weights.length]
+		out += -1*@weights[@weights.length-1]
 		console.log('out:', out, sigmoid(out, params.activationResponse))
 		return sigmoid(out, params.activationResponse)
 
+	getWeights: -> @weights
+	putWeights: (weights) -> @weights = weights.splice(0,@nInputs+1) # +1 for bias
+
 class NeuronLayer
-	nNeurons: 0
 	neurons: []
 	
 	constructor: (nNeurons=3) ->
 		@neurons = (new Neuron for i in [0...nNeurons])
 
 	calculate: (input) ->
-		console.log('neuron layer:')
 		output = []
 		for neuron in @neurons
 			output.push(neuron.fire(input))
 		return output
 
+	getWeights: -> _.flatten((neuron.getWeights() for neuron in @neurons))
+	putWeights: (weights) ->
+		for neuron in @neurons
+			neuron.putWeights(weights)
+
 class NeuralNet
-	nInputs: 0
-	nOutputs: 0
-	neuronsPerHiddenLayer: 0
+	# nInputs: 0
+	# nOutputs: 0
+	# neuronsPerHiddenLayer: 0
 	layers: []
 
 	constructor: (layersConf=null) ->
@@ -52,11 +60,14 @@ class NeuralNet
 		else # layersConf is Array
 			@layers = (new NeuronLayer(n) for n in layersConf)
 	
-	getWeights: () ->
+	# getNumberOfWeights: () ->
 	
-	getNumberOfWeights: () ->
-	
+	getWeights: -> _.flatten((layer.getWeights() for layer in @layers))	
 	putWeights: (weights) ->
+		# I'm setting these to work like streams: each neuron splices a bit of it.
+		_weights = weights[..] # Make a copy just in case.
+		for layer in @layers
+			layer.putWeights(_weights)
 	
 	update: (inputNeurons) ->
 		console.log(@layers)
@@ -66,8 +77,12 @@ class NeuralNet
 		return outputs
 
 nn = new NeuralNet
-console.log(nn.update([1,0,1]))
+output = nn.update([1,0,1])
 
+nn.putWeights([0,1.1,2.2,3.3,4,5.1,6.2,7.3,8,9.1,10.2,11.3,12,13.1,14.2,15.3,16,17.1,18.2,19.3,20,21.1,22.2,23.3,24,25.1,26.2,27.3,28,29.1,30.2,31.3,32,33.1,34.2,35.3,36,37.1,38.2,39.3,40,41.1,42.2,43.3,44,45.1,46.2,47.3])
+ws = nn.getWeights()
+console.log(ws, ws.length)
+console.log(nn.update([1,50,1]))
 
 ################################################################################
 ################################################################################
