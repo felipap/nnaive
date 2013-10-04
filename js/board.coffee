@@ -204,19 +204,20 @@ class _Bot extends Circle
 		@p2 = {x: -@size*2/3, y: @size/3}
 		@p3 = {x: -@size*2/3, y: -@size/3}
 
+		painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
 		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:'white', fill:true})
 
-		context.lineWidth = @size-6
-		angles = {a:[Math.PI, Math.PI*3/2], d:[Math.PI/2, Math.PI], c:[0, Math.PI/2], b:[Math.PI*3/2, 0]}
-		context.save()
-		context.translate(@position.x, @position.y)
-		context.rotate(@angle)
-		for t, a of angles
-			context.beginPath()
-			context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
-			context.arc(0, 0, @size/2+6, a[0], a[1]);
-			context.stroke()
-		context.restore()
+		# context.lineWidth = @size-6
+		# angles = {a:[Math.PI, Math.PI*3/2], d:[Math.PI/2, Math.PI], c:[0, Math.PI/2], b:[Math.PI*3/2, 0]}
+		# context.save()
+		# context.translate(@position.x, @position.y)
+		# context.rotate(@angle)
+		# for t, a of angles
+		# 	context.beginPath()
+		# 	context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
+		# 	context.arc(0, 0, @size/2+6, a[0], a[1]);
+		# 	context.stroke()
+		# context.restore()
 
 	foundFood: ->
 		if dist2(@position,@closestFood.position) < Math.pow(@size+@closestFood.size,2)
@@ -241,9 +242,10 @@ sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
 parameters =
 	activationResponse: 1 								# for the sigmoid function
 	numTics: 500										# num of tics per generation
-	popSize: 15
+	popSize: 30
 	crossoverRate: 0.7
 	mutationRate: 0.3 # down to 0.05
+	foodCount: 40
 
 class Neuron
 	
@@ -362,6 +364,7 @@ class GeneticEngine
 		newpop = []
 		# Push elite (5 best members) to new population. Survive!
 		for g in sorted[sorted.length-5..] # Use parameters.
+			g.reset()
 			newpop.push(g)
 			g.isTop = true
 		# Generate until population cap is reached.
@@ -385,6 +388,12 @@ class Bot extends _Bot
 		@nn.putWeights(@weights)
 		console.log('here:', @nn.update([0,0,0,0]))
 		@isTop = false
+
+	reset: ->
+		# @position =
+		# 	x: Math.random()*canvas.width
+		# 	y: Math.random()*canvas.height
+		@fitness = 0
 
 	tic: ->
 		super
@@ -446,7 +455,7 @@ class Board
 		# @addBot(new Bot()) for i in [0..10]
 		window.pop = genEng.makeNew(parameters.popSize, (window.NPL+1)*window.NPL*window.NL)		
 		console.log('gen:',window.pop)
-		@food.push(new Food()) for i in [0..20]
+		@food.push(new Food()) for i in [0..parameters.foodCount]
 
 	render: (context) ->
 		item.render(context) for item in @state

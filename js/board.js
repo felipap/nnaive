@@ -355,7 +355,6 @@ _Bot = (function(_super) {
   };
 
   _Bot.prototype.render = function(context) {
-    var a, angles, t;
     _Bot.__super__.render.apply(this, arguments);
     this.p1 = {
       x: this.size / 2,
@@ -369,28 +368,13 @@ _Bot = (function(_super) {
       x: -this.size * 2 / 3,
       y: -this.size / 3
     };
-    painter.drawCenteredPolygon(context, this.position, [this.p1, this.p2, this.p3], this.angle, {
+    painter.drawCircle(context, this.position, this.size + this.fitness * 4, {
+      color: 'rgba(0,0,0,.4)'
+    });
+    return painter.drawCenteredPolygon(context, this.position, [this.p1, this.p2, this.p3], this.angle, {
       color: 'white',
       fill: true
     });
-    context.lineWidth = this.size - 6;
-    angles = {
-      a: [Math.PI, Math.PI * 3 / 2],
-      d: [Math.PI / 2, Math.PI],
-      c: [0, Math.PI / 2],
-      b: [Math.PI * 3 / 2, 0]
-    };
-    context.save();
-    context.translate(this.position.x, this.position.y);
-    context.rotate(this.angle);
-    for (t in angles) {
-      a = angles[t];
-      context.beginPath();
-      context.strokeStyle = "rgba(0,0,0," + this.thrust[t] + ")";
-      context.arc(0, 0, this.size / 2 + 6, a[0], a[1]);
-      context.stroke();
-    }
-    return context.restore();
   };
 
   _Bot.prototype.foundFood = function() {
@@ -432,9 +416,10 @@ sigmoid = function(netinput, response) {
 parameters = {
   activationResponse: 1,
   numTics: 500,
-  popSize: 15,
+  popSize: 30,
   crossoverRate: 0.7,
-  mutationRate: 0.3
+  mutationRate: 0.3,
+  foodCount: 40
 };
 
 Neuron = (function() {
@@ -701,6 +686,7 @@ GeneticEngine = (function() {
     _ref4 = sorted.slice(sorted.length - 5);
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
       g = _ref4[_i];
+      g.reset();
       newpop.push(g);
       g.isTop = true;
     }
@@ -732,6 +718,10 @@ Bot = (function(_super) {
     console.log('here:', this.nn.update([0, 0, 0, 0]));
     this.isTop = false;
   }
+
+  Bot.prototype.reset = function() {
+    return this.fitness = 0;
+  };
 
   Bot.prototype.tic = function() {
     Bot.__super__.tic.apply(this, arguments);
@@ -778,7 +768,7 @@ tic = function(step) {
 
 Board = (function() {
   function Board(canvas) {
-    var i, _i;
+    var i, _i, _ref4;
     this.canvas = canvas;
     window.context = this.canvas.getContext("2d");
     this.state = [];
@@ -786,7 +776,7 @@ Board = (function() {
     this.food = [];
     window.pop = genEng.makeNew(parameters.popSize, (window.NPL + 1) * window.NPL * window.NL);
     console.log('gen:', window.pop);
-    for (i = _i = 0; _i <= 20; i = ++_i) {
+    for (i = _i = 0, _ref4 = parameters.foodCount; 0 <= _ref4 ? _i <= _ref4 : _i >= _ref4; i = 0 <= _ref4 ? ++_i : --_i) {
       this.food.push(new Food());
     }
   }
