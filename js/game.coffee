@@ -31,7 +31,7 @@ class Game
 		$(".wrapper").height($(document).height()-20)
 		@canvas.width = $('.wrapper').width()  # window.innerWidth
 		@canvas.height = $('.wrapper').height() # window.innerHeight
-		context = @canvas.getContext "2d"
+		context = @canvas.getContext("2d")
 
 		@board = new window.Board(@canvas)
 		console.log 'board', @board
@@ -72,6 +72,7 @@ class Game
 		#window.AnimateOnFrameRate(->game.loop())
 
 	start: ->
+		return
 		addFpsCounter()
 		console.log "Start looping board" # , @board, "with painter", @ 
 		@loop()

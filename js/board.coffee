@@ -1,23 +1,68 @@
 
 # board.coffee for nnaive
 
-class SNeuron
-	nInputs: 0
-	weights: []
-	constructor: (@nInputs) ->
-		for i in [0..@nInputs]
-			weights = []
+sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
 
-class SNeuronLayer
+params =
+	activationResponse: 1
+
+class Neuron
+	
+	constructor: (@nInputs=3) ->
+		# Notice we're deliberately chosing to go for a nInputs+1 sized @weights
+		# array, leaving space for the last item to be the bias weight.
+		@weights = (i/10 for i in [0..@nInputs])
+
+	fire: (input) ->
+		out = 0
+		console.log(@weights, input)
+		console.assert(@weights.length is input.length+1)
+		for value, i in input
+			console.log('\tvalue:', value, i, @weights[i])
+			out += value*@weights[i]
+		#out += -1*@weights[@weights.length]
+		console.log('out:', out, sigmoid(out, params.activationResponse))
+		return sigmoid(out, params.activationResponse)
+
+class NeuronLayer
 	nNeurons: 0
 	neurons: []
-	constructor: (@nNeurons, inputsPerNeuron) ->
+	
+	constructor: (nNeurons=3) ->
+		@neurons = (new Neuron for i in [0...nNeurons])
 
-class CNeuralNet
+	calculate: (input) ->
+		console.log('neuron layer:')
+		output = []
+		for neuron in @neurons
+			output.push(neuron.fire(input))
+		return output
+
+class NeuralNet
 	nInputs: 0
 	nOutputs: 0
-	nHiddenLayers: 0
-	neuronsPerHiddenLayer
+	neuronsPerHiddenLayer: 0
+	layers: []
+
+	constructor: (nLayers=1) ->
+		@layers = (new NeuronLayer for i in [0...nLayers])
+	
+	getWeights: () ->
+	
+	getNumberOfWeights: () ->
+	
+	putWeights: (weights) ->
+	
+	update: (inputNeurons) ->
+		console.log(@layers)
+		outputs = inputNeurons
+		for layer in @layers
+			outputs = layer.calculate(outputs)
+		return outputs
+
+nn = new NeuralNet
+console.log(nn.update([1,0,1]))
+
 
 ################################################################################
 ################################################################################
