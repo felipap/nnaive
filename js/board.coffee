@@ -1,6 +1,27 @@
 
 # board.coffee for nnaive
 
+class SNeuron
+	nInputs: 0
+	weights: []
+	constructor: (@nInputs) ->
+		for i in [0..@nInputs]
+			weights = []
+
+class SNeuronLayer
+	nNeurons: 0
+	neurons: []
+	constructor: (@nNeurons, inputsPerNeuron) ->
+
+class CNeuralNet
+	nInputs: 0
+	nOutputs: 0
+	nHiddenLayers: 0
+	neuronsPerHiddenLayer
+
+################################################################################
+################################################################################
+
 painter =
 	applyCanvasOptions : (context, options) ->
 		if options.fill is true
@@ -97,6 +118,9 @@ painter =
 			context.fill()
 		else context.stroke()
 
+################################################################################
+################################################################################
+
 mod  = (a,n) -> ((a%n)+n)%n
 dist2= (a,b) -> Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2)
 dist = (a,b) -> Math.sqrt(dist2(a,b))
@@ -108,7 +132,9 @@ class Drawable
 	position: {x:0, y:0}
 	angularSpeed: 0
 	
-	constructor: (@position={x:Math.floor(Math.random()*canvas.width),y:Math.floor(Math.random()*canvas.height)}) ->
+	constructor: (@position=\
+			{x:Math.floor(Math.random()*canvas.width),\
+			y:Math.floor(Math.random()*canvas.height)}) ->
 		@vel = {x:0, y:0}
 		@acc = {x:0, y:0}
 		@thrust = {a:.2,b:.2,c:.2,d:.2}
@@ -245,7 +271,8 @@ class Board
 				n = name
 				$(".control#"+name+" input").bind 'change', (event) =>
 					window.e = event
-					value = Math.max(0.1, parseInt(event.target.value)/parseInt(event.target.dataset.divisor or 1))
+					value = Math.max(0.1, parseInt(event.target.value)/\
+						parseInt(event.target.dataset.divisor or 1))
 					event.target.parentElement.querySelector('span').innerHTML = value
 					window.vars[n] = value
 		@state = [] # Objects to be drawn.
@@ -265,7 +292,8 @@ class Board
 	tic: (step) ->
 		window.frame++
 		context.clearRect(0, 0, @canvas.width, @canvas.height)
-		# painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.1)", fill:true})
+		# painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height},
+			# 0, {color:"rgba(255,255,255,.1)", fill:true})
 		item.tic(step) for item in @food
 		item.tic(step) for item in @bots
 		item.tic(step) for item in @state
