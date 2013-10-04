@@ -4,6 +4,42 @@
 		"selected_items":
 		[
 			[
+				"lay",
+				"layersConf"
+			],
+			[
+				"contr",
+				"constructor"
+			],
+			[
+				"close",
+				"closestFood"
+			],
+			[
+				"dis",
+				"distDecay"
+			],
+			[
+				"angle",
+				"angularSpeed"
+			],
+			[
+				"ge",
+				"getMultiplier"
+			],
+			[
+				"ANGLE",
+				"angle_speed"
+			],
+			[
+				"canv",
+				"canvasStop"
+			],
+			[
+				"fill",
+				"fillRectangle"
+			],
+			[
 				"border-right",
 				"border-top-right-radius"
 			],
@@ -46,10 +82,6 @@
 			[
 				"cons",
 				"consumer_key"
-			],
-			[
-				"fill",
-				"fillColor"
 			],
 			[
 				"closes",
@@ -482,38 +514,6 @@
 			[
 				"scrollTo",
 				"scrollToContent"
-			],
-			[
-				"scroll",
-				"scrollToContent"
-			],
-			[
-				"search-",
-				"search-music"
-			],
-			[
-				"remove",
-				"removePunctuation"
-			],
-			[
-				"sea",
-				"search-music"
-			],
-			[
-				"searc",
-				"search-artist"
-			],
-			[
-				"Searc",
-				"SearchBar"
-			],
-			[
-				"mont",
-				"monthlyRankURL"
-			],
-			[
-				"top",
-				"topArtists"
 			]
 		]
 	},
@@ -523,34 +523,23 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 2090,
+				"buffer_size": 3016,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "nnaive.run",
+			"file": "js/game.coffee",
 			"settings":
 			{
-				"buffer_size": 442,
+				"buffer_size": 2627,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "coffee/bots.coffee",
+			"file": "js/board.coffee",
 			"settings":
 			{
-				"buffer_size": 0,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "\n$(function (window) {\n\n	var canvas = $(\"canvas#nnaive\");\n\n});",
-			"file": "js/bots.js",
-			"file_size": 1,
-			"file_write_time": 130248644994475300,
-			"settings":
-			{
-				"buffer_size": 62,
+				"buffer_size": 10267,
 				"line_ending": "Unix"
 			}
 		}
@@ -558,12 +547,20 @@
 	"build_system": "Packages/CoffeeScript/CoffeeScript.sublime-build",
 	"command_palette":
 	{
-		"height": 308.0,
+		"height": 56.0,
 		"selected_items":
 		[
 			[
 				"install",
 				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Disable Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
 			],
 			[
 				"pack",
@@ -614,10 +611,6 @@
 				"Convert Case: Upper Case"
 			],
 			[
-				"Package Control: ",
-				"Package Control: Install Package"
-			],
-			[
 				"Package Control: add",
 				"Package Control: Add Repository"
 			]
@@ -642,7 +635,16 @@
 	},
 	"file_history":
 	[
+		"/home/felipe/Projects/nnaive/js/board.js",
+		"/home/felipe/Projects/magnet-project/js/stiffexperimentation2.js",
+		"/home/felipe/Projects/magnet-project/js/magnetic.js",
+		"/home/felipe/Projects/nnaive/js/board.coffee",
+		"/home/felipe/Projects/nnaive/js/painter.coffee",
+		"/home/felipe/Projects/nnaive/js/vendor/bootstrap.js",
+		"/home/felipe/Projects/nnaive/js/bots.coffee",
+		"/home/felipe/.config/sublime-text-3/Packages/Emmet/Emmet.sublime-settings",
 		"/home/felipe/Projects/nnaive/nnaive.run",
+		"/home/felipe/Projects/nnaive/js/bots.js",
 		"/home/felipe/Projects/nnaive/css/main.less",
 		"/home/felipe/Projects/heroku-tc/turmacidada/templates/footer.html",
 		"/home/felipe/Projects/heroku-tc/turmacidada/templates/osite.html",
@@ -709,9 +711,7 @@
 		"/home/felipe/Projects/meavisa/app.js",
 		"/home/felipe/Projects/meavisa/update.js",
 		"/home/felipe/Projects/magnet-project/js/stiffexperimentation.js",
-		"/home/felipe/Projects/magnet-project/js/stiffexperimentation2.js",
 		"/home/felipe/Projects/meavisa/pack.js",
-		"/home/felipe/Projects/magnet-project/js/magnetic.js",
 		"/home/felipe/Projects/magnet-project/css/magnetic.less",
 		"/home/felipe/Projects/magnet-project/js/magnet.new.js",
 		"/home/felipe/Projects/magnet-project/js/magnetic3.js",
@@ -762,14 +762,7 @@
 		"/home/felipe/Projects/pi.is/css/normalize.css",
 		"/home/felipe/Projects/pi.is/js/pi.js",
 		"/home/felipe/Projects/pi.is/main.css",
-		"/home/felipe/Projects/pi.is/pi.js",
-		"/home/felipe/Projects/pi.is/main.less",
-		"/home/felipe/Desktop/trabalhinho/pesquisa.html",
-		"/home/felipe/Desktop/trabalhinho/inicio.html",
-		"/home/felipe/Desktop/trabalhinho/registrar.html",
-		"/home/felipe/Desktop/trabalhinho/main.css",
-		"/home/felipe/Desktop/trabalhinho/procurar.html",
-		"/home/felipe/Desktop/trabalhinho/Estilo.css"
+		"/home/felipe/Projects/pi.is/pi.js"
 	],
 	"find":
 	{
@@ -787,134 +780,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"blog",
-			"boto",
-			"500",
-			"404",
-			"box-shadow",
-			"7",
-			"box",
-			"datetime",
-			"4",
-			"5",
-			"div",
-			"self.age",
-			"born",
-			"140",
-			"models.Date",
-			"birth",
-			"margin-bottom:",
-			"margin-bottom",
-			"blank",
-			"TreeManager",
-			"6>",
-			"6",
-			"margin: 20px",
-			"h6",
-			"box",
-			"top:",
-			"none",
-			"@p",
-			"3px",
-			"; ",
-			"link",
-			"background:",
-			"news",
-			"h4",
-			"h3",
-			"h4",
-			"totalHeight",
-			"150px",
-			"20px",
-			"hover",
-			"span",
-			"h3",
-			"span",
-			"h4",
-			"span",
-			"relative",
-			"absolute",
-			"h4",
-			"relative",
-			"3",
-			"10px",
-			"asdasd",
-			"a",
-			"asd",
-			"DIV ",
-			"h2",
-			",",
-			"h3",
-			"3",
-			"#",
-			"like-box",
-			"facebook",
-			"40px",
-			".like-box",
-			".fan_box ",
-			".facebook",
-			"fb-like-box",
-			"like-box",
 			" ",
-			"fb",
-			"fb.",
-			"FB.init",
-			"fb.init",
-			"data-",
-			"data-href",
-			" data",
-			"blog",
-			"google-",
-			"plus",
-			"class=\"\"",
-			"class=\"\" ",
-			"class=\"\"",
-			"language",
-			"compress",
-			"compressor",
-			"compress",
-			"{",
+			"0.1",
+			"i",
+			"..",
+			"n",
+			"factor",
+			"mass",
+			"mm",
+			"context",
+			"context.",
+			"game",
+			"mod",
+			"foods",
+			"foods ",
+			"@angle*",
+			"@angle",
+			"#",
 			"%",
-			"s3cache",
-			"compressor",
-			"boto",
+			"Math.abs",
+			"x",
+			"M",
+			"r",
+			"rx",
+			"Math",
+			"#",
+			"*rx",
+			" 0.2",
+			"@position.",
+			"acc",
+			"0.2",
+			")*",
+			"0.99",
+			"10",
+			"@thrusts",
+			"thrust",
+			"step*(",
+			"step*",
+			"step",
+			"x",
+			"console.log",
+			"b",
+			"c",
+			"b",
+			"then ",
+			" then",
+			"if ",
+			"a",
+			"leftPressed",
+			"0",
+			"@thrust",
+			"thrust",
+			",@thrust",
+			"@thrust",
+			"thrust",
+			"thursts",
+			"thurst",
+			"thrust",
+			"		context.beginPath()\n",
+			"false",
 			"4",
-			"ALLOWED_HOSTS",
-			"ALLOWED_HOSTS = []",
-			"ALLOWED",
-			"media",
-			"767",
-			"container",
-			"650px",
-			"@media",
-			"width",
-			"enviar",
-			"stro",
-			"Curso Técnico de Informática",
-			"ensino médio",
-			"form",
+			"true",
+			"# ",
+			"fill",
+			"context.arc(",
+			"context.fillStyle",
+			"20",
+			"ctx",
+			"; ",
+			"// ",
+			"Create",
+			"          // Create",
+			"// ",
+			"true",
+			"= true",
+			"Down ",
+			"4000",
+			"distDecay",
+			"50000",
+			"1",
+			" distDecay",
+			"window.vars.rest",
+			"100",
+			"*  Math.pow((@acc.angle-@angle)/2/Math.PI,2)",
+			"10000",
+			"Math.max(",
+			"5000",
+			"m.size+5",
+			"m.size*2",
+			"*2",
+			"0.1",
+			"2*",
+			"Pi",
+			")/",
+			"/",
+			"100",
+			"100 ",
+			"10",
+			"100",
+			"1000",
+			"10000",
+			"distDecay",
+			"Math.pow(1000,distDecay)",
+			"Math.pow(1000,distDecay",
+			"))",
+			"10000000",
+			"10,",
+			"10",
+			"1000000000",
+			"10000000",
+			"10",
+			"10000",
+			"size",
+			"velocity",
+			"drawCenteredPolygon",
+			"endPoint",
+			"100",
+			"10",
+			"0.99",
 			"00",
-			"A00",
-			"construction-banner",
-			"const-banner",
-			"ga",
-			"required ",
-			"d><td",
-			"<td",
-			"td>",
-			"not",
-			"with ",
-			"back",
+			"@size",
+			"\n",
+			" 100",
+			"10000",
+			"@.",
+			"m",
+			"y",
 			"5",
-			"header",
-			"canvas",
-			"body",
-			"data-stellar",
-			"lutas",
-			"slider-nav",
-			"strong>",
-			"strong",
-			"b>"
+			" :"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1069,15 +1062,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2090,
+						"buffer_size": 3016,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2071,
-								2071
+								755,
+								755
 							]
 						],
 						"settings":
@@ -1087,85 +1080,60 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 91.0,
+						"translation.y": 152.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "nnaive.run",
+					"file": "js/game.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 442,
+						"buffer_size": 2627,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								326,
-								326
+								1681,
+								1681
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/ShellScript/Shell-Unix-Generic.tmLanguage"
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 836.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "coffee/bots.coffee",
+					"file": "js/board.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 10267,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								369,
+								387
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "js/bots.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 62,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								62,
-								62
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1252,7 +1220,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 174.0,
+	"side_bar_width": 256.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

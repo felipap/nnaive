@@ -1,29 +1,25 @@
 
 # board.coffee for nnaive
 
-sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/1))
+sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
 
 params =
-	activationResponse: 1
-
-window.counter = 0
+	activationResponse: 1 								# for the sigmoid function
+	numTics: 2000										# num of tics per generation
 
 class Neuron
 	
 	constructor: (@nInputs=3) ->
 		# Notice we're deliberately chosing to go for a nInputs+1 sized @weights
 		# array, leaving space for the last item to be the bias weight.
-		@weights = ((window.counter++)+i/10 for i in [0..@nInputs])
+		@weights = (0 for i in [0..@nInputs]) # Initialize to 0.
 
 	fire: (input) ->
 		out = 0
-		# console.log(@weights, input)
 		console.assert(@weights.length is input.length+1)
 		for value, i in input
-			# console.log('\tvalue:', value, i, @weights[i])
 			out += value*@weights[i]
 		out += -1*@weights[@weights.length-1]
-		console.log('out:', out, sigmoid(out, params.activationResponse))
 		return sigmoid(out, params.activationResponse)
 
 	getWeights: -> @weights
@@ -47,9 +43,6 @@ class NeuronLayer
 			neuron.putWeights(weights)
 
 class NeuralNet
-	# nInputs: 0
-	# nOutputs: 0
-	# neuronsPerHiddenLayer: 0
 	layers: []
 
 	constructor: (layersConf=null) ->
@@ -59,8 +52,6 @@ class NeuralNet
 			@layers = (new NeuronLayer for i in [0...nLayers])
 		else # layersConf is Array
 			@layers = (new NeuronLayer(n) for n in layersConf)
-	
-	# getNumberOfWeights: () ->
 	
 	getWeights: -> _.flatten((layer.getWeights() for layer in @layers))	
 	putWeights: (weights) ->
@@ -76,6 +67,40 @@ class NeuralNet
 			outputs = layer.calculate(outputs)
 		return outputs
 
+
+class Genoma
+	weights = []
+	fitness = 0
+
+class GeneticAlgorithm
+	cromossomes = [] # Holds all SGenoma
+	totalFitness = 0
+	bestFitness = 0
+	avgFitness = 0
+	worstFitness = 0
+	bestGenoma = null
+	mutationRate = 0.3 # to 0.05
+	crossoverRate = 0.7
+	genCounter = 0
+
+	constructor: (popSize) ->
+		#for 
+
+	crossover: (mum, dad) ->
+
+		return {baby1: baby1, baby2: baby2}
+
+	getChromoRoulette: ->
+
+	grabNBest: (nBest, numCopies, vecPop) ->
+
+	calculateBestWorstAvgTotal: ->
+
+	reset: ->
+
+	epoch: (oldPop) ->
+
+
 nn = new NeuralNet
 output = nn.update([1,0,1])
 
@@ -83,6 +108,17 @@ nn.putWeights([0,1.1,2.2,3.3,4,5.1,6.2,7.3,8,9.1,10.2,11.3,12,13.1,14.2,15.3,16,
 ws = nn.getWeights()
 console.log(ws, ws.length)
 console.log(nn.update([1,50,1]))
+
+window.tics = 0
+generationCounter = 0
+
+tic = (step) ->
+	if window.tics++ < param.numTics
+
+	else # Resec
+		window.tics = 0
+		generationCounter++
+
 
 ################################################################################
 ################################################################################
@@ -355,6 +391,8 @@ class Board
 		item.render(context) for item in @bots
 
 	tic: (step) ->
+		tic(step)
+
 		window.frame++
 		context.clearRect(0, 0, @canvas.width, @canvas.height)
 		# painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height},
