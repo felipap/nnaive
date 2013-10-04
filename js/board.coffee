@@ -1,6 +1,11 @@
 
 # board.coffee for nnaive
 
+mod = (a, n) -> ((a%n)+n)%n
+
+dist2 = (a, b) -> Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2)
+dist = (a, b) -> Math.sqrt(dist2(a,b))
+
 painter =
 	applyCanvasOptions : (context, options) ->
 		if options.fill is true
@@ -100,23 +105,18 @@ painter =
 mm = (min, num, max) -> # restricts num to min max bounds.
 	Math.max(min, Math.min(max, num))
 
+
 getResultant = (m, objects, distDecay=2, reppel=2) ->
 	fx = fy = 0
 	for obj in objects when obj isnt m
-		# Delta calculations. 
-		dx = m.position.x - obj.position.x
-		dy = m.position.y - obj.position.y
-		# Vector direction corrections.
-		# rx = if dx > 0 then -1 else 1
-		# ry = if dy > 0 then -1 else 1
 		# Distance calculation. (squared)
 		d2 = Math.pow(m.position.x-obj.position.x,2)+Math.pow(m.position.y-obj.position.y,2)
 		# Force is inversely proportional to the distance^distDecay.
 		F = m.mass*obj.mass/(if distDecay is 2 then d2 else Math.pow(d2,distDecay/2)) 
 		# Calculate vector projections. (update to shortcut functions?)
-		alpha = Math.atan2(dy,dx)
-		dfx = Math.abs(Math.cos(alpha))*F*rx
-		dfy = Math.abs(Math.sin(alpha))*F*ry
+		alpha = Math.atan2(m.position.y-obj.position.y,m.position.x-obj.position.x)
+		dfx = -Math.cos(alpha)*F
+		dfy = -Math.sin(alpha)*F
 		# Draw point-to-point vector.
 		painter.drawLine(context, m.position, obj.position, {color: "#444", width: mm(0, F*50000,100)})
 		# Multiplier
@@ -144,7 +144,9 @@ class Drawable
 	position: {x:0, y:0}
 	angularSpeed: 0
 	
-	constructor: (@position) ->
+	constructor: (@position=null) ->
+		if @position is null
+			@position = {x: Math.floor(Math.random()*canvas.width), y: Math.floor(Math.random()*canvas.height) }
 		@vel = {x:0, y:0}
 		@acc = {x:0, y:0}
 		@twalk = 0
@@ -169,33 +171,7 @@ class Drawable
 		# @twalk = Math.max(50, Math.floor(500*Math.random()))
 		# # @angularSpeed = mm(0.00001, Math.random()*0.00001, 0.00002)
 
-	tic: (step) ->
-		step = window.vars.step
-
-		# speed = 20
-		@_acc = {x: @acc.x, y: @acc.y}
-		@acc = {x: @thrust.a+@thrust.d-@thrust.b-@thrust.c, y:(@thrust.a-@thrust.d+@thrust.b-@thrust.c)}
-
-		@position.x += @vel.x*step # *(@_acc.x*step*step/2)
-		@position.y += @vel.y*step # *(@_acc.y*step*step/2)
-		@vel.x += @acc.x*0.05
-		@vel.y += @acc.y*0.05
-
-		@vel.x *= 0.9
-		@vel.y *= 0.9
-		
-		angle = if @vel.x and @vel.y then Math.atan2(@vel.y,@vel.x) else @angle
-		@angle += angle*step/1000
-		console.log(angle, @angle)
-
-		# Bounce, please.
-		if canvas.height- @position.y < 0 or @position.y < 0 then @vel.y *= -0.5
-		if canvas.width - @position.x < 0 or @position.x < 0 then @vel.x *= -0.5
-		# Limit particle to canvas bounds.
-		@position.x = mm(0, @position.x, window.canvas.width)
-		@position.y = mm(0, @position.y, window.canvas.height)
-
-	ticMove: (step) ->
+	ticTT: (step) ->
 		step = window.vars.step # 100
 		# Verlet Integration
 		@_acc = {x: @acc.x, y: @acc.y}
@@ -205,7 +181,7 @@ class Drawable
 		@acc.x *= 1/@mass # add multipliers here
 		@acc.y *= 1/@mass
 
-		factor = step * window.vars.rest
+		factor = step * window.vars.rest/100
 
 		# Update velocity with average acceleration and defined factor
 		@vel.x += (@_acc.x+@acc.x) / 2 * factor
@@ -221,16 +197,9 @@ class Drawable
 		# 	console.log(@acc.angle)
 		@angle += (@acc.angle-@angle)*0.2
 		# @angle += -@angularSpeed * step * window.vars.anglemom # * Math.max(1, Math.pow(Math.abs(@acc.x)+Math.abs(@acc.y), 3) )/ @mass
-
-		# Eat, please.
-		# for p in food
-
-		# Bounce, please.
-		if canvas.height - @position.y < 10 or @position.y < 10
-			@vel.y *= -0.5
-		if canvas.width - @position.x < 10 or @position.x < 10
-			@vel.x *= -0.5
-		
+		# # Bounce, please.
+		# if canvas.height- @position.y < 0 or @position.y < 0 then @vel.y *= -0.5
+		# if canvas.width - @position.x < 0 or @position.x < 0 then @vel.x *= -0.5
 		# Limit particle to canvas bounds.
 		@position.x = mm(0, @position.x, window.canvas.width)
 		@position.y = mm(0, @position.y, window.canvas.height)
@@ -238,10 +207,6 @@ class Drawable
 	render: (context) ->
 
 class Triangle extends Drawable
-
-	constructor: (@position) ->
-	
-	tic: (step) ->
 
 	render: (context) ->
 		@p1 = {x: 0, y: -1.154700*@size}
@@ -273,26 +238,57 @@ class Square extends Drawable
 
 	render: (context) =>
 		painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:@color, fill:true})
-		# painter.drawSizedRect(context, @position, {x:@size,y:@size}, @angle, {color:'white', fill:false, width:1})
+
+class Food extends Triangle
+
+	size: 5
+
+	constructor: ->
+		super
+		@angularSpeed = Math.random()*20-10
+
+	tic: (step) ->
+		@angle += @angularSpeed * step
+
+	eat: (eater) ->
+		@position = {
+			x: Math.random()*canvas.width,
+			y: Math.random()*canvas.height
+		}
+
 
 class Bot extends Circle
 	
 	type: 'Bot'
 	color: '#A2A'
 	#multipliers: {'Bot': 0.01,'FixedPole': .5}
-	size: 20
-	angularSpeed: .00001
+	size: 10
+	#angularSpeed: .00001
 
 	constructor: (@position) ->
 		super
 		window.lastAdded = @
 
 	tic: (step) ->
-		super
-		if window.leftPressed then @thrust.a = 0.5 else @thrust.a = 0
-		if window.upPressed then @thrust.b = 0.5 else @thrust.b = 0
-		if window.rightPressed then @thrust.c = 0.5 else @thrust.c = 0
-		if window.downPressed then @thrust.d = 0.5 else @thrust.d = 0
+		step = window.vars.step
+
+		speed = 0.2
+
+		@position.x += speed*Math.cos(@angle)*step # *(@_acc.x*step*step/2)
+		@position.y += speed*Math.sin(@angle)*step # *(@_acc.y*step*step/2)
+
+		# Limit particle to canvas bounds.
+		@position.x = mod(@position.x,window.canvas.width)
+		@position.y = mod(@position.y,window.canvas.height)
+
+		for food in game.board.food
+			if dist2(@position, food.position) < Math.pow(@size+food.size,2)
+				food.eat(@)
+
+		if window.leftPressed then @angle += 0.2
+		# if window.upPressed then @thrust.b = 0.5 else @thrust.b = 0
+		if window.rightPressed then @angle -= 0.2
+		# if window.downPressed then @thrust.d = 0.5 else @thrust.d = 0
 
 	render: (context) ->
 		super
@@ -314,12 +310,12 @@ class FixedPole extends Triangle
 	type: 'FixedPole'
 	color: "#08e"
 	size: 30
-	angularSpeed: .0002
+	angularSpeed: .02
 
 	tic: (step) ->
 		step = 20
 		@size = window.vars.polesize
-		@angle += @angularSpeed * step 
+		@angle += @angularSpeed * step
 
 ################################################################################
 ################################################################################
@@ -329,9 +325,15 @@ class Board
 	addObject: (object) ->
 		@state.push object
 
+	addBot: (object) ->
+		@bots.push object
+
+	addFood: (object) ->
+		@food.push object
+
 	constructor: (@canvas) ->
 		window.context = @canvas.getContext("2d")
-		
+		window.frame = 0
 		window.vars = {}
 		vars = _.map($(".control"), (i)-> i.id );
 		for name in vars
@@ -345,14 +347,22 @@ class Board
 					event.target.parentElement.querySelector('span').innerHTML = value
 					window.vars[n] = value
 		@state = [] # Objects to be drawn.
+		@bots = []
+		@food = []
+
+		# @addBot(new Bot()) for i in [0..10]
+
+		@addFood(new Food()) for i in [0..50]
 
 	render: (context) ->
-		for item in @state
-			item.render(context)
+		item.render(context) for item in @state
+		item.render(context) for item in @food
+		item.render(context) for item in @bots
 
 	tic: (step) ->
+		window.frame++
 		context.clearRect(0, 0, @canvas.width, @canvas.height)
-		#painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.1)", fill:true})
-		for item in @state
-			item.tic(step)
-
+		# painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.1)", fill:true})
+		item.tic(step) for item in @state
+		item.tic(step) for item in @food
+		item.tic(step) for item in @bots
