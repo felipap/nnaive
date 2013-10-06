@@ -215,9 +215,9 @@ Circle = (function(_super) {
     return _ref;
   }
 
-  Circle.prototype.render = function(context) {
+  Circle.prototype.render = function(context, color) {
     return painter.drawCircle(context, this.position, this.size, {
-      color: this.color,
+      color: color,
       fill: true
     });
   };
@@ -359,7 +359,7 @@ _Bot = (function(_super) {
       width: 1,
       color: 'grey'
     });
-    output = this.nn.fire([Math.atan2(this.closestFood.position.y - this.position.y, this.closestFood.position.x - this.position.x), this.angle]);
+    output = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x), this.angle]);
     this.angle += output[0] - output[1];
     /*
     		context.lineWidth = @size-6
@@ -683,6 +683,8 @@ Board = (function() {
     newpop.push(new Bot(this.mutate(sorted[0].weights.slice(0)), 'green'));
     newpop.push(new Bot(this.mutate(sorted[1].weights.slice(0)), 'green'));
     newpop.push(new Bot(this.mutate(sorted[3].weights.slice(0)), 'green'));
+    newpop.push(new Bot(this.crossover(sorted[0].weights.slice(0), sorted[1].weights.slice(0))[0], 'yellow'));
+    newpop.push(new Bot(this.crossover(sorted[0].weights.slice(0), sorted[2].weights.slice(0))[1], 'yellow'));
     this.stats.mutated = 0;
     while (newpop.length < this.params.popSize) {
       mother = getChromoRoulette(sorted.slice(0, 11));
@@ -801,14 +803,15 @@ Bot = (function(_super) {
     return this.closestFood = null;
   };
 
-  Bot.prototype.render = function() {
-    this.color = '#A2A';
+  Bot.prototype.render = function(context) {
+    var color;
+    color = this.color;
     if (stats.topBot === this) {
-      this.color = 'black';
+      color = 'black';
     } else if (this.isElite) {
-      this.color = '#088';
+      color = '#088';
     }
-    return Bot.__super__.render.apply(this, arguments);
+    return Bot.__super__.render.call(this, context, color);
   };
 
   return Bot;

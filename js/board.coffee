@@ -126,8 +126,8 @@ class Drawable
 
 class Circle extends Drawable
 
-	render: (context) ->
-		painter.drawCircle(context, @position, @size, {color:@color, fill:true})
+	render: (context, color) ->
+		painter.drawCircle(context, @position, @size, {color:color, fill:true})
 
 class Square extends Drawable
 
@@ -190,8 +190,7 @@ class _Bot extends Circle
 
 		# output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
 		# 		Math.cos(@angle), Math.sin(@angle)])
-		output = @nn.fire([Math.atan2(@closestFood.position.y\
-			-@position.y,@closestFood.position.x-@position.x),@angle])
+		output = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
 		#nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
 		# if @ is window.lastAdded
 		# 	@color = 'red'
@@ -349,7 +348,6 @@ class Board
 				return g
 		# console.log('não', _.reduce(population,(a,b)->a.fitness+b.fitness), population)
 
-	# calculateBestWorstAvgTotal: ->
 
 	makeNew: (popSize, numWeights) ->
 		@pop = []
@@ -369,6 +367,9 @@ class Board
 		newpop.push(new Bot(@mutate(sorted[0].weights[..]), 'green'))
 		newpop.push(new Bot(@mutate(sorted[1].weights[..]), 'green'))
 		newpop.push(new Bot(@mutate(sorted[3].weights[..]), 'green'))
+
+		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[1].weights[..])[0], 'yellow'))
+		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[2].weights[..])[1], 'yellow'))
 
 		@stats.mutated = 0
 		# Generate until population cap is reached.
@@ -437,12 +438,12 @@ class Bot extends _Bot
 		@fitness = 0
 		@closestFood = null
 
-	render: ->
-		@color = '#A2A'
-		if stats.topBot is @ then @color = 'black'
-		else if @isElite then @color = '#088'
+	render: (context) ->
+		color = @color
+		if stats.topBot is @ then color = 'black'
+		else if @isElite then color = '#088'
 
-		super
+		super(context, color)
 
 calcNumWeights = (matrix, nInputs) ->
 	lastNum = nInputs
