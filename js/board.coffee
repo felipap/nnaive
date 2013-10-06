@@ -167,11 +167,12 @@ class _Bot extends Circle
 	
 	color: '#A2A'
 	size: 10
-	@closestFood = null
+	closestFood: null
 
 	constructor: (@position) ->
 		super
 		window.lastAdded = @
+		@lastOutput = [0,0]
 
 	tic: (step) ->
 		speed = 250
@@ -187,18 +188,21 @@ class _Bot extends Circle
 			if dist2(@position,food.position) < dist2(@position,@closestFood.position)
 				@closestFood = food
 		@closestFood.color = 'red'
-		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 
-		# output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
-		# 		Math.cos(@angle), Math.sin(@angle)])
-		output = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
-		#nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
-		# if @ is window.lastAdded
-		# 	@color = 'red'
-		# 	console.log [Math.atan2(@closestFood.position.y-@position.y,\
-			# @closestFood.position.x-@position.x),@angle, output[0]]
-		@angle += output[0]-output[1]
+		output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
+				Math.cos(@angle), Math.sin(@angle)])
+		# @lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
+		@angle += @lastOutput[0]-@lastOutput[1]
 		######
+		if window.leftPressed then @angle += 0.2
+		if window.rightPressed then @angle -= 0.2
+		
+	render: (context) ->
+		# Draw circle
+		super
+		# if @fitness
+		# 	painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
+		# Draw crown
 		context.lineWidth = @size-6
 		angles = {0:[-Math.PI, 0], 1:[0,Math.PI]}
 		context.save() 
@@ -206,22 +210,17 @@ class _Bot extends Circle
 		context.rotate(@angle)
 		for t, a of angles
 			context.beginPath()
-			context.strokeStyle = "rgba(0,0,0,#{output[t]})"
+			context.strokeStyle = "rgba(0,0,0,#{@lastOutput[t]})"
 			context.arc(0, 0, @size/2+8+5*@fitness, a[0], a[1]);
 			context.stroke()
 		context.restore()
-		######
-		if window.leftPressed then @angle += 0.2
-		if window.rightPressed then @angle -= 0.2
-		
-	render: (context) ->
-		super
+		# Draw line to nearest food item.
+		if @closestFood
+			painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
+		# Draw middle triangle
 		@p1 = {x: @size/2, y: 0}
 		@p2 = {x: -@size*2/3, y: @size/3}
 		@p3 = {x: -@size*2/3, y: -@size/3}
-
-		# if @fitness
-		# 	painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
 		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:'white', fill:true})
 
 	foundFood: ->
@@ -292,6 +291,27 @@ class NeuralNet
 
 ##########################################################################################
 ##########################################################################################
+
+
+class Bot extends _Bot
+	
+	constructor: (@weights, @color='#A2A') ->
+		super()
+		@fitness = 0
+		@nn = new NeuralNet(window.layersConf, window.nInputs)
+		@nn.putWeights(@weights)
+
+	reset: -> # Is elite.
+		@isElite = true
+		@fitness = 0
+		@closestFood = null
+
+	render: (context) ->
+		color = @color
+		if stats.topBot is @ then color = 'black'
+		else if @isElite then color = '#088'
+
+		super(context, color)
 
 class Board
 	totalFitness: 0
@@ -397,7 +417,6 @@ class Board
 		@food = (new Food() for i in [0..foodCount])
 
 	tic: (step) ->
-		context.clearRect(0, 0, canvas.width, canvas.height)
 		# painter.drawRectangle(context, {x:0,y:0},
 		# {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
 		
@@ -415,6 +434,7 @@ class Board
 		item.tic(step) for item in @food
 
 	render: (context) ->
+		context.clearRect(0, 0, canvas.width, canvas.height)
 		item.render(context) for item in @food
 		item.render(context) for item in @pop
 
@@ -431,25 +451,6 @@ class Board
 		@pop = @epoch(@pop)
 
 
-class Bot extends _Bot
-	
-	constructor: (@weights, @color='#A2A') ->
-		super()
-		@fitness = 0
-		@nn = new NeuralNet(window.layersConf, window.nInputs)
-		@nn.putWeights(@weights)
-
-	reset: -> # Is elite.
-		@isElite = true
-		@fitness = 0
-		@closestFood = null
-
-	render: (context) ->
-		color = @color
-		if stats.topBot is @ then color = 'black'
-		else if @isElite then color = '#088'
-
-		super(context, color)
 
 calcNumWeights = (matrix, nInputs) ->
 	lastNum = nInputs
@@ -461,6 +462,6 @@ calcNumWeights = (matrix, nInputs) ->
 
 window.activationResponse = 1
 
-window.nInputs = 2
+window.nInputs = 4
 window.layersConf = [5,2]
 window.numWeights = calcNumWeights(layersConf, window.nInputs)

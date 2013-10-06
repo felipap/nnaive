@@ -56,7 +56,7 @@ Game = (function() {
     });
   }
 
-  Game.prototype.loop = function() {
+  Game.prototype.loopTic = function() {
     var now, thisFrameFPS,
       _this = this;
     thisFrameFPS = 1000 / ((now = new Date) - lastUpdate);
@@ -64,17 +64,27 @@ Game = (function() {
     lastUpdate = now * 1 - 1;
     if (!window.canvasStop) {
       this.board.tic(1 / 50);
+    }
+    if (!window.canvasStop) {
       this.board.render(context);
     }
-    return window.setTimeout(function() {
-      return _this.loop();
-    }, 1);
+    return window.setTimeout((function() {
+      return _this.loopTic();
+    }), 1);
+  };
+
+  Game.prototype.loopRender = function() {
+    var _this = this;
+    return window.setTimeout((function() {
+      return _this.loopRender();
+    }), 100);
   };
 
   Game.prototype.start = function() {
     addFpsCounter();
     console.log("Start looping board", this.board, "with painter", this);
-    return this.loop();
+    this.loopTic();
+    return this.loopRender();
   };
 
   return Game;

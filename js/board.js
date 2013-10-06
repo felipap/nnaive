@@ -334,16 +334,17 @@ _Bot = (function(_super) {
 
   _Bot.prototype.size = 10;
 
-  _Bot.closestFood = null;
+  _Bot.prototype.closestFood = null;
 
   function _Bot(position) {
     this.position = position;
     _Bot.__super__.constructor.apply(this, arguments);
     window.lastAdded = this;
+    this.lastOutput = [0, 0];
   }
 
   _Bot.prototype.tic = function(step) {
-    var a, angles, food, output, speed, t, _i, _len, _ref4;
+    var food, output, speed, _i, _len, _ref4;
     speed = 250;
     this.position.x += speed * Math.cos(this.angle) * step;
     this.position.y += speed * Math.sin(this.angle) * step;
@@ -359,12 +360,19 @@ _Bot = (function(_super) {
       }
     }
     this.closestFood.color = 'red';
-    painter.drawLine(context, this.position, this.closestFood.position, {
-      width: 1,
-      color: 'grey'
-    });
-    output = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x), this.angle]);
-    this.angle += output[0] - output[1];
+    output = this.nn.fire([this.closestFood.position.x - this.position.x, this.closestFood.position.y - this.position.y, Math.cos(this.angle), Math.sin(this.angle)]);
+    this.angle += this.lastOutput[0] - this.lastOutput[1];
+    if (window.leftPressed) {
+      this.angle += 0.2;
+    }
+    if (window.rightPressed) {
+      return this.angle -= 0.2;
+    }
+  };
+
+  _Bot.prototype.render = function(context) {
+    var a, angles, t;
+    _Bot.__super__.render.apply(this, arguments);
     context.lineWidth = this.size - 6;
     angles = {
       0: [-Math.PI, 0],
@@ -376,21 +384,17 @@ _Bot = (function(_super) {
     for (t in angles) {
       a = angles[t];
       context.beginPath();
-      context.strokeStyle = "rgba(0,0,0," + output[t] + ")";
+      context.strokeStyle = "rgba(0,0,0," + this.lastOutput[t] + ")";
       context.arc(0, 0, this.size / 2 + 8 + 5 * this.fitness, a[0], a[1]);
       context.stroke();
     }
     context.restore();
-    if (window.leftPressed) {
-      this.angle += 0.2;
+    if (this.closestFood) {
+      painter.drawLine(context, this.position, this.closestFood.position, {
+        width: 1,
+        color: 'grey'
+      });
     }
-    if (window.rightPressed) {
-      return this.angle -= 0.2;
-    }
-  };
-
-  _Bot.prototype.render = function(context) {
-    _Bot.__super__.render.apply(this, arguments);
     this.p1 = {
       x: this.size / 2,
       y: 0
@@ -569,6 +573,39 @@ NeuralNet = (function() {
 
 })();
 
+Bot = (function(_super) {
+  __extends(Bot, _super);
+
+  function Bot(weights, color) {
+    this.weights = weights;
+    this.color = color != null ? color : '#A2A';
+    Bot.__super__.constructor.call(this);
+    this.fitness = 0;
+    this.nn = new NeuralNet(window.layersConf, window.nInputs);
+    this.nn.putWeights(this.weights);
+  }
+
+  Bot.prototype.reset = function() {
+    this.isElite = true;
+    this.fitness = 0;
+    return this.closestFood = null;
+  };
+
+  Bot.prototype.render = function(context) {
+    var color;
+    color = this.color;
+    if (stats.topBot === this) {
+      color = 'black';
+    } else if (this.isElite) {
+      color = '#088';
+    }
+    return Bot.__super__.render.call(this, context, color);
+  };
+
+  return Bot;
+
+})(_Bot);
+
 Board = (function() {
   var genRandBot, getChromoRoulette;
 
@@ -723,7 +760,6 @@ Board = (function() {
 
   Board.prototype.tic = function(step) {
     var bestBot, bot, item, _i, _j, _len, _len1, _ref4, _ref5, _results;
-    context.clearRect(0, 0, canvas.width, canvas.height);
     bestBot = stats.topBot || this.pop[0];
     if (++this.tics < this.params.ticsPerGen) {
       _ref4 = this.pop;
@@ -753,6 +789,7 @@ Board = (function() {
 
   Board.prototype.render = function(context) {
     var item, _i, _j, _len, _len1, _ref4, _ref5, _results;
+    context.clearRect(0, 0, canvas.width, canvas.height);
     _ref4 = this.food;
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
       item = _ref4[_i];
@@ -791,39 +828,6 @@ Board = (function() {
 
 })();
 
-Bot = (function(_super) {
-  __extends(Bot, _super);
-
-  function Bot(weights, color) {
-    this.weights = weights;
-    this.color = color != null ? color : '#A2A';
-    Bot.__super__.constructor.call(this);
-    this.fitness = 0;
-    this.nn = new NeuralNet(window.layersConf, window.nInputs);
-    this.nn.putWeights(this.weights);
-  }
-
-  Bot.prototype.reset = function() {
-    this.isElite = true;
-    this.fitness = 0;
-    return this.closestFood = null;
-  };
-
-  Bot.prototype.render = function(context) {
-    var color;
-    color = this.color;
-    if (stats.topBot === this) {
-      color = 'black';
-    } else if (this.isElite) {
-      color = '#088';
-    }
-    return Bot.__super__.render.call(this, context, color);
-  };
-
-  return Bot;
-
-})(_Bot);
-
 calcNumWeights = function(matrix, nInputs) {
   var e, i, lastNum, numWeights, _i, _len;
   lastNum = nInputs;
@@ -838,7 +842,7 @@ calcNumWeights = function(matrix, nInputs) {
 
 window.activationResponse = 1;
 
-window.nInputs = 2;
+window.nInputs = 4;
 
 window.layersConf = [5, 2];
 

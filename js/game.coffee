@@ -40,7 +40,7 @@ class Game
 				window.canvasStop = !window.canvasStop
 				$("#flags #stopped").html(if window.canvasStop then "Stopped" else "")
 
-	loop: ->
+	loopTic: ->
 		# Synchronise fps
 		thisFrameFPS = 1000 / ((now=new Date) - lastUpdate)
 		fps += (thisFrameFPS - fps) / 1;
@@ -48,16 +48,20 @@ class Game
 
 		if not window.canvasStop
 			@board.tic(1/50)
+		if not window.canvasStop
 			@board.render(context)
 
-		window.setTimeout =>
-			@loop()
-		, 1
+		window.setTimeout((=> @loopTic()), 1)
+
+	loopRender: ->
+
+		window.setTimeout((=> @loopRender()), 100)
 
 	start: ->
 		addFpsCounter()
 		console.log("Start looping board", @board, "with painter", @)
-		@loop()
+		@loopTic()
+		@loopRender()
 
 
 window.AnimateOnFrameRate = do ->
