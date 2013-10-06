@@ -2,24 +2,30 @@
 var Game;
 
 Game = (function() {
-  var addFpsCounter, context, fps, fpsFilter, lastUpdate, resetFpsCounter;
+  var addFpsCounter, context, fps, fpsFilter, lastRender, lastTic, resetFpsCounter, tps;
 
   fps = 0;
 
-  lastUpdate = (new Date) * 1 - 1;
+  tps = 0;
+
+  lastTic = (new Date) * 1 - 1;
+
+  lastRender = (new Date) * 1 - 1;
 
   fpsFilter = 50;
 
   context = null;
 
   addFpsCounter = function() {
-    var fpsOut,
+    var fpsOut, tics, tpsOut,
       _this = this;
     fpsOut = document.getElementById('fps');
-    fps = 0;
+    tpsOut = document.getElementById('tps');
+    tics = document.getElementById('tics');
     return setInterval(function() {
       fpsOut.innerHTML = 'fps:' + fps.toFixed(1);
-      return $("#flags #tic").html('tic: ' + game.board.tics);
+      tpsOut.innerHTML = 'tps:' + tps.toFixed(1);
+      return tics.innerHTML = 'tic: ' + game.board.tics;
     }, 500);
   };
 
@@ -57,27 +63,31 @@ Game = (function() {
   }
 
   Game.prototype.loopTic = function() {
-    var now, thisFrameFPS,
+    var now, thisFrameTPS,
       _this = this;
-    thisFrameFPS = 1000 / ((now = new Date) - lastUpdate);
-    fps += (thisFrameFPS - fps) / 1;
-    lastUpdate = now * 1 - 1;
     if (!window.canvasStop) {
       this.board.tic(1 / 50);
     }
-    if (!window.canvasStop) {
-      this.board.render(context);
-    }
-    return window.setTimeout((function() {
+    window.setTimeout((function() {
       return _this.loopTic();
     }), 1);
+    thisFrameTPS = 1000 / ((now = new Date) - lastTic);
+    tps += (thisFrameTPS - tps) / 10;
+    return lastTic = now * 1 - 1;
   };
 
   Game.prototype.loopRender = function() {
-    var _this = this;
-    return window.setTimeout((function() {
+    var now, thisFrameFPS,
+      _this = this;
+    if (!window.canvasStop) {
+      this.board.render(context);
+    }
+    window.AnimateOnFrameRate(function() {
       return _this.loopRender();
-    }), 100);
+    });
+    thisFrameFPS = 1000 / ((now = new Date) - lastRender);
+    fps += (thisFrameFPS - fps) / 10;
+    return lastRender = now * 1 - 1;
   };
 
   Game.prototype.start = function() {

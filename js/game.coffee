@@ -2,16 +2,20 @@
 class Game
 
 	fps = 0
-	lastUpdate = (new Date)*1 - 1
+	tps = 0
+	lastTic = (new Date)*1 - 1
+	lastRender = (new Date)*1 - 1
 	fpsFilter = 50
 	context = null
 
 	addFpsCounter = ->
-		fpsOut = document.getElementById 'fps'
-		fps = 0
+		fpsOut = document.getElementById('fps')
+		tpsOut = document.getElementById('tps')
+		tics = document.getElementById('tics')
 		setInterval =>
 			fpsOut.innerHTML = 'fps:'+fps.toFixed(1)
-			$("#flags #tic").html('tic: '+game.board.tics)
+			tpsOut.innerHTML = 'tps:'+tps.toFixed(1)
+			tics.innerHTML = 'tic: '+game.board.tics
 		, 500
 
 	resetFpsCounter = ->
@@ -41,21 +45,22 @@ class Game
 				$("#flags #stopped").html(if window.canvasStop then "Stopped" else "")
 
 	loopTic: ->
-		# Synchronise fps
-		thisFrameFPS = 1000 / ((now=new Date) - lastUpdate)
-		fps += (thisFrameFPS - fps) / 1;
-		lastUpdate = now * 1 - 1
-
 		if not window.canvasStop
 			@board.tic(1/50)
-		if not window.canvasStop
-			@board.render(context)
-
 		window.setTimeout((=> @loopTic()), 1)
+		# Synchronise tps
+		thisFrameTPS = 1000 / ((now=new Date) - lastTic)
+		tps += (thisFrameTPS - tps) / 10;
+		lastTic = now * 1 - 1
 
 	loopRender: ->
-
-		window.setTimeout((=> @loopRender()), 100)
+		if not window.canvasStop
+			@board.render(context)
+		window.AnimateOnFrameRate(=>@loopRender())
+		# Synchronise fps
+		thisFrameFPS = 1000 / ((now=new Date) - lastRender)
+		fps += (thisFrameFPS - fps) / 10;
+		lastRender = now * 1 - 1
 
 	start: ->
 		addFpsCounter()
