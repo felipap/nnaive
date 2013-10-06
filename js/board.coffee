@@ -178,8 +178,8 @@ class _Bot extends Circle
 		@position.x += speed*Math.cos(@angle)*step
 		@position.y += speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.
-		@position.x = mm(0,@position.x,window.canvas.width)
-		@position.y = mm(0,@position.y,window.canvas.height)
+		@position.x = mod(@position.x,window.canvas.width)
+		@position.y = mod(@position.y,window.canvas.height)
 		# Set-up @closestFood
 		@closestFood = @closestFood or game.board.food[0]
 		@closestFood.color = 'blue'
@@ -198,19 +198,19 @@ class _Bot extends Circle
 		# 	console.log [Math.atan2(@closestFood.position.y-@position.y,\
 			# @closestFood.position.x-@position.x),@angle, output[0]]
 		@angle += output[0]-output[1]
-		###
+		######
 		context.lineWidth = @size-6
-		angles = {x:[Math.PI, Math.PI*3/2], y:[Math.PI*3/2, 0]}
+		angles = {0:[-Math.PI, 0], 1:[0,Math.PI]}
 		context.save() 
 		context.translate(@position.x, @position.y)
 		context.rotate(@angle)
 		for t, a of angles
 			context.beginPath()
-			context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
-			context.arc(0, 0, @size/2+6, a[0], a[1]);
+			context.strokeStyle = "rgba(0,0,0,#{output[t]})"
+			context.arc(0, 0, @size/2+8+5*@fitness, a[0], a[1]);
 			context.stroke()
 		context.restore()
-		###
+		######
 		if window.leftPressed then @angle += 0.2
 		if window.rightPressed then @angle -= 0.2
 		
@@ -220,8 +220,8 @@ class _Bot extends Circle
 		@p2 = {x: -@size*2/3, y: @size/3}
 		@p3 = {x: -@size*2/3, y: -@size/3}
 
-		if @fitness
-			painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
+		# if @fitness
+		# 	painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
 		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:'white', fill:true})
 
 	foundFood: ->

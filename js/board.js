@@ -343,12 +343,12 @@ _Bot = (function(_super) {
   }
 
   _Bot.prototype.tic = function(step) {
-    var food, output, speed, _i, _len, _ref4;
+    var a, angles, food, output, speed, t, _i, _len, _ref4;
     speed = 250;
     this.position.x += speed * Math.cos(this.angle) * step;
     this.position.y += speed * Math.sin(this.angle) * step;
-    this.position.x = mm(0, this.position.x, window.canvas.width);
-    this.position.y = mm(0, this.position.y, window.canvas.height);
+    this.position.x = mod(this.position.x, window.canvas.width);
+    this.position.y = mod(this.position.y, window.canvas.height);
     this.closestFood = this.closestFood || game.board.food[0];
     this.closestFood.color = 'blue';
     _ref4 = game.board.food.slice(1);
@@ -365,20 +365,22 @@ _Bot = (function(_super) {
     });
     output = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x), this.angle]);
     this.angle += output[0] - output[1];
-    /*
-    		context.lineWidth = @size-6
-    		angles = {x:[Math.PI, Math.PI*3/2], y:[Math.PI*3/2, 0]}
-    		context.save() 
-    		context.translate(@position.x, @position.y)
-    		context.rotate(@angle)
-    		for t, a of angles
-    			context.beginPath()
-    			context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
-    			context.arc(0, 0, @size/2+6, a[0], a[1]);
-    			context.stroke()
-    		context.restore()
-    */
-
+    context.lineWidth = this.size - 6;
+    angles = {
+      0: [-Math.PI, 0],
+      1: [0, Math.PI]
+    };
+    context.save();
+    context.translate(this.position.x, this.position.y);
+    context.rotate(this.angle);
+    for (t in angles) {
+      a = angles[t];
+      context.beginPath();
+      context.strokeStyle = "rgba(0,0,0," + output[t] + ")";
+      context.arc(0, 0, this.size / 2 + 8 + 5 * this.fitness, a[0], a[1]);
+      context.stroke();
+    }
+    context.restore();
     if (window.leftPressed) {
       this.angle += 0.2;
     }
@@ -401,11 +403,6 @@ _Bot = (function(_super) {
       x: -this.size * 2 / 3,
       y: -this.size / 3
     };
-    if (this.fitness) {
-      painter.drawCircle(context, this.position, this.size + this.fitness * 4, {
-        color: 'rgba(0,0,0,.4)'
-      });
-    }
     return painter.drawCenteredPolygon(context, this.position, [this.p1, this.p2, this.p3], this.angle, {
       color: 'white',
       fill: true
