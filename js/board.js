@@ -332,9 +332,8 @@ _Bot = (function(_super) {
 
   _Bot.closestFood = null;
 
-  function _Bot(position, color) {
+  function _Bot(position) {
     this.position = position;
-    this.color = color != null ? color : '#A2A';
     _Bot.__super__.constructor.apply(this, arguments);
     window.lastAdded = this;
   }
@@ -570,7 +569,7 @@ NeuralNet = (function() {
 })();
 
 Board = (function() {
-  var crossover, genRandBot, getChromoRoulette, mutate, params, stats;
+  var genRandBot, getChromoRoulette;
 
   Board.prototype.totalFitness = 0;
 
@@ -582,7 +581,7 @@ Board = (function() {
 
   Board.prototype.bestGenoma = null;
 
-  params = {
+  Board.prototype.params = {
     activationResponse: 1,
     ticsPerGen: 500,
     mutationRate: 0.1,
@@ -591,7 +590,7 @@ Board = (function() {
     crossoverRate: 0.7
   };
 
-  stats = {
+  Board.prototype.stats = {
     foodEaten: 0,
     genCount: 0
   };
@@ -608,9 +607,9 @@ Board = (function() {
     })());
   };
 
-  crossover = function(mum, dad) {
+  Board.prototype.crossover = function(mum, dad) {
     var baby1, baby2, cp, i, _i, _j, _ref4;
-    if (mum === dad || params.crossoverRate < Math.random()) {
+    if (mum === dad || this.params.crossoverRate < Math.random()) {
       return [mum.slice(0), dad.slice(0)];
     }
     baby1 = [];
@@ -627,19 +626,20 @@ Board = (function() {
     return [baby1, baby2];
   };
 
-  mutate = function(crom) {
+  Board.prototype.mutate = function(crom) {
     var e, i, mutated, _i, _len;
     mutated = false;
     for (i = _i = 0, _len = crom.length; _i < _len; i = ++_i) {
       e = crom[i];
-      if (Math.random() < params.mutationRate) {
-        crom[i] = Math.random();
+      if (Math.random() < this.params.mutationRate) {
+        crom[i] = Math.random() - Math.random();
         mutated = true;
       }
     }
     if (mutated) {
-      return ++stats.mutated;
+      ++this.stats.mutated;
     }
+    return crom;
   };
 
   getChromoRoulette = function(population) {
@@ -668,70 +668,74 @@ Board = (function() {
   };
 
   Board.prototype.epoch = function(oldpop) {
-    var baby1, baby2, father, g, i2, mother, newpop, sorted, _i, _len, _ref4, _ref5;
+    var baby1, baby2, father, g, mother, newpop, sorted, _i, _len, _ref4, _ref5;
     sorted = _.sortBy(oldpop, function(a) {
       return a.fitness;
     }).reverse();
     newpop = [];
     console.log('sorted: (%s)', sorted.length, _.pluck(sorted, 'fitness'));
-    _ref4 = sorted.slice(0, 6);
+    _ref4 = sorted.slice(0, 9);
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
       g = _ref4[_i];
       g.reset();
       newpop.push(g);
-      g.isTop = true;
     }
-    stats.mutated = 0;
-    while (newpop.length < params.popSize) {
+    newpop.push(new Bot(this.mutate(sorted[0].weights.slice(0)), 'green'));
+    newpop.push(new Bot(this.mutate(sorted[1].weights.slice(0)), 'green'));
+    newpop.push(new Bot(this.mutate(sorted[3].weights.slice(0)), 'green'));
+    this.stats.mutated = 0;
+    while (newpop.length < this.params.popSize) {
       mother = getChromoRoulette(sorted.slice(0, 11));
       father = getChromoRoulette(sorted.slice(0, 11));
       if (mother.fitness === 0 || father.fitness === 0) {
         console.log('fitness 0. making random');
-        mother = new Bot((function() {
-          var _j, _ref5, _results;
-          _results = [];
-          for (i2 = _j = 0, _ref5 = window.numWeights; 0 <= _ref5 ? _j < _ref5 : _j > _ref5; i2 = 0 <= _ref5 ? ++_j : --_j) {
-            _results.push(Math.random() - Math.random());
-          }
-          return _results;
-        })());
+        mother = genRandBot();
       }
-      _ref5 = crossover(mother.weights, father.weights), baby1 = _ref5[0], baby2 = _ref5[1];
-      mutate(baby1);
-      mutate(baby2);
+      _ref5 = this.crossover(mother.weights, father.weights), baby1 = _ref5[0], baby2 = _ref5[1];
+      this.mutate(baby1);
+      this.mutate(baby2);
       newpop.push(new Bot(baby1));
       newpop.push(new Bot(baby2));
     }
-    console.log('mutated:', stats.mutated);
+    console.log('mutated:', this.stats.mutated);
     return newpop;
   };
 
   function Board() {
-    var i, _i, _ref4;
-    this.tics = stats.genCount = 0;
-    this.food = [];
-    this.makeNew(params.popSize, window.numWeights);
-    for (i = _i = 0, _ref4 = params.foodCount; 0 <= _ref4 ? _i <= _ref4 : _i >= _ref4; i = 0 <= _ref4 ? ++_i : --_i) {
-      this.food.push(new Food());
-    }
+    var i;
+    this.tics = this.stats.genCount = 0;
+    this.makeNew(this.params.popSize, window.numWeights);
+    this.food = (function() {
+      var _i, _ref4, _results;
+      _results = [];
+      for (i = _i = 0, _ref4 = this.params.foodCount; 0 <= _ref4 ? _i <= _ref4 : _i >= _ref4; i = 0 <= _ref4 ? ++_i : --_i) {
+        _results.push(new Food());
+      }
+      return _results;
+    }).call(this);
   }
 
   Board.prototype.tic = function(step) {
-    var bot, item, _i, _j, _len, _len1, _ref4, _ref5, _results;
+    var bestBot, bot, item, _i, _j, _len, _len1, _ref4, _ref5, _results;
     context.clearRect(0, 0, canvas.width, canvas.height);
-    if (++this.tics < params.ticsPerGen) {
+    bestBot = stats.topBot || this.pop[0];
+    if (++this.tics < this.params.ticsPerGen) {
       _ref4 = this.pop;
       for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
         bot = _ref4[_i];
         bot.tic(step);
+        if (bot.fitness > bestBot.fitness) {
+          bestBot = bot;
+        }
         if (bot.foundFood()) {
           ++bot.fitness;
-          ++stats.foodEaten;
+          ++this.stats.foodEaten;
         }
       }
     } else {
       this.reset();
     }
+    stats.topBot = bestBot;
     _ref5 = this.food;
     _results = [];
     for (_j = 0, _len1 = _ref5.length; _j < _len1; _j++) {
@@ -758,17 +762,20 @@ Board = (function() {
   };
 
   Board.prototype.reset = function() {
-    var food, _i, _len, _ref4;
-    ++stats.genCount;
-    console.log("Ending generation " + stats.genCount + ". " + ((stats.foodEaten / params.popSize).toFixed(2)));
-    $("#flags #stats").html("last eaten: " + (stats.foodEaten / params.popSize).toFixed(2));
-    $("#flags #generation").html("generation: " + stats.genCount);
-    _ref4 = game.board.food;
-    for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
-      food = _ref4[_i];
-      food.eat();
-    }
-    this.tics = stats.foodEaten = 0;
+    var i;
+    ++this.stats.genCount;
+    console.log("Ending generation " + this.stats.genCount + ". " + ((this.stats.foodEaten / this.params.popSize).toFixed(2)));
+    $("#flags #stats").html("last eaten: " + (this.stats.foodEaten / this.params.popSize).toFixed(2));
+    $("#flags #generation").html("generation: " + this.stats.genCount);
+    this.food = (function() {
+      var _i, _ref4, _results;
+      _results = [];
+      for (i = _i = 0, _ref4 = this.params.foodCount; 0 <= _ref4 ? _i <= _ref4 : _i >= _ref4; i = 0 <= _ref4 ? ++_i : --_i) {
+        _results.push(new Food());
+      }
+      return _results;
+    }).call(this);
+    this.tics = this.stats.foodEaten = 0;
     return this.pop = this.epoch(this.pop);
   };
 
@@ -779,24 +786,29 @@ Board = (function() {
 Bot = (function(_super) {
   __extends(Bot, _super);
 
-  function Bot(weights) {
+  function Bot(weights, color) {
     this.weights = weights;
+    this.color = color != null ? color : '#A2A';
     Bot.__super__.constructor.call(this);
     this.fitness = 0;
-    this.isTop = false;
     this.nn = new NeuralNet(window.layersConf, window.nInputs);
     this.nn.putWeights(this.weights);
   }
 
   Bot.prototype.reset = function() {
-    return this.fitness = 0;
+    this.isElite = true;
+    this.fitness = 0;
+    return this.closestFood = null;
   };
 
-  Bot.prototype.tic = function() {
-    Bot.__super__.tic.apply(this, arguments);
-    if (this.isTop) {
-      return this.color = '#088';
+  Bot.prototype.render = function() {
+    this.color = '#A2A';
+    if (stats.topBot === this) {
+      this.color = 'black';
+    } else if (this.isElite) {
+      this.color = '#088';
     }
+    return Bot.__super__.render.apply(this, arguments);
   };
 
   return Bot;

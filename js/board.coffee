@@ -168,7 +168,7 @@ class _Bot extends Circle
 	size: 10
 	@closestFood = null
 
-	constructor: (@position, @color='#A2A') ->
+	constructor: (@position) ->
 		super
 		window.lastAdded = @
 
@@ -300,7 +300,7 @@ class Board
 	worstFitness: 0
 	bestGenoma: null
 
-	params =
+	params:
 		activationResponse: 1 					# for the sigmoid function
 		ticsPerGen: 500							# num of tics per generation
 		mutationRate: 0.1 						# down to 0.05
@@ -308,14 +308,14 @@ class Board
 		popSize: 20
 		crossoverRate: 0.7
 
-	stats =
+	stats:
 		foodEaten: 0
 		genCount: 0
 
 	genRandBot = -> new Bot(((Math.random()-Math.random()) for i2 in [0...window.numWeights]))
 
-	crossover = (mum, dad) ->
-		if mum is dad or params.crossoverRate < Math.random()
+	crossover: (mum, dad) ->
+		if mum is dad or @params.crossoverRate < Math.random()
 			return [mum[..], dad[..]]
 		baby1 = []
 		baby2 = []
@@ -329,14 +329,15 @@ class Board
 		# console.log('baby1', baby1, 'baby2', baby2)
 		return [baby1, baby2]
 
-	mutate = (crom) ->
+	mutate: (crom) ->
 		mutated = false
 		for e,i in crom
-			if Math.random() < params.mutationRate
-				crom[i] = Math.random()
+			if Math.random() < @params.mutationRate
+				crom[i] = Math.random()-Math.random()
 				mutated = true
 		if mutated
-			++stats.mutated
+			++@stats.mutated
+		return crom
 
 	getChromoRoulette = (population) ->
 		slice = Math.random()*_.reduce(_.pluck(population, 'fitness'),((a,b)->a+b))
@@ -360,50 +361,51 @@ class Board
 		sorted = _.sortBy(oldpop, (a) -> a.fitness).reverse()
 		newpop = []
 		console.log('sorted: (%s)', sorted.length, _.pluck(sorted,'fitness'))
-		# Push elite (5 best members) to new population. Survive!
-		for g in sorted[..5] # Use parameters.
+		
+		for g in sorted[..8] # Use parameters
 			g.reset()
 			newpop.push(g)
-			g.isTop = true
 
-		# for i in [0..3]
-		# 	newpop.push(new Bot(((Math.random()-Math.random()) for i2 in [0...window.numWeights])))
-		# 	newpop[newpop]
-		
-		stats.mutated = 0
+		newpop.push(new Bot(@mutate(sorted[0].weights[..]), 'green'))
+		newpop.push(new Bot(@mutate(sorted[1].weights[..]), 'green'))
+		newpop.push(new Bot(@mutate(sorted[3].weights[..]), 'green'))
+
+		@stats.mutated = 0
 		# Generate until population cap is reached.
-		while newpop.length < params.popSize
+		while newpop.length < @params.popSize
 			mother = getChromoRoulette(sorted[0..10])
 			father = getChromoRoulette(sorted[0..10])
 			if mother.fitness is 0 or father.fitness is 0
 				console.log('fitness 0. making random')
-				mother = new Bot(((Math.random()-Math.random()) for i2 in [0...window.numWeights]))
-			[baby1, baby2] = crossover(mother.weights, father.weights)
-			mutate(baby1)
-			mutate(baby2)
+				mother = genRandBot()
+			[baby1, baby2] = @crossover(mother.weights, father.weights)
+			@mutate(baby1)
+			@mutate(baby2)
 			newpop.push(new Bot(baby1))
 			newpop.push(new Bot(baby2))
-		console.log('mutated:',stats.mutated)
+		console.log('mutated:',@stats.mutated)
 		return newpop
 
 	constructor: ->
-		@tics = stats.genCount = 0
-		@food = []
-		@makeNew(params.popSize, window.numWeights)
-		@food.push(new Food()) for i in [0..params.foodCount]
+		@tics = @stats.genCount = 0
+		@makeNew(@params.popSize, window.numWeights)
+		@food = (new Food() for i in [0..@params.foodCount])
 
 	tic: (step) ->
 		context.clearRect(0, 0, canvas.width, canvas.height)
 		# painter.drawRectangle(context, {x:0,y:0},
 		# {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
 		
-		if ++@tics < params.ticsPerGen
+		bestBot = stats.topBot or @pop[0]
+		if ++@tics < @params.ticsPerGen
 			for bot in @pop
 				bot.tic(step)
+				bestBot = bot if bot.fitness > bestBot.fitness
 				if bot.foundFood()
 					++bot.fitness
-					++stats.foodEaten
+					++@stats.foodEaten
 		else @reset()
+		stats.topBot = bestBot
 
 		item.tic(step) for item in @food
 
@@ -412,30 +414,35 @@ class Board
 		item.render(context) for item in @pop
 
 	reset: ->
-		++stats.genCount
-		console.log("Ending generation #{stats.genCount}. #{(stats.foodEaten/params.popSize).toFixed(2)}")
-		$("#flags #stats").html("last eaten: "+(stats.foodEaten/params.popSize).toFixed(2))
-		$("#flags #generation").html("generation: "+stats.genCount)
-		food.eat() for food in game.board.food
-		@tics = stats.foodEaten = 0
+		++@stats.genCount
+		console.log("Ending generation #{@stats.genCount}. #{(@stats.foodEaten/@params.popSize).toFixed(2)}")
+		$("#flags #stats").html("last eaten: "+(@stats.foodEaten/@params.popSize).toFixed(2))
+		$("#flags #generation").html("generation: "+@stats.genCount)
+		
+		@food = (new Food() for i in [0..@params.foodCount])
+		@tics = @stats.foodEaten = 0
 		@pop = @epoch(@pop)
 
 
 class Bot extends _Bot
 	
-	constructor: (@weights) ->
+	constructor: (@weights, @color='#A2A') ->
 		super()
 		@fitness = 0
-		@isTop = false
 		@nn = new NeuralNet(window.layersConf, window.nInputs)
 		@nn.putWeights(@weights)
 
-	reset: ->
+	reset: -> # Is elite.
+		@isElite = true
 		@fitness = 0
+		@closestFood = null
 
-	tic: ->
+	render: ->
+		@color = '#A2A'
+		if stats.topBot is @ then @color = 'black'
+		else if @isElite then @color = '#088'
+
 		super
-		if @isTop then @color = '#088'
 
 calcNumWeights = (matrix, nInputs) ->
 	lastNum = nInputs
