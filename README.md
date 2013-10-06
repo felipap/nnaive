@@ -3,4 +3,7 @@ nnaive
 
 Neural Network(ed) Artificially Intelligent Virtual Engines
 
-!()[http://cdn.meme.li/i/oy9vx.jpg]
+### Because I had a teacher...
+
+![](http://i.imgflip.com/41hsn.jpg)
+![](http://i.imgflip.com/41hwd.jpg)
