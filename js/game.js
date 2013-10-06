@@ -18,8 +18,7 @@ Game = (function() {
     fpsOut = document.getElementById('fps');
     window.fps = 0;
     return setInterval(function() {
-      fpsOut.innerHTML = window.fps.toFixed(1);
-      $("#flags #generation").html('generation: ' + window.genCount);
+      fpsOut.innerHTML = 'fps:' + window.fps.toFixed(1);
       return $("#flags #tic").html('tic: ' + window.tics);
     }, 500);
   };

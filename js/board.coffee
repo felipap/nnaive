@@ -174,7 +174,7 @@ class _Bot extends Circle
 
 	tic: (step) ->
 
-		speed = 100
+		speed = 20
 		@position.x += speed*Math.cos(@angle)*step
 		@position.y += speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.
@@ -182,23 +182,25 @@ class _Bot extends Circle
 		@position.y = mod(@position.y,window.canvas.height)
 		# Set-up @closestFood
 		@closestFood = @closestFood or game.board.food[0]
+		@closestFood.color = 'blue'
 		for food in game.board.food[1..]
 			if dist2(@position,food.position) < dist2(@position,@closestFood.position)
-				@closestFood.color = 'blue'
 				@closestFood = food
 		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 		@closestFood.color = 'red'
 
-		output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
-				Math.cos(@angle), Math.sin(@angle)])
-		output = @nn.fire([Math.atan2(@closestFood.y-@position.y,@closestFood.x-@position.x),@angle])
-		nangle = output[0]
+		# output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
+		# 		Math.cos(@angle), Math.sin(@angle)])
+		output = @nn.fire([Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle])
 		#nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
-		@angle += nangle
+		if @ is window.lastAdded
+			@color = 'red'
+			console.log [Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle, output[0]]
+		@angle += output[0]-output[1]
 
 		# context.lineWidth = @size-6
 		# angles = {x:[Math.PI, Math.PI*3/2], y:[Math.PI*3/2, 0]}
-		# context.save()
+		# context.save() 
 		# context.translate(@position.x, @position.y)
 		# context.rotate(@angle)
 		# for t, a of angles
@@ -231,16 +233,7 @@ class _Bot extends Circle
 ################################################################################
 ################################################################################
 
-
 sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
-
-parameters =
-	activationResponse: 1 								# for the sigmoid function
-	numTics: 500										# num of tics per generation
-	popSize: 20
-	crossoverRate: 0.7
-	mutationRate: 0.3 # down to 0.05
-	foodCount: 20
 
 class Neuron
 	
@@ -306,7 +299,7 @@ class GeneticEngine
 	bestGenoma = null
 	# mutationRate = 0.3 # to 0.05
 	# crossoverRate = 0.9
-	genCounter = 0
+	# genCounter = 0
 
 	crossover = (mum, dad) ->
 		if mum is dad or parameters.crossoverRate < Math.random()
@@ -320,7 +313,7 @@ class GeneticEngine
 		for i in [cp...mum.length]
 			baby1.push(dad[i])
 			baby2.push(mum[i])
-		console.log('baby1', baby1, 'baby2', baby2)
+		# console.log('baby1', baby1, 'baby2', baby2)
 		return [baby1, baby2]
 
 	mutate = (a) -> a
@@ -333,7 +326,7 @@ class GeneticEngine
 			fitnessCount += g.fitness
 			if fitnessCount >= slice
 				return g
-		console.log('não', _.reduce(population,(a,b)->a.fitness+b.fitness), population)
+		# console.log('não', _.reduce(population,(a,b)->a.fitness+b.fitness), population)
 
 	# calculateBestWorstAvgTotal: ->
 
@@ -341,7 +334,6 @@ class GeneticEngine
 		pop = []
 		for i in [0...popSize]
 			pop.push(new Bot(((Math.random()-Math.random()) for i2 in [0...numWeights])))
-			# pop.push(new Bot([1,-1,0]))
 		return pop
 
 	reset: ->
@@ -371,7 +363,7 @@ class Bot extends _Bot
 	constructor: (@weights) ->
 		super()
 		@fitness = 0
-		@nn = new NeuralNet(window.layersConf,2)
+		@nn = new NeuralNet(window.layersConf,window.nInputs)
 		@nn.putWeights(@weights)
 		@isTop = false
 
@@ -385,18 +377,6 @@ class Bot extends _Bot
 		super
 		if @isTop then @color = '#088'
 
-window.layersConf = [1]
-
-window.tics = 0
-window.genCount = 0
-
-genEng = new GeneticEngine()
-
-stats = {}
-
-stats.foodEaten = 0
-
-window.layersConf
 calcNumWeights = (matrix, nInputs) ->
 	lastNum = nInputs
 	numWeights = 0
@@ -404,11 +384,24 @@ calcNumWeights = (matrix, nInputs) ->
 		numWeights += (lastNum+1)*e
 		lastNum = e
 	return numWeights
-window.numWeights = calcNumWeights(layersConf, 2)
 
-console.log('number of weights', window.numWeights)
+parameters =
+	activationResponse: 1 								# for the sigmoid function
+	ticsPerGen: 2000										# num of tics per generation
+	popSize: 20
+	crossoverRate: 0.7
+	mutationRate: 0.3 # down to 0.05
+	foodCount: 20
 
-roundFloat = (num,arg) -> Math.round(Math.pow(10,arg)*num)/Math.pow(10,arg)
+window.nInputs = 2
+window.layersConf = [5,5,5,2]
+window.numWeights = calcNumWeights(layersConf, window.nInputs)
+
+window.stats = {foodEaten: 0, genCount: 0}
+
+window.tics = 0
+
+genEng = new GeneticEngine()
 
 
 class Board
@@ -417,8 +410,7 @@ class Board
 		window.context = @canvas.getContext("2d")
 		@bots = []
 		@food = []
-		window.pop = genEng.makeNew(parameters.popSize, window.numWeights)		
-		console.log('gen:',window.pop)
+		window.pop = genEng.makeNew(parameters.popSize, window.numWeights)
 		@food.push(new Food()) for i in [0..parameters.foodCount]
 
 	render: (context) ->
@@ -426,7 +418,10 @@ class Board
 		item.render(context) for item in @bots
 
 	tic: (step) ->
-		if ++window.tics < parameters.numTics
+		context.clearRect(0, 0, @canvas.width, @canvas.height)
+		# painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
+		
+		if ++window.tics < parameters.ticsPerGen
 			for bot in window.pop
 				bot.tic(step)
 				if bot.foundFood()
@@ -435,13 +430,12 @@ class Board
 				bot.render(context)
 
 		else # Reset and gogo next generation.
-			$("#flags #stats").html("last eaten: "+roundFloat(stats.foodEaten/parameters.popSize,2))
-			console.log('reset please')
+			console.log("Ending generation #{window.stats.genCount}. Next...")
+			++window.stats.genCount
+			$("#flags #stats").html("last eaten: "+(stats.foodEaten/parameters.popSize).toFixed(2))
+			$("#flags #generation").html("generation: "+window.stats.genCount)
 			food.eat() for food in game.board.food
 			window.tics = stats.foodEaten = 0
-			++window.genCount
 			window.pop = genEng.epoch(window.pop)
 
-		# context.clearRect(0, 0, @canvas.width, @canvas.height)
-		painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
 		item.tic(step) for item in @food
