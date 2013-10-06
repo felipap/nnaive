@@ -1,30 +1,26 @@
 
 class Game
 
-	###### Fps stuff
-
-	window.fps = 0
+	fps = 0
 	lastUpdate = (new Date)*1 - 1
 	fpsFilter = 50
 	context = null
 
 	addFpsCounter = ->
 		fpsOut = document.getElementById 'fps'
-		window.fps = 0
+		fps = 0
 		setInterval =>
-			fpsOut.innerHTML = 'fps:'+window.fps.toFixed(1)
-			$("#flags #tic").html('tic: '+window.tics)
+			fpsOut.innerHTML = 'fps:'+fps.toFixed(1)
+			$("#flags #tic").html('tic: '+game.board.tics)
 		, 500
 
 	resetFpsCounter = ->
-		window.fps = 0
+		fps = 0
 
 	_getMousePos: (event) ->
 		rect = @canvas.getBoundingClientRect()
 		x: event.clientX - rect.left
 		y: event.clientY - rect.top
-
-	######
 
 	constructor: ->
 		@canvas = document.querySelector "canvas#nnaive"
@@ -36,31 +32,18 @@ class Game
 		window.context = context
 
 		@board = new window.Board()
-		console.log 'board', @board
-		
-		$(@canvas).bind 'click', (event) =>
-			# t = new Bot(@_getMousePos(event))
-			# @board.addBot(t)
-
-		$(@canvas).bind 'mousedown', (event) =>
-			# if event.button is 2
-			# 	t = new FixedPole(@_getMousePos(event))
-			# 	@board.addObject(t)
 
 		window.canvasStop = false
 		$(document).keydown (event) =>
 			if event.keyCode == 32
-				console.log('spacebar')
+				console.log('spacebar hit')
 				window.canvasStop = !window.canvasStop
 				$("#flags #stopped").html(if window.canvasStop then "Stopped" else "")
 
-		return
-		@dispatcher = new EventDispatcher(@board, @)
-
 	loop: ->
-		# Synchronise window.fps
+		# Synchronise fps
 		thisFrameFPS = 1000 / ((now=new Date) - lastUpdate)
-		window.fps += (thisFrameFPS - window.fps) / 1;
+		fps += (thisFrameFPS - fps) / 1;
 		lastUpdate = now * 1 - 1
 
 		if not window.canvasStop
@@ -73,7 +56,7 @@ class Game
 
 	start: ->
 		addFpsCounter()
-		console.log "Start looping board" # , @board, "with painter", @ 
+		console.log("Start looping board", @board, "with painter", @)
 		@loop()
 
 

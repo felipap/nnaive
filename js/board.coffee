@@ -81,7 +81,7 @@ painter =
 			context.fill()
 		else context.stroke()
 
-	# Draws a rectangle using the center and size (x:width,y:height) as paramenters. 
+	# Draws a rectangle using the center and size (x:width,y:height) as parameters. 
 	drawSizedRect : (context, point, size, angle=0, options={}) ->
 		this.applyCanvasOptions(context, options)
 		context.beginPath()
@@ -174,7 +174,7 @@ class _Bot extends Circle
 
 	tic: (step) ->
 
-		speed = 100
+		speed = 150
 		@position.x += speed*Math.cos(@angle)*step
 		@position.y += speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.
@@ -193,9 +193,9 @@ class _Bot extends Circle
 		# 		Math.cos(@angle), Math.sin(@angle)])
 		output = @nn.fire([Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle])
 		#nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
-		if @ is window.lastAdded
-			@color = 'red'
-			console.log [Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle, output[0]]
+		# if @ is window.lastAdded
+		# 	@color = 'red'
+		# 	console.log [Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle, output[0]]
 		@angle += output[0]-output[1]
 		###
 		context.lineWidth = @size-6
@@ -229,13 +229,12 @@ class _Bot extends Circle
 			return yes
 		return no
 
-
 ################################################################################
 ################################################################################
-
-sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
 
 class Neuron
+
+	sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
 	
 	constructor: (@nInputs) ->
 		# Notice we're deliberately chosing to go for a nInputs+1 sized @weights
@@ -290,16 +289,31 @@ class NeuralNet
 			outputs = layer.calculate(outputs)
 		return outputs
 
-class GeneticEngine
-	population = [] # Holds all SGenoma
-	totalFitness = 0
-	bestFitness = 0
-	avgFitness = 0
-	worstFitness = 0
-	bestGenoma = null
-	# mutationRate = 0.3 # to 0.05
+################################################################################
+################################################################################
+
+parameters =
+	activationResponse: 1 									# for the sigmoid function
+	ticsPerGen: 2000										# num of tics per generation
+	popSize: 20
+	crossoverRate: 0.7
+	mutationRate: 0.3 # down to 0.05
+	foodCount: 20
+
+class Board
+	totalFitness: 0
+	bestFitness: 0
+	avgFitness: 0
+	worstFitness: 0
+	bestGenoma: null
+	mutationRate = 0.3 # down to 0.05
 	# crossoverRate = 0.9
-	# genCounter = 0
+	params =
+		ticsPerGen: 200
+
+	stats =
+		foodEaten: 0
+		genCount: 0
 
 	crossover = (mum, dad) ->
 		if mum is dad or parameters.crossoverRate < Math.random()
@@ -316,10 +330,16 @@ class GeneticEngine
 		# console.log('baby1', baby1, 'baby2', baby2)
 		return [baby1, baby2]
 
-	mutate = (a) -> a
+	mutate = (crom) ->
+		mutated = false
+		for e,i in crom
+			if Math.random() < mutationRate
+				crom[i] = Math.random()
+				mutated = true
+		if mutated
+			console.log('mutating')
 
-	# Returns a random chromossome. (?)
-	getChromoRoulette: (population) ->
+	getChromoRoulette = (population) ->
 		slice = Math.random()*_.reduce(_.pluck(population, 'fitness'),((a,b)->a+b))
 		fitnessCount = 0
 		for g in population
@@ -336,8 +356,6 @@ class GeneticEngine
 			pop.push(new Bot(((Math.random()-Math.random()) for i2 in [0...numWeights])))
 		return pop
 
-	reset: ->
-
 	epoch: (oldpop) ->
 		sorted = _.sortBy(oldpop, (a) -> a.fitness);
 		newpop = []
@@ -346,16 +364,50 @@ class GeneticEngine
 			g.reset()
 			newpop.push(g)
 			g.isTop = true
+
 		# Generate until population cap is reached.
 		while newpop.length < parameters.popSize
-			mother = @getChromoRoulette(oldpop)
-			father = @getChromoRoulette(oldpop)
+			mother = getChromoRoulette(oldpop)
+			father = getChromoRoulette(oldpop)
 			[baby1, baby2] = crossover(mother.weights, father.weights)
 			mutate(baby1)
 			mutate(baby2)
 			newpop.push(new Bot(baby1))
 			newpop.push(new Bot(baby2))
 		return newpop
+
+	constructor: ->
+		@tics = stats.genCount = 0
+		@food = []
+		@pop = @makeNew(parameters.popSize, window.numWeights)
+		@food.push(new Food()) for i in [0..parameters.foodCount]
+
+	tic: (step) ->
+		context.clearRect(0, 0, canvas.width, canvas.height)
+		# painter.drawRectangle(context, {x:0,y:0}, {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
+		
+		if ++@tics < params.ticsPerGen
+			for bot in @pop
+				bot.tic(step)
+				if bot.foundFood()
+					++bot.fitness
+					++stats.foodEaten
+		else @reset()
+
+		item.tic(step) for item in @food
+
+	render: (context) ->
+		item.render(context) for item in @food
+		item.render(context) for item in @pop
+
+	reset: ->
+		++stats.genCount
+		console.log("Ending generation #{stats.genCount}.")
+		$("#flags #stats").html("last eaten: "+(stats.foodEaten/parameters.popSize).toFixed(2))
+		$("#flags #generation").html("generation: "+stats.genCount)
+		food.eat() for food in game.board.food
+		@tics = stats.foodEaten = 0
+		@pop = @epoch(@pop)
 
 
 class Bot extends _Bot
@@ -364,7 +416,7 @@ class Bot extends _Bot
 		super()
 		@fitness = 0
 		@isTop = false
-		@nn = new NeuralNet(window.layersConf,window.nInputs)
+		@nn = new NeuralNet(window.layersConf, window.nInputs)
 		@nn.putWeights(@weights)
 
 	reset: ->
@@ -382,56 +434,6 @@ calcNumWeights = (matrix, nInputs) ->
 		lastNum = e
 	return numWeights
 
-parameters =
-	activationResponse: 1 								# for the sigmoid function
-	ticsPerGen: 2000										# num of tics per generation
-	popSize: 20
-	crossoverRate: 0.7
-	mutationRate: 0.3 # down to 0.05
-	foodCount: 20
-
 window.nInputs = 2
 window.layersConf = [5,5,5,2]
 window.numWeights = calcNumWeights(layersConf, window.nInputs)
-
-window.stats = {foodEaten: 0, genCount: 0}
-
-window.tics = 0
-
-genEng = new GeneticEngine()
-
-
-class Board
-
-	constructor: ->
-		@bots = []
-		@food = []
-		window.pop = genEng.makeNew(parameters.popSize, window.numWeights)
-		@food.push(new Food()) for i in [0..parameters.foodCount]
-
-	render: (context) ->
-		item.render(context) for item in @food
-		item.render(context) for item in @bots
-
-	tic: (step) ->
-		context.clearRect(0, 0, canvas.width, canvas.height)
-		# painter.drawRectangle(context, {x:0,y:0}, {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
-		
-		if ++window.tics < parameters.ticsPerGen
-			for bot in window.pop
-				bot.tic(step)
-				if bot.foundFood()
-					++bot.fitness
-					++stats.foodEaten
-				# bot.render(context)
-
-		else # Reset and gogo next generation.
-			console.log("Ending generation #{window.stats.genCount}. Next...")
-			++window.stats.genCount
-			$("#flags #stats").html("last eaten: "+(stats.foodEaten/parameters.popSize).toFixed(2))
-			$("#flags #generation").html("generation: "+window.stats.genCount)
-			food.eat() for food in game.board.food
-			window.tics = stats.foodEaten = 0
-			window.pop = genEng.epoch(window.pop)
-
-		item.tic(step) for item in @food

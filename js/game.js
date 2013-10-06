@@ -2,9 +2,9 @@
 var Game;
 
 Game = (function() {
-  var addFpsCounter, context, fpsFilter, lastUpdate, resetFpsCounter;
+  var addFpsCounter, context, fps, fpsFilter, lastUpdate, resetFpsCounter;
 
-  window.fps = 0;
+  fps = 0;
 
   lastUpdate = (new Date) * 1 - 1;
 
@@ -16,15 +16,15 @@ Game = (function() {
     var fpsOut,
       _this = this;
     fpsOut = document.getElementById('fps');
-    window.fps = 0;
+    fps = 0;
     return setInterval(function() {
-      fpsOut.innerHTML = 'fps:' + window.fps.toFixed(1);
-      return $("#flags #tic").html('tic: ' + window.tics);
+      fpsOut.innerHTML = 'fps:' + fps.toFixed(1);
+      return $("#flags #tic").html('tic: ' + game.board.tics);
     }, 500);
   };
 
   resetFpsCounter = function() {
-    return window.fps = 0;
+    return fps = 0;
   };
 
   Game.prototype._getMousePos = function(event) {
@@ -46,26 +46,21 @@ Game = (function() {
     context = this.canvas.getContext("2d");
     window.context = context;
     this.board = new window.Board();
-    console.log('board', this.board);
-    $(this.canvas).bind('click', function(event) {});
-    $(this.canvas).bind('mousedown', function(event) {});
     window.canvasStop = false;
     $(document).keydown(function(event) {
       if (event.keyCode === 32) {
-        console.log('spacebar');
+        console.log('spacebar hit');
         window.canvasStop = !window.canvasStop;
         return $("#flags #stopped").html(window.canvasStop ? "Stopped" : "");
       }
     });
-    return;
-    this.dispatcher = new EventDispatcher(this.board, this);
   }
 
   Game.prototype.loop = function() {
     var now, thisFrameFPS,
       _this = this;
     thisFrameFPS = 1000 / ((now = new Date) - lastUpdate);
-    window.fps += (thisFrameFPS - window.fps) / 1;
+    fps += (thisFrameFPS - fps) / 1;
     lastUpdate = now * 1 - 1;
     if (!window.canvasStop) {
       this.board.tic(1 / 50);
@@ -78,7 +73,7 @@ Game = (function() {
 
   Game.prototype.start = function() {
     addFpsCounter();
-    console.log("Start looping board");
+    console.log("Start looping board", this.board, "with painter", this);
     return this.loop();
   };
 
