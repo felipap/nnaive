@@ -71,7 +71,7 @@ painter =
 		context.beginPath()
 		if angle isnt 0
 			context.save()
-			context.translate((p1.x+p2.x)/2, (p1.y+p2.y)/2) # Translate center of canvas to center of figure.
+			context.translate((p1.x+p2.x)/2, (p1.y+p2.y)/2)
 			context.rotate(angle)
 			context.rect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)
 			context.restore()
@@ -87,7 +87,7 @@ painter =
 		context.beginPath()
 		if angle
 			context.save()
-			context.translate(point.x, point.y) # Translate center of canvas to center of figure.
+			context.translate(point.x, point.y)
 			context.rotate(angle)
 			context.rect(-size.x/2, -size.y/2, size.x, size.y)
 			context.restore()
@@ -97,8 +97,8 @@ painter =
 			context.fill()
 		else context.stroke()
 
-################################################################################
-################################################################################
+##########################################################################################
+##########################################################################################
 
 mod  = (a,n) -> ((a%n)+n)%n
 dist2= (a,b) -> Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2)
@@ -191,11 +191,13 @@ class _Bot extends Circle
 
 		# output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
 		# 		Math.cos(@angle), Math.sin(@angle)])
-		output = @nn.fire([Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle])
+		output = @nn.fire([Math.atan2(@closestFood.position.y\
+			-@position.y,@closestFood.position.x-@position.x),@angle])
 		#nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
 		# if @ is window.lastAdded
 		# 	@color = 'red'
-		# 	console.log [Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle, output[0]]
+		# 	console.log [Math.atan2(@closestFood.position.y-@position.y,\
+			# @closestFood.position.x-@position.x),@angle, output[0]]
 		@angle += output[0]-output[1]
 		###
 		context.lineWidth = @size-6
@@ -229,8 +231,8 @@ class _Bot extends Circle
 			return yes
 		return no
 
-################################################################################
-################################################################################
+##########################################################################################
+##########################################################################################
 
 class Neuron
 
@@ -289,16 +291,8 @@ class NeuralNet
 			outputs = layer.calculate(outputs)
 		return outputs
 
-################################################################################
-################################################################################
-
-parameters =
-	activationResponse: 1 									# for the sigmoid function
-	ticsPerGen: 2000										# num of tics per generation
-	popSize: 20
-	crossoverRate: 0.7
-	mutationRate: 0.3 # down to 0.05
-	foodCount: 20
+##########################################################################################
+##########################################################################################
 
 class Board
 	totalFitness: 0
@@ -306,17 +300,21 @@ class Board
 	avgFitness: 0
 	worstFitness: 0
 	bestGenoma: null
-	mutationRate = 0.3 # down to 0.05
-	# crossoverRate = 0.9
+
 	params =
-		ticsPerGen: 200
+		activationResponse: 1 					# for the sigmoid function
+		ticsPerGen: 500							# num of tics per generation
+		mutationRate = 0.5 						# down to 0.05
+		foodCount: 20
+		popSize: 20
+		crossoverRate: 0.7
 
 	stats =
 		foodEaten: 0
 		genCount: 0
 
 	crossover = (mum, dad) ->
-		if mum is dad or parameters.crossoverRate < Math.random()
+		if mum is dad or params.crossoverRate < Math.random()
 			return [mum[..], dad[..]]
 		baby1 = []
 		baby2 = []
@@ -333,11 +331,11 @@ class Board
 	mutate = (crom) ->
 		mutated = false
 		for e,i in crom
-			if Math.random() < mutationRate
+			if Math.random() < params.mutationRate
 				crom[i] = Math.random()
 				mutated = true
 		if mutated
-			console.log('mutating')
+			++stats.mutated
 
 	getChromoRoulette = (population) ->
 		slice = Math.random()*_.reduce(_.pluck(population, 'fitness'),((a,b)->a+b))
@@ -357,16 +355,17 @@ class Board
 		return pop
 
 	epoch: (oldpop) ->
-		sorted = _.sortBy(oldpop, (a) -> a.fitness);
+		sorted = _.sortBy(oldpop, (a) -> a.fitness).reverse()
 		newpop = []
 		# Push elite (5 best members) to new population. Survive!
-		for g in sorted[sorted.length-5..] # Use parameters.
+		for g in sorted[..5] # Use parameters.
 			g.reset()
 			newpop.push(g)
 			g.isTop = true
 
+		stats.mutated = 0
 		# Generate until population cap is reached.
-		while newpop.length < parameters.popSize
+		while newpop.length < params.popSize
 			mother = getChromoRoulette(oldpop)
 			father = getChromoRoulette(oldpop)
 			[baby1, baby2] = crossover(mother.weights, father.weights)
@@ -374,17 +373,19 @@ class Board
 			mutate(baby2)
 			newpop.push(new Bot(baby1))
 			newpop.push(new Bot(baby2))
+		console.log('mutated:',stats.mutated)
 		return newpop
 
 	constructor: ->
 		@tics = stats.genCount = 0
 		@food = []
-		@pop = @makeNew(parameters.popSize, window.numWeights)
-		@food.push(new Food()) for i in [0..parameters.foodCount]
+		@pop = @makeNew(params.popSize, window.numWeights)
+		@food.push(new Food()) for i in [0..params.foodCount]
 
 	tic: (step) ->
 		context.clearRect(0, 0, canvas.width, canvas.height)
-		# painter.drawRectangle(context, {x:0,y:0}, {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
+		# painter.drawRectangle(context, {x:0,y:0},
+		# {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
 		
 		if ++@tics < params.ticsPerGen
 			for bot in @pop
@@ -403,7 +404,7 @@ class Board
 	reset: ->
 		++stats.genCount
 		console.log("Ending generation #{stats.genCount}.")
-		$("#flags #stats").html("last eaten: "+(stats.foodEaten/parameters.popSize).toFixed(2))
+		$("#flags #stats").html("last eaten: "+(stats.foodEaten/params.popSize).toFixed(2))
 		$("#flags #generation").html("generation: "+stats.genCount)
 		food.eat() for food in game.board.food
 		@tics = stats.foodEaten = 0

@@ -570,11 +570,7 @@ NeuralNet = (function() {
 
 parameters = {
   activationResponse: 1,
-  ticsPerGen: 2000,
-  popSize: 20,
-  crossoverRate: 0.7,
-  mutationRate: 0.3,
-  foodCount: 20
+  mutationRate: 0.3
 };
 
 Board = (function() {
@@ -590,10 +586,13 @@ Board = (function() {
 
   Board.prototype.bestGenoma = null;
 
-  mutationRate = 0.3;
+  mutationRate = 0.5;
 
   params = {
-    ticsPerGen: 200
+    foodCount: 20,
+    popSize: 20,
+    crossoverRate: 0.7,
+    ticsPerGen: 500
   };
 
   stats = {
@@ -603,7 +602,7 @@ Board = (function() {
 
   crossover = function(mum, dad) {
     var baby1, baby2, cp, i, _i, _j, _ref4;
-    if (mum === dad || parameters.crossoverRate < Math.random()) {
+    if (mum === dad || params.crossoverRate < Math.random()) {
       return [mum.slice(0), dad.slice(0)];
     }
     baby1 = [];
@@ -631,7 +630,7 @@ Board = (function() {
       }
     }
     if (mutated) {
-      return console.log('mutating');
+      return ++stats.mutated;
     }
   };
 
@@ -670,16 +669,17 @@ Board = (function() {
     var baby1, baby2, father, g, mother, newpop, sorted, _i, _len, _ref4, _ref5;
     sorted = _.sortBy(oldpop, function(a) {
       return a.fitness;
-    });
+    }).reverse();
     newpop = [];
-    _ref4 = sorted.slice(sorted.length - 5);
+    _ref4 = sorted.slice(0, 6);
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
       g = _ref4[_i];
       g.reset();
       newpop.push(g);
       g.isTop = true;
     }
-    while (newpop.length < parameters.popSize) {
+    stats.mutated = 0;
+    while (newpop.length < params.popSize) {
       mother = getChromoRoulette(oldpop);
       father = getChromoRoulette(oldpop);
       _ref5 = crossover(mother.weights, father.weights), baby1 = _ref5[0], baby2 = _ref5[1];
@@ -688,6 +688,7 @@ Board = (function() {
       newpop.push(new Bot(baby1));
       newpop.push(new Bot(baby2));
     }
+    console.log('mutated:', stats.mutated);
     return newpop;
   };
 
@@ -695,8 +696,8 @@ Board = (function() {
     var i, _i, _ref4;
     this.tics = stats.genCount = 0;
     this.food = [];
-    this.pop = this.makeNew(parameters.popSize, window.numWeights);
-    for (i = _i = 0, _ref4 = parameters.foodCount; 0 <= _ref4 ? _i <= _ref4 : _i >= _ref4; i = 0 <= _ref4 ? ++_i : --_i) {
+    this.pop = this.makeNew(params.popSize, window.numWeights);
+    for (i = _i = 0, _ref4 = params.foodCount; 0 <= _ref4 ? _i <= _ref4 : _i >= _ref4; i = 0 <= _ref4 ? ++_i : --_i) {
       this.food.push(new Food());
     }
   }
@@ -746,7 +747,7 @@ Board = (function() {
     var food, _i, _len, _ref4;
     ++stats.genCount;
     console.log("Ending generation " + stats.genCount + ".");
-    $("#flags #stats").html("last eaten: " + (stats.foodEaten / parameters.popSize).toFixed(2));
+    $("#flags #stats").html("last eaten: " + (stats.foodEaten / params.popSize).toFixed(2));
     $("#flags #generation").html("generation: " + stats.genCount);
     _ref4 = game.board.food;
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
