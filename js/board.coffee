@@ -168,12 +168,11 @@ class _Bot extends Circle
 	size: 10
 	@closestFood = null
 
-	constructor: (@position) ->
+	constructor: (@position, @color='#A2A') ->
 		super
 		window.lastAdded = @
 
 	tic: (step) ->
-
 		speed = 150
 		@position.x += speed*Math.cos(@angle)*step
 		@position.y += speed*Math.sin(@angle)*step
@@ -186,8 +185,8 @@ class _Bot extends Circle
 		for food in game.board.food[1..]
 			if dist2(@position,food.position) < dist2(@position,@closestFood.position)
 				@closestFood = food
-		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 		@closestFood.color = 'red'
+		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 
 		# output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
 		# 		Math.cos(@angle), Math.sin(@angle)])
@@ -249,7 +248,7 @@ class Neuron
 		for value, i in input
 			out += value*@weights[i]
 		out += -1*@weights[@weights.length-1] # Add bias.
-		return sigmoid(out, parameters.activationResponse)
+		return sigmoid(out, window.activationResponse)
 
 	getWeights: -> @weights
 	putWeights: (weights) ->
@@ -304,14 +303,16 @@ class Board
 	params =
 		activationResponse: 1 					# for the sigmoid function
 		ticsPerGen: 500							# num of tics per generation
-		mutationRate = 0.5 						# down to 0.05
-		foodCount: 20
+		mutationRate: 0.1 						# down to 0.05
+		foodCount: 50
 		popSize: 20
 		crossoverRate: 0.7
 
 	stats =
 		foodEaten: 0
 		genCount: 0
+
+	genRandBot = -> new Bot(((Math.random()-Math.random()) for i2 in [0...window.numWeights]))
 
 	crossover = (mum, dad) ->
 		if mum is dad or params.crossoverRate < Math.random()
@@ -340,34 +341,43 @@ class Board
 	getChromoRoulette = (population) ->
 		slice = Math.random()*_.reduce(_.pluck(population, 'fitness'),((a,b)->a+b))
 		fitnessCount = 0
-		for g in population
+		for g in population by -1
 			fitnessCount += g.fitness
 			if fitnessCount >= slice
+				console.log('selected for roulette:',g.fitness)
 				return g
 		# console.log('não', _.reduce(population,(a,b)->a.fitness+b.fitness), population)
 
 	# calculateBestWorstAvgTotal: ->
 
 	makeNew: (popSize, numWeights) ->
-		pop = []
+		@pop = []
 		for i in [0...popSize]
-			pop.push(new Bot(((Math.random()-Math.random()) for i2 in [0...numWeights])))
-		return pop
+			@pop.push(genRandBot())
+		@pop
 
 	epoch: (oldpop) ->
 		sorted = _.sortBy(oldpop, (a) -> a.fitness).reverse()
 		newpop = []
+		console.log('sorted: (%s)', sorted.length, _.pluck(sorted,'fitness'))
 		# Push elite (5 best members) to new population. Survive!
 		for g in sorted[..5] # Use parameters.
 			g.reset()
 			newpop.push(g)
 			g.isTop = true
 
+		# for i in [0..3]
+		# 	newpop.push(new Bot(((Math.random()-Math.random()) for i2 in [0...window.numWeights])))
+		# 	newpop[newpop]
+		
 		stats.mutated = 0
 		# Generate until population cap is reached.
 		while newpop.length < params.popSize
-			mother = getChromoRoulette(oldpop)
-			father = getChromoRoulette(oldpop)
+			mother = getChromoRoulette(sorted[0..10])
+			father = getChromoRoulette(sorted[0..10])
+			if mother.fitness is 0 or father.fitness is 0
+				console.log('fitness 0. making random')
+				mother = new Bot(((Math.random()-Math.random()) for i2 in [0...window.numWeights]))
 			[baby1, baby2] = crossover(mother.weights, father.weights)
 			mutate(baby1)
 			mutate(baby2)
@@ -379,7 +389,7 @@ class Board
 	constructor: ->
 		@tics = stats.genCount = 0
 		@food = []
-		@pop = @makeNew(params.popSize, window.numWeights)
+		@makeNew(params.popSize, window.numWeights)
 		@food.push(new Food()) for i in [0..params.foodCount]
 
 	tic: (step) ->
@@ -403,7 +413,7 @@ class Board
 
 	reset: ->
 		++stats.genCount
-		console.log("Ending generation #{stats.genCount}.")
+		console.log("Ending generation #{stats.genCount}. #{(stats.foodEaten/params.popSize).toFixed(2)}")
 		$("#flags #stats").html("last eaten: "+(stats.foodEaten/params.popSize).toFixed(2))
 		$("#flags #generation").html("generation: "+stats.genCount)
 		food.eat() for food in game.board.food
@@ -435,6 +445,8 @@ calcNumWeights = (matrix, nInputs) ->
 		lastNum = e
 	return numWeights
 
+window.activationResponse = 1
+
 window.nInputs = 2
-window.layersConf = [5,5,5,2]
+window.layersConf = [5,2]
 window.numWeights = calcNumWeights(layersConf, window.nInputs)
