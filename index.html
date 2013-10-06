@@ -82,8 +82,23 @@
 			<div id="panel">
 				<h2>Controles</h2>
 				<div class="control" id="step">
+					<label>Velocidade</label>
+					<input onChange="game.board.params.speed = this.value/(this.divisor || 1); this.parentElement.querySelector('.badge').innerHTML=this.value/(this.divisor || 1);" type="range" min="1" max="200" value="50">
+					<span class="badge">50</span>
+				</div>
+				<div class="control" id="step">
+					<label>Tics por Geração</label>
+					<input onChange="game.board.params.ticsPerGen = this.value/(this.divisor || 1); this.parentElement.querySelector('.badge').innerHTML=this.value/(this.divisor || 1);" type="range" min="1" max="2000" value="2000">
+					<span class="badge">2000</span>
+				</div>
+				<div class="control" id="step">
+					<label>Densidade de Comida (por 100²cm²)</label>
+					<input onChange="game.board.params.foodDensity = this.value/(this.dataset.divisor || 1); this.parentElement.querySelector('.badge').innerHTML=this.value/(this.dataset.divisor || 1);" type="range" min="1" max="2000" value="400" data-divisor='1000'>
+					<span class="badge">0.4</span>
+				</div>
+				<div class="control" id="step">
 					<label>Step (velocidade)</label>
-					<input onChange="game.board.params.speed = this.value" type="range" min="1" max="200" value="20">
+					<input onChange="game.board.params.speed = this.value/(this.divisor || 1); this.parentElement.querySelector('.badge').innerHTML=this.value/(this.divisor || 1);" type="range" min="1" max="200" value="20">
 					<span class="badge">10</span>
 				</div>
 				<a onClick="game.board.leaveEvidence()" class="btn btn-danger">Close</a>

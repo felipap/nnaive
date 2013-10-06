@@ -6,7 +6,7 @@ painter =
 		if options.fill is true
 			context.fillStyle = options.color or 'black'
 		else
-			context.strokeStyle = options.color or 'blue'
+			context.strokeStyle = options.color or 'black'
 			context.lineWidth = options.width or 1
 
 	###### Canvas manipulation functions
@@ -154,7 +154,7 @@ class FixedPole extends Circle
 class Food extends Triangle
 
 	size: 5
-	color: 'blue'
+	color: '#25A'
 
 	constructor: ->
 		super
@@ -165,7 +165,7 @@ class Food extends Triangle
 
 class _Bot extends Circle
 	
-	color: '#A2A'
+	color: '#F5A'
 	size: 10
 	closestFood: null
 
@@ -175,34 +175,34 @@ class _Bot extends Circle
 		@lastOutput = [0,0]
 
 	tic: (step) ->
-		@position.x += @speed*Math.cos(@angle)*step
-		@position.y += @speed*Math.sin(@angle)*step
-		# Limit particle to canvas bounds.
-		@position.x = mod(@position.x,window.canvas.width)
-		@position.y = mod(@position.y,window.canvas.height)
 		# Set-up @closestFood
 		@closestFood = @closestFood or game.board.food[0]
-		@closestFood.color = 'blue'
+		@closestFood.color = '#25A'
 		for food in game.board.food[1..]
 			if dist2(@position,food.position) < dist2(@position,@closestFood.position)
 				@closestFood = food
-		@closestFood.color = 'red'
+		@closestFood.color = '#F22'
 
 		# @lastOutput = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
 		# 		Math.cos(@angle), Math.sin(@angle)])
 		@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
 		@angle += @lastOutput[0]-@lastOutput[1]
+		##
+		@position.x += @speed*Math.cos(@angle)*step
+		@position.y += @speed*Math.sin(@angle)*step
+		# Limit particle to canvas bounds.
+		@position.x = mod(@position.x,window.canvas.width)
+		@position.y = mod(@position.y,window.canvas.height)
 		######
 		if window.leftPressed then @angle += 0.2
 		if window.rightPressed then @angle -= 0.2
 		
-	render: (context) ->
-		# Draw circle
+	render: (context) -> # Draw circle
 		super
 		# if @fitness
-		# 	painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
+		# 	painter.drawCircle(context, @position, @size+@fitnes s*4, {color: 'rgba(0,0,0,.4)'})
 		# Draw crown
-		context.lineWidth = @size-6
+		context.lineWidth = 1
 		angles = {0:[-Math.PI, 0], 1:[0,Math.PI]}
 		context.save() 
 		context.translate(@position.x, @position.y)
@@ -210,12 +210,12 @@ class _Bot extends Circle
 		for t, a of angles
 			context.beginPath()
 			context.strokeStyle = "rgba(0,0,0,#{@lastOutput[t]})"
-			context.arc(0, 0, @size/2+8+5*@fitness, a[0], a[1]);
+			context.arc(0, 0, @size/2+8+3*@fitness, a[0], a[1]);
 			context.stroke()
 		context.restore()
 		# Draw line to nearest food item.
 		if @closestFood
-			painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
+			painter.drawLine(context, @position, @closestFood.position, {width:1, color:'grey'})
 		# Draw middle triangle
 		@p1 = {x: @size/2, y: 0}
 		@p2 = {x: -@size*2/3, y: @size/3}
@@ -294,11 +294,14 @@ class NeuralNet
 
 class Bot extends _Bot
 	
-	constructor: (@weights, params, @color='#A2A') ->
+	constructor: (@weights, params, @color=@color) ->
 		super()
 		@speed = params.speed
 		@fitness = 0
 		@inEvidence = false
+		$(@).bind('toggleEvidence', =>
+			@inEvidence = not @inEvidence
+			console.log('evidence?', @inEvidence))
 		@nn = new NeuralNet(params.layersConf, params.nInputs)
 		@nn.putWeights(@weights)
 
@@ -314,8 +317,9 @@ class Bot extends _Bot
 			painter.drawCircle(context, @position, @size+10, {color:'grey', fill:true})
 		if stats.topBot is @ then color = 'black'
 		else if @isElite then color = '#088'
-
 		super(context, color)
+
+
 
 class Board
 	totalFitness: 0
@@ -354,13 +358,16 @@ class Board
 		game.panel.hide()
 
 	showSpecs: (pos) ->
+		$(@inEvidence)?.trigger('toggleEvidence') if @inEvidence
+		@inEvidence = null
+		stop = false
 		for bot in @pop
 			if Math.pow(bot.size,2) > dist2(pos,bot.position)
-				window.canvasStop = true
-				if @inEvidence then @inEvidence.inEvidence = false
+				stop = true
 				@inEvidence = bot
-				bot.inEvidence = true
+				$(@inEvidence)?.trigger('toggleEvidence')
 				game.panel.show()
+		window.canvasStop = stop
 
 	genRandBot: -> new Bot(Math.random()-Math.random() for i2 in [0...@params.numWeights], @params)
 
@@ -470,7 +477,7 @@ class Board
 	reset: ->
 		++@stats.genCount
 		console.log("Ending generation #{@stats.genCount}. #{(@stats.foodEaten/@params.popSize).toFixed(2)}")
-		$("#flags #stats").html("last eaten: "+(@stats.foodEaten/@params.popSize).toFixed(2))
+		$("#flags #stats").html("Last generation ate: "+(@stats.foodEaten/@params.popSize).toFixed(2))
 		$("#flags #generation").html("generation: "+@stats.genCount)
 		
 		foodCount = Math.round(@params.foodDensity*canvas.height*canvas.width/10000)
