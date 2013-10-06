@@ -187,13 +187,25 @@ class _Bot extends Circle
 		painter.drawLine(context, @position, @closestFood.position, {width: 1, color: 'grey'})
 		@closestFood.color = 'red'
 
-		output = @nn.update([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
+		output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
 				Math.cos(@angle), Math.sin(@angle)])
 		# console.log('output', output)
 		nangle = output[0]-output[1]
 		#nangle = Math.atan2(@closestFood.position.y-@position.y, @closestFood.position.x-@position.x)
 		# vel = (nangle-@angle)/5
 		@angle += nangle
+
+		# context.lineWidth = @size-6
+		# angles = {x:[Math.PI, Math.PI*3/2], y:[Math.PI*3/2, 0]}
+		# context.save()
+		# context.translate(@position.x, @position.y)
+		# context.rotate(@angle)
+		# for t, a of angles
+		# 	context.beginPath()
+		# 	context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
+		# 	context.arc(0, 0, @size/2+6, a[0], a[1]);
+		# 	context.stroke()
+		# context.restore()
 
 		if window.leftPressed then @angle += 0.2
 		if window.rightPressed then @angle -= 0.2
@@ -204,20 +216,9 @@ class _Bot extends Circle
 		@p2 = {x: -@size*2/3, y: @size/3}
 		@p3 = {x: -@size*2/3, y: -@size/3}
 
-		painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
+		# painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
 		painter.drawCenteredPolygon(context, @position, [@p1,@p2,@p3], @angle, {color:'white', fill:true})
 
-		# context.lineWidth = @size-6
-		# angles = {a:[Math.PI, Math.PI*3/2], d:[Math.PI/2, Math.PI], c:[0, Math.PI/2], b:[Math.PI*3/2, 0]}
-		# context.save()
-		# context.translate(@position.x, @position.y)
-		# context.rotate(@angle)
-		# for t, a of angles
-		# 	context.beginPath()
-		# 	context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
-		# 	context.arc(0, 0, @size/2+6, a[0], a[1]);
-		# 	context.stroke()
-		# context.restore()
 
 	foundFood: ->
 		if dist2(@position,@closestFood.position) < Math.pow(@size+@closestFood.size,2)
@@ -242,10 +243,10 @@ sigmoid = (netinput, response) -> 1/(1+Math.exp(-netinput/response))
 parameters =
 	activationResponse: 1 								# for the sigmoid function
 	numTics: 500										# num of tics per generation
-	popSize: 30
+	popSize: 20
 	crossoverRate: 0.7
 	mutationRate: 0.3 # down to 0.05
-	foodCount: 40
+	foodCount: 20
 
 class Neuron
 	
@@ -256,20 +257,21 @@ class Neuron
 
 	fire: (input) ->
 		out = 0
-		console.assert(@weights.length is input.length+1)
+		console.assert(@weights.length is input.length+1, @weights.length)
 		for value, i in input
 			out += value*@weights[i]
 		out += -1*@weights[@weights.length-1]
 		return sigmoid(out, parameters.activationResponse)
 
 	getWeights: -> @weights
-	putWeights: (weights) -> @weights = weights.splice(0,@nInputs+1) # +1 for bias
+	putWeights: (weights) ->
+		@weights = weights.splice(0,@nInputs+1) # +1 for bias
 
 class NeuronLayer
 	neurons: []
 	
-	constructor: (nNeurons=window.NPL) ->
-		@neurons = (new Neuron for i in [0...nNeurons])
+	constructor: (nNeurons=window.NPL, nInputs=window.NPL) ->
+		@neurons = (new Neuron(nInputs) for i in [0...nNeurons])
 
 	calculate: (input) ->
 		output = []
@@ -285,13 +287,10 @@ class NeuronLayer
 class NeuralNet
 	layers: []
 
-	constructor: (layersConf=null) ->
-		if not layersConf
-			@layers = (new NeuronLayer for i in [0...window.NL])
-		else if typeof layersConf is 'number'
-			@layers = (new NeuronLayer for i in [0...nLayers])
-		else # layersConf is Array
-			@layers = (new NeuronLayer(n) for n in layersConf)
+	constructor: (layersConf, nInputs) ->
+		@layers = []
+		for e, i in layersConf
+			@layers.push(new NeuronLayer(e, if i > 0 then layersConf[i-1] else nInputs))
 	
 	getWeights: -> _.flatten((layer.getWeights() for layer in @layers))	
 	putWeights: (weights) ->
@@ -300,8 +299,7 @@ class NeuralNet
 		for layer in @layers
 			layer.putWeights(_weights)
 	
-	update: (inputNeurons) ->
-		# console.log(@layers)
+	fire: (inputNeurons) ->
 		outputs = inputNeurons
 		for layer in @layers
 			outputs = layer.calculate(outputs)
@@ -384,9 +382,9 @@ class Bot extends _Bot
 	constructor: (@weights) ->
 		super()
 		@fitness = 0
-		@nn = new NeuralNet
+		@nn = new NeuralNet(window.layersConf,4)
 		@nn.putWeights(@weights)
-		console.log('here:', @nn.update([0,0,0,0]))
+		console.log('here:', @nn.fire([0,0,0,0]))
 		@isTop = false
 
 	reset: ->
@@ -399,33 +397,46 @@ class Bot extends _Bot
 		super
 		if @isTop then @color = '#088'
 
-# nn = new NeuralNet
-# output = nn.update([1,0,1])
-
-# nn.putWeights([0,1.1,2.2,3.3,4,5.1,6.2,7.3,8,9.1,10.2,11.3,12,13.1,14.2,15.3,16,17.1,18.2,19.3,20,21.1,22.2,23.3,24,25.1,26.2,27.3,28,29.1,30.2,31.3,32,33.1,34.2,35.3,36,37.1,38.2,39.3,40,41.1,42.2,43.3,44,45.1,46.2,47.3])
-# ws = nn.getWeights()
-# console.log(ws, ws.length)
-# console.log(nn.update([1,50,1]))
+window.layersConf = [4,4,4,4,5]
 
 window.tics = 0
 window.genCount = 0
 
 genEng = new GeneticEngine
 
-window.NPL = 4 			# Neurons-per-layer
-window.NL = 3 			# Number of layers
+window.NPL = 4 						# Neurons-per-layer
+window.NL = 3 						# Number of layers
+
+window.foodEaten = 0
+
+window.layersConf
+calcNumWeights = (matrix, nInputs) ->
+	lastNum = nInputs
+	numWeights = 0
+	for e,i in matrix
+		numWeights += (lastNum+1)*e
+		lastNum = e
+	return numWeights
+window.numWeights = calcNumWeights(layersConf, 4)
+
+console.log('number of weights', window.numWeights)
+
+roundFloat = (num,arg) -> Math.round(Math.pow(10,arg)*num)/Math.pow(10,arg)
 
 tic = (step) ->
 
 	if ++window.tics < parameters.numTics
 		for bot in window.pop
 			bot.tic(step)
-			if bot.foundFood() then ++bot.fitness
+			if bot.foundFood()
+				++bot.fitness
+				++window.foodEaten
 			bot.render(context)
 
 	else # Reset and gogo next generation.
+		$("#flags #stats").html("last eaten: "+roundFloat(window.foodEaten/parameters.popSize,2))
 		console.log('reset please')
-		window.tics = 0
+		window.tics = window.foodEaten = 0
 		++window.genCount
 		window.pop = genEng.epoch(window.pop)
 
@@ -453,7 +464,7 @@ class Board
 		@food = []
 
 		# @addBot(new Bot()) for i in [0..10]
-		window.pop = genEng.makeNew(parameters.popSize, (window.NPL+1)*window.NPL*window.NL)		
+		window.pop = genEng.makeNew(parameters.popSize, window.numWeights)		
 		console.log('gen:',window.pop)
 		@food.push(new Food()) for i in [0..parameters.foodCount]
 
