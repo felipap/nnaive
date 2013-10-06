@@ -103,6 +103,7 @@ painter =
 mod  = (a,n) -> ((a%n)+n)%n
 dist2= (a,b) -> Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2)
 dist = (a,b) -> Math.sqrt(dist2(a,b))
+mm = (a,num,b) -> Math.max(a,Math.min(num,b))
 
 class Drawable
 	type: 'Drawable'
@@ -177,8 +178,8 @@ class _Bot extends Circle
 		@position.x += speed*Math.cos(@angle)*step
 		@position.y += speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.
-		@position.x = mod(@position.x,window.canvas.width)
-		@position.y = mod(@position.y,window.canvas.height)
+		@position.x = mm(0,@position.x,window.canvas.width)
+		@position.y = mm(0,@position.y,window.canvas.height)
 		# Set-up @closestFood
 		@closestFood = @closestFood or game.board.food[0]
 		@closestFood.color = 'blue'
@@ -301,11 +302,12 @@ class Board
 
 	params:
 		activationResponse: 1 					# for the sigmoid function
-		ticsPerGen: 500							# num of tics per generation
+		ticsPerGen: 400							# num of tics per generation
 		mutationRate: 0.1 						# down to 0.05
-		foodCount: 50
+		foodDensity: 0.1 						# per 100x100 px² squares
 		popSize: 20
 		crossoverRate: 0.7
+		maxMutationFactor: 0.3
 
 	stats:
 		foodEaten: 0
@@ -325,14 +327,13 @@ class Board
 		for i in [cp...mum.length]
 			baby1.push(dad[i])
 			baby2.push(mum[i])
-		# console.log('baby1', baby1, 'baby2', baby2)
 		return [baby1, baby2]
 
 	mutate: (crom) ->
 		mutated = false
 		for e,i in crom
 			if Math.random() < @params.mutationRate
-				crom[i] = Math.random()-Math.random()
+				crom[i] = mm(-@params.maxMutationFactor,Math.random()-Math.random(),@params.maxMutationFactor)
 				mutated = true
 		if mutated
 			++@stats.mutated
@@ -360,13 +361,13 @@ class Board
 		newpop = []
 		console.log('sorted: (%s)', sorted.length, _.pluck(sorted,'fitness'))
 		
-		for g in sorted[..8] # Use parameters
+		for g in sorted[..5] # Use parameters
 			g.reset()
 			newpop.push(g)
 
 		newpop.push(new Bot(@mutate(sorted[0].weights[..]), 'green'))
 		newpop.push(new Bot(@mutate(sorted[1].weights[..]), 'green'))
-		newpop.push(new Bot(@mutate(sorted[3].weights[..]), 'green'))
+		newpop.push(new Bot(@mutate(sorted[2].weights[..]), 'green'))
 
 		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[1].weights[..])[0], 'yellow'))
 		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[2].weights[..])[1], 'yellow'))
@@ -374,8 +375,8 @@ class Board
 		@stats.mutated = 0
 		# Generate until population cap is reached.
 		while newpop.length < @params.popSize
-			mother = getChromoRoulette(sorted[0..10])
-			father = getChromoRoulette(sorted[0..10])
+			mother = getChromoRoulette(sorted)
+			father = getChromoRoulette(sorted)
 			if mother.fitness is 0 or father.fitness is 0
 				console.log('fitness 0. making random')
 				mother = genRandBot()
@@ -390,7 +391,10 @@ class Board
 	constructor: ->
 		@tics = @stats.genCount = 0
 		@makeNew(@params.popSize, window.numWeights)
-		@food = (new Food() for i in [0..@params.foodCount])
+		
+		foodCount = Math.round(@params.foodDensity*canvas.height*canvas.width/10000)
+		console.log("Making #{foodCount} of food for generation #{@stats.genCount}.")
+		@food = (new Food() for i in [0..foodCount])
 
 	tic: (step) ->
 		context.clearRect(0, 0, canvas.width, canvas.height)
@@ -420,7 +424,9 @@ class Board
 		$("#flags #stats").html("last eaten: "+(@stats.foodEaten/@params.popSize).toFixed(2))
 		$("#flags #generation").html("generation: "+@stats.genCount)
 		
-		@food = (new Food() for i in [0..@params.foodCount])
+		foodCount = Math.round(@params.foodDensity*canvas.height*canvas.width/10000)
+		console.log("Making #{foodCount} of food for generation #{@stats.genCount}.")
+		@food = (new Food() for i in [0..foodCount])
 		@tics = @stats.foodEaten = 0
 		@pop = @epoch(@pop)
 
