@@ -173,7 +173,7 @@ class _Bot extends Circle
 		window.lastAdded = @
 
 	tic: (step) ->
-		speed = 150
+		speed = 250
 		@position.x += speed*Math.cos(@angle)*step
 		@position.y += speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.

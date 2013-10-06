@@ -340,7 +340,7 @@ _Bot = (function(_super) {
 
   _Bot.prototype.tic = function(step) {
     var food, output, speed, _i, _len, _ref4;
-    speed = 150;
+    speed = 250;
     this.position.x += speed * Math.cos(this.angle) * step;
     this.position.y += speed * Math.sin(this.angle) * step;
     this.position.x = mod(this.position.x, window.canvas.width);
