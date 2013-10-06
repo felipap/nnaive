@@ -189,7 +189,7 @@ class _Bot extends Circle
 				@closestFood = food
 		@closestFood.color = 'red'
 
-		output = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
+		@lastOutput = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
 				Math.cos(@angle), Math.sin(@angle)])
 		# @lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
 		@angle += @lastOutput[0]-@lastOutput[1]
@@ -247,7 +247,7 @@ class Neuron
 		for value, i in input
 			out += value*@weights[i]
 		out += -1*@weights[@weights.length-1] # Add bias.
-		return sigmoid(out, window.activationResponse)
+		return sigmoid(out, game.board.params.activationResponse)
 
 	getWeights: -> @weights
 	putWeights: (weights) ->
@@ -295,10 +295,10 @@ class NeuralNet
 
 class Bot extends _Bot
 	
-	constructor: (@weights, @color='#A2A') ->
+	constructor: (@weights, params, @color='#A2A') ->
 		super()
 		@fitness = 0
-		@nn = new NeuralNet(window.layersConf, window.nInputs)
+		@nn = new NeuralNet(params.layersConf, params.nInputs)
 		@nn.putWeights(@weights)
 
 	reset: -> # Is elite.
@@ -320,6 +320,14 @@ class Board
 	worstFitness: 0
 	bestGenoma: null
 
+	calcNumWeights = (matrix, nInputs) ->
+		lastNum = nInputs
+		numWeights = 0
+		for e,i in matrix
+			numWeights += (lastNum+1)*e
+			lastNum = e
+		return numWeights
+
 	params:
 		activationResponse: 1 					# for the sigmoid function
 		ticsPerGen: 400							# num of tics per generation
@@ -328,12 +336,15 @@ class Board
 		popSize: 20
 		crossoverRate: 0.7
 		maxMutationFactor: 0.3
+		nInputs: 4
+		layersConf: [5,2]
+		numWeights: null # calcNumWeights(this.layersConf) # Initialized in constructor
 
 	stats:
 		foodEaten: 0
 		genCount: 0
 
-	genRandBot = -> new Bot(((Math.random()-Math.random()) for i2 in [0...window.numWeights]))
+	genRandBot: -> new Bot(Math.random()-Math.random() for i2 in [0...@params.numWeights], @params)
 
 	crossover: (mum, dad) ->
 		if mum is dad or @params.crossoverRate < Math.random()
@@ -373,7 +384,7 @@ class Board
 	makeNew: (popSize, numWeights) ->
 		@pop = []
 		for i in [0...popSize]
-			@pop.push(genRandBot())
+			@pop.push(@genRandBot())
 		@pop
 
 	epoch: (oldpop) ->
@@ -385,12 +396,12 @@ class Board
 			g.reset()
 			newpop.push(g)
 
-		newpop.push(new Bot(@mutate(sorted[0].weights[..]), 'green'))
-		newpop.push(new Bot(@mutate(sorted[1].weights[..]), 'green'))
-		newpop.push(new Bot(@mutate(sorted[2].weights[..]), 'green'))
+		newpop.push(new Bot(@mutate(sorted[0].weights[..]), @params, 'green'))
+		newpop.push(new Bot(@mutate(sorted[1].weights[..]), @params, 'green'))
+		newpop.push(new Bot(@mutate(sorted[2].weights[..]), @params, 'green'))
 
-		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[1].weights[..])[0], 'yellow'))
-		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[2].weights[..])[1], 'yellow'))
+		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[1].weights[..])[0], @params, 'yellow'))
+		newpop.push(new Bot(@crossover(sorted[0].weights[..],sorted[2].weights[..])[1], @params, 'yellow'))
 
 		@stats.mutated = 0
 		# Generate until population cap is reached.
@@ -399,18 +410,19 @@ class Board
 			father = getChromoRoulette(sorted)
 			if mother.fitness is 0 or father.fitness is 0
 				console.log('fitness 0. making random')
-				mother = genRandBot()
+				mother = @genRandBot()
 			[baby1, baby2] = @crossover(mother.weights, father.weights)
 			@mutate(baby1)
 			@mutate(baby2)
-			newpop.push(new Bot(baby1))
-			newpop.push(new Bot(baby2))
+			newpop.push(new Bot(baby1,@params))
+			newpop.push(new Bot(baby2,@params))
 		console.log('mutated:',@stats.mutated)
 		return newpop
 
 	constructor: ->
+		@params.numWeights = calcNumWeights(@params.layersConf,@params.nInputs)
 		@tics = @stats.genCount = 0
-		@makeNew(@params.popSize, window.numWeights)
+		@makeNew(@params.popSize, @params.numWeights)
 		
 		foodCount = Math.round(@params.foodDensity*canvas.height*canvas.width/10000)
 		console.log("Making #{foodCount} of food for generation #{@stats.genCount}.")
@@ -451,17 +463,3 @@ class Board
 		@pop = @epoch(@pop)
 
 
-
-calcNumWeights = (matrix, nInputs) ->
-	lastNum = nInputs
-	numWeights = 0
-	for e,i in matrix
-		numWeights += (lastNum+1)*e
-		lastNum = e
-	return numWeights
-
-window.activationResponse = 1
-
-window.nInputs = 4
-window.layersConf = [5,2]
-window.numWeights = calcNumWeights(layersConf, window.nInputs)

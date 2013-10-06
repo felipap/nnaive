@@ -50,7 +50,7 @@ class Game
 		window.setTimeout((=> @loopTic()), 1)
 		# Synchronise tps
 		thisFrameTPS = 1000 / ((now=new Date) - lastTic)
-		tps += (thisFrameTPS - tps) / 10;
+		tps += (thisFrameTPS - tps) / 50;
 		lastTic = now * 1 - 1
 
 	loopRender: ->
@@ -59,7 +59,7 @@ class Game
 		window.AnimateOnFrameRate(=>@loopRender())
 		# Synchronise fps
 		thisFrameFPS = 1000 / ((now=new Date) - lastRender)
-		fps += (thisFrameFPS - fps) / 10;
+		fps += (thisFrameFPS - fps) / 50;
 		lastRender = now * 1 - 1
 
 	start: ->

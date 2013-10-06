@@ -72,7 +72,7 @@ Game = (function() {
       return _this.loopTic();
     }), 1);
     thisFrameTPS = 1000 / ((now = new Date) - lastTic);
-    tps += (thisFrameTPS - tps) / 10;
+    tps += (thisFrameTPS - tps) / 50;
     return lastTic = now * 1 - 1;
   };
 
@@ -86,7 +86,7 @@ Game = (function() {
       return _this.loopRender();
     });
     thisFrameFPS = 1000 / ((now = new Date) - lastRender);
-    fps += (thisFrameFPS - fps) / 10;
+    fps += (thisFrameFPS - fps) / 50;
     return lastRender = now * 1 - 1;
   };
 
