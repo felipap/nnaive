@@ -33,8 +33,9 @@ class Game
 		@canvas.width = $('.wrapper').width()  # window.innerWidth
 		@canvas.height = $('.wrapper').height() # window.innerHeight
 		context = @canvas.getContext("2d")
+		window.context = context
 
-		@board = new window.Board(@canvas)
+		@board = new window.Board()
 		console.log 'board', @board
 		
 		$(@canvas).bind 'click', (event) =>
@@ -68,9 +69,7 @@ class Game
 
 		window.setTimeout =>
 			@loop()
-		#, 1000/@fps
 		, 1
-		#window.AnimateOnFrameRate(->game.loop())
 
 	start: ->
 		addFpsCounter()

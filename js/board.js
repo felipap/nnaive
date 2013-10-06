@@ -340,7 +340,7 @@ _Bot = (function(_super) {
 
   _Bot.prototype.tic = function(step) {
     var food, output, speed, _i, _len, _ref4;
-    speed = 20;
+    speed = 100;
     this.position.x += speed * Math.cos(this.angle) * step;
     this.position.y += speed * Math.sin(this.angle) * step;
     this.position.x = mod(this.position.x, window.canvas.width);
@@ -365,6 +365,20 @@ _Bot = (function(_super) {
       console.log([Math.atan2(this.closestFood.position.y - this.position.y, this.closestFood.position.x - this.position.x), this.angle, output[0]]);
     }
     this.angle += output[0] - output[1];
+    /*
+    		context.lineWidth = @size-6
+    		angles = {x:[Math.PI, Math.PI*3/2], y:[Math.PI*3/2, 0]}
+    		context.save() 
+    		context.translate(@position.x, @position.y)
+    		context.rotate(@angle)
+    		for t, a of angles
+    			context.beginPath()
+    			context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
+    			context.arc(0, 0, @size/2+6, a[0], a[1]);
+    			context.stroke()
+    		context.restore()
+    */
+
     if (window.leftPressed) {
       this.angle += 0.2;
     }
@@ -665,9 +679,9 @@ Bot = (function(_super) {
     this.weights = weights;
     Bot.__super__.constructor.call(this);
     this.fitness = 0;
+    this.isTop = false;
     this.nn = new NeuralNet(window.layersConf, window.nInputs);
     this.nn.putWeights(this.weights);
-    this.isTop = false;
   }
 
   Bot.prototype.reset = function() {
@@ -722,10 +736,8 @@ window.tics = 0;
 genEng = new GeneticEngine();
 
 Board = (function() {
-  function Board(canvas) {
+  function Board() {
     var i, _i, _ref4;
-    this.canvas = canvas;
-    window.context = this.canvas.getContext("2d");
     this.bots = [];
     this.food = [];
     window.pop = genEng.makeNew(parameters.popSize, window.numWeights);
@@ -752,7 +764,7 @@ Board = (function() {
 
   Board.prototype.tic = function(step) {
     var bot, food, item, _i, _j, _k, _len, _len1, _len2, _ref4, _ref5, _ref6, _results;
-    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
     if (++window.tics < parameters.ticsPerGen) {
       _ref4 = window.pop;
       for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
@@ -762,7 +774,6 @@ Board = (function() {
           ++bot.fitness;
           ++stats.foodEaten;
         }
-        bot.render(context);
       }
     } else {
       console.log("Ending generation " + window.stats.genCount + ". Next...");

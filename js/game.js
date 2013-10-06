@@ -44,7 +44,8 @@ Game = (function() {
     this.canvas.width = $('.wrapper').width();
     this.canvas.height = $('.wrapper').height();
     context = this.canvas.getContext("2d");
-    this.board = new window.Board(this.canvas);
+    window.context = context;
+    this.board = new window.Board();
     console.log('board', this.board);
     $(this.canvas).bind('click', function(event) {});
     $(this.canvas).bind('mousedown', function(event) {});

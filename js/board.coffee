@@ -174,7 +174,7 @@ class _Bot extends Circle
 
 	tic: (step) ->
 
-		speed = 20
+		speed = 100
 		@position.x += speed*Math.cos(@angle)*step
 		@position.y += speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.
@@ -197,19 +197,19 @@ class _Bot extends Circle
 			@color = 'red'
 			console.log [Math.atan2(@closestFood.position.y-@position.y,@closestFood.position.x-@position.x),@angle, output[0]]
 		@angle += output[0]-output[1]
-
-		# context.lineWidth = @size-6
-		# angles = {x:[Math.PI, Math.PI*3/2], y:[Math.PI*3/2, 0]}
-		# context.save() 
-		# context.translate(@position.x, @position.y)
-		# context.rotate(@angle)
-		# for t, a of angles
-		# 	context.beginPath()
-		# 	context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
-		# 	context.arc(0, 0, @size/2+6, a[0], a[1]);
-		# 	context.stroke()
-		# context.restore()
-
+		###
+		context.lineWidth = @size-6
+		angles = {x:[Math.PI, Math.PI*3/2], y:[Math.PI*3/2, 0]}
+		context.save() 
+		context.translate(@position.x, @position.y)
+		context.rotate(@angle)
+		for t, a of angles
+			context.beginPath()
+			context.strokeStyle = "rgba(0,0,0,#{@thrust[t]})"
+			context.arc(0, 0, @size/2+6, a[0], a[1]);
+			context.stroke()
+		context.restore()
+		###
 		if window.leftPressed then @angle += 0.2
 		if window.rightPressed then @angle -= 0.2
 		
@@ -363,14 +363,11 @@ class Bot extends _Bot
 	constructor: (@weights) ->
 		super()
 		@fitness = 0
+		@isTop = false
 		@nn = new NeuralNet(window.layersConf,window.nInputs)
 		@nn.putWeights(@weights)
-		@isTop = false
 
 	reset: ->
-		# @position =
-		# 	x: Math.random()*canvas.width
-		# 	y: Math.random()*canvas.height
 		@fitness = 0
 
 	tic: ->
@@ -406,8 +403,7 @@ genEng = new GeneticEngine()
 
 class Board
 
-	constructor: (@canvas) ->
-		window.context = @canvas.getContext("2d")
+	constructor: ->
 		@bots = []
 		@food = []
 		window.pop = genEng.makeNew(parameters.popSize, window.numWeights)
@@ -418,8 +414,8 @@ class Board
 		item.render(context) for item in @bots
 
 	tic: (step) ->
-		context.clearRect(0, 0, @canvas.width, @canvas.height)
-		# painter.drawRectangle(context, {x:0,y:0}, {x:@canvas.width,y:@canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
+		context.clearRect(0, 0, canvas.width, canvas.height)
+		# painter.drawRectangle(context, {x:0,y:0}, {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
 		
 		if ++window.tics < parameters.ticsPerGen
 			for bot in window.pop
@@ -427,7 +423,7 @@ class Board
 				if bot.foundFood()
 					++bot.fitness
 					++stats.foodEaten
-				bot.render(context)
+				# bot.render(context)
 
 		else # Reset and gogo next generation.
 			console.log("Ending generation #{window.stats.genCount}. Next...")
