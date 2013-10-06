@@ -39,14 +39,16 @@
 							border: 1px solid #DDD;
 						}
 
-						#controls {
+						#panel {
 							position: fixed;
 							right: 0;
-							top: 0;
+							top: 0; bottom: 0;
 							border: 1px solid #DDD;
 							width: 20%;
 
 							box-sizing: border-box;
+							background: rgba(150,150,150,.8);
+							color: white;
 							padding: 0 20px;
 						}
 
@@ -76,14 +78,16 @@
 			<div class="wrapper">
 				<canvas id="nnaive" oncontextmenu="return false"></canvas>
 			</div>
-<!-- 			<div id="controls">
+
+			<div id="panel">
 				<h2>Controles</h2>
 				<div class="control" id="step">
 					<label>Step (velocidade)</label>
-					<input type="range" min="1" max="200" value="20">
+					<input onChange="game.board.params.speed = this.value" type="range" min="1" max="200" value="20">
 					<span class="badge">10</span>
 				</div>
-			</div> -->
+				<a onClick="game.board.leaveEvidence()" class="btn btn-danger">Close</a>
+			</div>
 
 		</div> <!-- /container --> <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 				<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>

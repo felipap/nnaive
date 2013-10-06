@@ -14,8 +14,9 @@ class Game
 		tics = document.getElementById('tics')
 		setInterval =>
 			fpsOut.innerHTML = 'fps:'+fps.toFixed(1)
+			$("#flags #stopped").html(if window.canvasStop then "Stopped" else "")
 			tpsOut.innerHTML = 'tps:'+tps.toFixed(1)
-			tics.innerHTML = 'tic: '+game.board.tics
+			tics.innerHTML = "tic: #{game.board.tics}/#{game.board.params.ticsPerGen}"
 		, 500
 
 	resetFpsCounter = ->
@@ -35,14 +36,17 @@ class Game
 		context = @canvas.getContext("2d")
 		window.context = context
 
+		@panel = $("#panel")
+
 		@board = new window.Board()
+		$(@canvas).bind 'click', (event) =>
+			@board.showSpecs(@_getMousePos(event))
 
 		window.canvasStop = false
 		$(document).keydown (event) =>
 			if event.keyCode == 32
 				console.log('spacebar hit')
 				window.canvasStop = !window.canvasStop
-				$("#flags #stopped").html(if window.canvasStop then "Stopped" else "")
 
 	loopTic: ->
 		if not window.canvasStop
@@ -50,16 +54,16 @@ class Game
 		window.setTimeout((=> @loopTic()), 1)
 		# Synchronise tps
 		thisFrameTPS = 1000 / ((now=new Date) - lastTic)
-		tps += (thisFrameTPS - tps) / 50;
+		tps += (thisFrameTPS - tps) / 30;
 		lastTic = now * 1 - 1
 
 	loopRender: ->
-		if not window.canvasStop
-			@board.render(context)
+		# if not window.canvasStop
+		@board.render(context)
 		window.AnimateOnFrameRate(=>@loopRender())
 		# Synchronise fps
 		thisFrameFPS = 1000 / ((now=new Date) - lastRender)
-		fps += (thisFrameFPS - fps) / 50;
+		fps += (thisFrameFPS - fps) / 30;
 		lastRender = now * 1 - 1
 
 	start: ->

@@ -344,10 +344,9 @@ _Bot = (function(_super) {
   }
 
   _Bot.prototype.tic = function(step) {
-    var food, speed, _i, _len, _ref4;
-    speed = 250;
-    this.position.x += speed * Math.cos(this.angle) * step;
-    this.position.y += speed * Math.sin(this.angle) * step;
+    var food, _i, _len, _ref4;
+    this.position.x += this.speed * Math.cos(this.angle) * step;
+    this.position.y += this.speed * Math.sin(this.angle) * step;
     this.position.x = mod(this.position.x, window.canvas.width);
     this.position.y = mod(this.position.y, window.canvas.height);
     this.closestFood = this.closestFood || game.board.food[0];
@@ -360,7 +359,7 @@ _Bot = (function(_super) {
       }
     }
     this.closestFood.color = 'red';
-    this.lastOutput = this.nn.fire([this.closestFood.position.x - this.position.x, this.closestFood.position.y - this.position.y, Math.cos(this.angle), Math.sin(this.angle)]);
+    this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x), this.angle]);
     this.angle += this.lastOutput[0] - this.lastOutput[1];
     if (window.leftPressed) {
       this.angle += 0.2;
@@ -580,20 +579,29 @@ Bot = (function(_super) {
     this.weights = weights;
     this.color = color != null ? color : '#A2A';
     Bot.__super__.constructor.call(this);
+    this.speed = params.speed;
     this.fitness = 0;
+    this.inEvidence = false;
     this.nn = new NeuralNet(params.layersConf, params.nInputs);
     this.nn.putWeights(this.weights);
   }
 
-  Bot.prototype.reset = function() {
+  Bot.prototype.reset = function(params) {
     this.isElite = true;
     this.fitness = 0;
+    this.speed = params.speed;
     return this.closestFood = null;
   };
 
   Bot.prototype.render = function(context) {
     var color;
     color = this.color;
+    if (this.inEvidence) {
+      painter.drawCircle(context, this.position, this.size + 10, {
+        color: 'grey',
+        fill: true
+      });
+    }
     if (stats.topBot === this) {
       color = 'black';
     } else if (this.isElite) {
@@ -633,13 +641,14 @@ Board = (function() {
 
   Board.prototype.params = {
     activationResponse: 1,
-    ticsPerGen: 400,
+    ticsPerGen: 2000,
     mutationRate: 0.1,
-    foodDensity: 0.1,
+    foodDensity: 0.4,
     popSize: 20,
     crossoverRate: 0.7,
     maxMutationFactor: 0.3,
-    nInputs: 4,
+    nInputs: 2,
+    speed: 50,
     layersConf: [5, 2],
     numWeights: null
   };
@@ -647,6 +656,34 @@ Board = (function() {
   Board.prototype.stats = {
     foodEaten: 0,
     genCount: 0
+  };
+
+  Board.prototype.leaveEvidence = function() {
+    if (this.inEvidence) {
+      this.inEvidence.inEvidence = false;
+    }
+    return game.panel.hide();
+  };
+
+  Board.prototype.showSpecs = function(pos) {
+    var bot, _i, _len, _ref4, _results;
+    _ref4 = this.pop;
+    _results = [];
+    for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+      bot = _ref4[_i];
+      if (Math.pow(bot.size, 2) > dist2(pos, bot.position)) {
+        window.canvasStop = true;
+        if (this.inEvidence) {
+          this.inEvidence.inEvidence = false;
+        }
+        this.inEvidence = bot;
+        bot.inEvidence = true;
+        _results.push(game.panel.show());
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
   };
 
   Board.prototype.genRandBot = function() {
@@ -731,7 +768,7 @@ Board = (function() {
     _ref4 = sorted.slice(0, 6);
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
       g = _ref4[_i];
-      g.reset();
+      g.reset(this.params);
       newpop.push(g);
     }
     newpop.push(new Bot(this.mutate(sorted[0].weights.slice(0)), this.params, 'green'));

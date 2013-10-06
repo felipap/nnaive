@@ -175,9 +175,8 @@ class _Bot extends Circle
 		@lastOutput = [0,0]
 
 	tic: (step) ->
-		speed = 250
-		@position.x += speed*Math.cos(@angle)*step
-		@position.y += speed*Math.sin(@angle)*step
+		@position.x += @speed*Math.cos(@angle)*step
+		@position.y += @speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.
 		@position.x = mod(@position.x,window.canvas.width)
 		@position.y = mod(@position.y,window.canvas.height)
@@ -189,9 +188,9 @@ class _Bot extends Circle
 				@closestFood = food
 		@closestFood.color = 'red'
 
-		@lastOutput = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
-				Math.cos(@angle), Math.sin(@angle)])
-		# @lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
+		# @lastOutput = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
+		# 		Math.cos(@angle), Math.sin(@angle)])
+		@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
 		@angle += @lastOutput[0]-@lastOutput[1]
 		######
 		if window.leftPressed then @angle += 0.2
@@ -297,17 +296,22 @@ class Bot extends _Bot
 	
 	constructor: (@weights, params, @color='#A2A') ->
 		super()
+		@speed = params.speed
 		@fitness = 0
+		@inEvidence = false
 		@nn = new NeuralNet(params.layersConf, params.nInputs)
 		@nn.putWeights(@weights)
 
-	reset: -> # Is elite.
+	reset: (params) -> # Is elite.
 		@isElite = true
 		@fitness = 0
+		@speed = params.speed
 		@closestFood = null
 
 	render: (context) ->
 		color = @color
+		if @inEvidence
+			painter.drawCircle(context, @position, @size+10, {color:'grey', fill:true})
 		if stats.topBot is @ then color = 'black'
 		else if @isElite then color = '#088'
 
@@ -330,19 +334,33 @@ class Board
 
 	params:
 		activationResponse: 1 					# for the sigmoid function
-		ticsPerGen: 400							# num of tics per generation
+		ticsPerGen: 2000							# num of tics per generation
 		mutationRate: 0.1 						# down to 0.05
-		foodDensity: 0.1 						# per 100x100 px² squares
+		foodDensity: 0.4						# per 100x100 px² squares
 		popSize: 20
 		crossoverRate: 0.7
 		maxMutationFactor: 0.3
-		nInputs: 4
+		nInputs: 2
+		speed: 50
 		layersConf: [5,2]
 		numWeights: null # calcNumWeights(this.layersConf) # Initialized in constructor
 
 	stats:
 		foodEaten: 0
 		genCount: 0
+
+	leaveEvidence: ->
+		if @inEvidence then @inEvidence.inEvidence = false
+		game.panel.hide()
+
+	showSpecs: (pos) ->
+		for bot in @pop
+			if Math.pow(bot.size,2) > dist2(pos,bot.position)
+				window.canvasStop = true
+				if @inEvidence then @inEvidence.inEvidence = false
+				@inEvidence = bot
+				bot.inEvidence = true
+				game.panel.show()
 
 	genRandBot: -> new Bot(Math.random()-Math.random() for i2 in [0...@params.numWeights], @params)
 
@@ -380,7 +398,6 @@ class Board
 				return g
 		# console.log('não', _.reduce(population,(a,b)->a.fitness+b.fitness), population)
 
-
 	makeNew: (popSize, numWeights) ->
 		@pop = []
 		for i in [0...popSize]
@@ -393,7 +410,7 @@ class Board
 		console.log('sorted: (%s)', sorted.length, _.pluck(sorted,'fitness'))
 		
 		for g in sorted[..5] # Use parameters
-			g.reset()
+			g.reset(@params)
 			newpop.push(g)
 
 		newpop.push(new Bot(@mutate(sorted[0].weights[..]), @params, 'green'))
@@ -462,4 +479,5 @@ class Board
 		@tics = @stats.foodEaten = 0
 		@pop = @epoch(@pop)
 
-
+##########################################################################################
+##########################################################################################
