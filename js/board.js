@@ -376,8 +376,9 @@ _Bot = (function(_super) {
         this.closestFood = food;
       }
     }
+    if (this.position.y === this.closestFood.position.y) { console.log('fuck you', this.position, this.closestFood.position); }
     this.closestFood.color = '#F22';
-    this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x) - this.angle]);
+    this.lastOutput = this.nn.fire([Math.atan2((this.position.y - this.closestFood.position.y) || 1, this.position.x - this.closestFood.position.x) - this.angle]);
     this.angle += this.lastOutput[0] - this.lastOutput[1];
     this.position.x = mod(this.position.x + this.speed * Math.cos(this.angle) * step, window.canvas.width);
     return this.position.y = mod(this.position.y + this.speed * Math.sin(this.angle) * step, window.canvas.height);
