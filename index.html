@@ -11,62 +11,6 @@
 				<meta name="viewport" content="width=device-width">
 
 				<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-				<style>
-						body {
-								spadding: 10px;
-						}
-
-						canvas {
-							sborder: 1px solid #DDD;
-						}
-
-						.wrapper {
-							width: 100%;
-						}
-
-						#fps {
-							psosition: fixed;
-						}
-
-						#flags {
-							position: fixed;
-							right: left;
-							font-family: Ubuntu, Arial;
-						}
-
-						#flags > div {
-							width: 150px;
-							position: relative;
-							border: 1px solid #DDD;
-						}
-
-						#flags > div > span {
-							position: absolute;
-							width: 50px;
-							right: 5px;
-							text-align: right;
-							color: blue;
-						}
-
-						#panel {
-							position: fixed;
-							right: 0;
-							top: 0; bottom: 0;
-							border: 1px solid #DDD;
-							width: 20%;
-
-							box-sizing: border-box;
-							background: rgba(150,150,150,.8);
-							color: white;
-							padding: 0 20px;
-						}
-
-						.control {
-							box-sizing: border-box;
-							padding: 20px;
-						}
-				</style>
-				<slink rel="stylesheet" href="css/bootstrap-theme.min.css">
 				<link rel="stylesheet" href="css/main.css">
 				<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css">
 
@@ -77,11 +21,11 @@
 						<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
 				<![endif]-->
 			<div id="flags">
-				<div>Frames/sec<span id="fps"></span></div>
-				<div>Tics/sec<span id="tps"></span></div>
-				<div>Tic #<span id="tics"></span></div>
-				<div>Generation #<span id="generation"></span></div>
-				<div>Stats<span id="lastEat"></span></div>
+				<div>Frames/sec<span id="fps">0</span></div>
+				<div>Tics/sec<span id="tps">0</span></div>
+				<div>Tic<span id="tics">0</span></div>
+				<div>Generation<span id="generation">0</span></div>
+				<div>Last Eated<span id="lastEat">~</span></div>
 				<div><span id="stopped"></span></div>
 			</div>
 			<div class="wrapper">
@@ -89,28 +33,28 @@
 			</div>
 
 			<div id="panel">
-				<h2>Controles</h2>
+				<button onClick="$(this.parentElement).hide()" type="button" class="close" aria-hidden="true">&times;</button>
+
 				<div class="control">
 					<label>Velocidade</label>
 					<input type="range" min="1" max="200" value="50" data-param="speed">
-					<span class="badge">50</span>
+					<span class="label label-primary">50</span>
 				</div>
 				<div class="control">
 					<label>Tics por Geração</label>
 					<input type="range" min="1" max="2000" value="2000" data-param="ticsPerGen">
-					<span class="badge">2000</span>
+					<span class="label label-primary">2000</span>
 				</div>
 				<div class="control">
-					<label>Densidade de Comida (por 100²cm²)</label>
+					<label>Comida por 100²cm²</label>
 					<input type="range" min="1" max="2000" value="400" data-divisor="1000" data-param="foodDensity">
-					<span class="badge">0.4</span>
+					<span class="label label-primary">0.4</span>
 				</div>
 				<div class="control">
 					<label>População</label>
 					<input type="range" min="1" max="100" value="20" data-param="popSize">
-					<span class="badge">10</span>
+					<span class="label label-primary">10</span>
 				</div>
-				<a onClick="game.board.leaveEvidence()" class="btn btn-danger">Close</a>
 			</div>
 		</div> <!-- /container --> <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 				<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
@@ -130,7 +74,7 @@
 							$(e).bind('change', function(event) {
 								var value = this.value/(this.dataset.divisor || 1);
 								game.board.params[this.dataset.param] = value;
-								this.parentElement.querySelector('.badge').innerHTML = value;
+								this.parentElement.querySelector('.label').innerHTML = value;
 							});
 						}
 					});

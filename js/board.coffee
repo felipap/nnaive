@@ -35,6 +35,9 @@ painter =
 		context.closePath()
 		context.stroke()
 
+	clearRect : (context, p1, p2) ->
+		context.clearRect(p1.x, p1.y, p2.x, p2.y)
+
 	drawCenteredPolygon : (context, center, points, angle=0, options={}) ->
 		this.applyCanvasOptions(context, options)
 		context.save()
@@ -465,14 +468,14 @@ class Board
 		item.tic(step) for item in @food
 
 	render: (context) ->
-		context.clearRect(0, 0, canvas.width, canvas.height)
+		painter.clearRect(context, {x:0,y:0}, {x:canvas.width,y:canvas.height})
 		item.render(context) for item in @food
 		item.render(context) for item in @pop
 
 	reset: ->
 		++@stats.genCount
 		console.log("Ending generation #{@stats.genCount}. #{(@stats.foodEaten/@params.popSize).toFixed(2)}")
-		$("#flags #lastEat").html("Last generation ate: "+(@stats.foodEaten/@params.popSize).toFixed(2))
+		$("#flags #lastEat").html((@stats.foodEaten/@params.popSize).toFixed(2))
 		$("#flags #generation").html(@stats.genCount)
 		
 		foodCount = Math.round(@params.foodDensity*canvas.height*canvas.width/10000)

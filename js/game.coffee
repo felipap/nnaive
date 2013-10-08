@@ -31,7 +31,7 @@ class Game
 	constructor: ->
 		@canvas = document.querySelector "canvas#nnaive"
 		window.canvas = @canvas
-		$(".wrapper").height($(document).height()-3)
+		$(".wrapper").height($(document).height()-5)
 		@canvas.width = $('.wrapper').width()  # window.innerWidth
 		@canvas.height = $('.wrapper').height() # window.innerHeight
 		context = @canvas.getContext("2d")

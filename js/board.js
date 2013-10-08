@@ -51,6 +51,9 @@ painter = {
     context.closePath();
     return context.stroke();
   },
+  clearRect: function(context, p1, p2) {
+    return context.clearRect(p1.x, p1.y, p2.x, p2.y);
+  },
   drawCenteredPolygon: function(context, center, points, angle, options) {
     var point, _i, _len, _ref;
     if (angle == null) {
@@ -856,7 +859,13 @@ Board = (function() {
 
   Board.prototype.render = function(context) {
     var item, _i, _j, _len, _len1, _ref4, _ref5, _results;
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    painter.clearRect(context, {
+      x: 0,
+      y: 0
+    }, {
+      x: canvas.width,
+      y: canvas.height
+    });
     _ref4 = this.food;
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
       item = _ref4[_i];
@@ -875,7 +884,7 @@ Board = (function() {
     var foodCount, i;
     ++this.stats.genCount;
     console.log("Ending generation " + this.stats.genCount + ". " + ((this.stats.foodEaten / this.params.popSize).toFixed(2)));
-    $("#flags #lastEat").html("Last generation ate: " + (this.stats.foodEaten / this.params.popSize).toFixed(2));
+    $("#flags #lastEat").html((this.stats.foodEaten / this.params.popSize).toFixed(2));
     $("#flags #generation").html(this.stats.genCount);
     foodCount = Math.round(this.params.foodDensity * canvas.height * canvas.width / 10000);
     console.log("Making " + foodCount + " of food for generation " + this.stats.genCount + ".");

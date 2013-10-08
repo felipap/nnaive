@@ -48,7 +48,7 @@ Game = (function() {
     var _this = this;
     this.canvas = document.querySelector("canvas#nnaive");
     window.canvas = this.canvas;
-    $(".wrapper").height($(document).height() - 3);
+    $(".wrapper").height($(document).height() - 5);
     this.canvas.width = $('.wrapper').width();
     this.canvas.height = $('.wrapper').height();
     context = this.canvas.getContext("2d");
