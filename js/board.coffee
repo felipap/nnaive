@@ -50,6 +50,16 @@ painter =
 		else context.stroke()
 		context.restore()
 
+	drawCrown : (context, center, radius, angles=[0,Math.PI*2], angle=0, options={}) ->
+		this.applyCanvasOptions(context,options)
+		context.save()
+		context.translate(center.x, center.y)
+		context.rotate(angle)
+		context.beginPath()
+		context.arc(0, 0, radius, angles[0], angles[1]);
+		context.stroke()
+		context.restore()
+
 	# Draws a polygon.
 	# Won't take angle arg, because it is necessary to have the rotation center.
 	# For that, use drawCenteredPolygo
@@ -175,47 +185,32 @@ class _Bot extends Circle
 		@lastOutput = [0,0]
 
 	tic: (step) ->
-		# Set-up @closestFood
+		# Set @closestFood
 		@closestFood = @closestFood or game.board.food[0]
 		@closestFood.color = '#25A'
 		for food in game.board.food[1..]
 			if dist2(@position,food.position) < dist2(@position,@closestFood.position)
 				@closestFood = food
 		@closestFood.color = '#F22'
-
-		# @lastOutput = @nn.fire([@closestFood.position.x-@position.x,@closestFood.position.y-@position.y,\
-		# 		Math.cos(@angle), Math.sin(@angle)])
-		@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
+		# Get output from Neural Network and update
+		@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x)-@angle])
 		@angle += @lastOutput[0]-@lastOutput[1]
-		##
-		@position.x += @speed*Math.cos(@angle)*step
-		@position.y += @speed*Math.sin(@angle)*step
 		# Limit particle to canvas bounds.
-		@position.x = mod(@position.x,window.canvas.width)
-		@position.y = mod(@position.y,window.canvas.height)
-		######
-		if window.leftPressed then @angle += 0.2
-		if window.rightPressed then @angle -= 0.2
+		@position.x = mod(@position.x+@speed*Math.cos(@angle)*step,window.canvas.width)
+		@position.y = mod(@position.y+@speed*Math.sin(@angle)*step,window.canvas.height)
 		
-	render: (context) -> # Draw circle
-		super
-		# if @fitness
-		# 	painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
-		# Draw crown
-		context.lineWidth = 2
-		angles = {0:[-Math.PI, 0], 1:[0,Math.PI]}
-		context.save() 
-		context.translate(@position.x, @position.y)
-		context.rotate(@angle)
-		for t, a of angles
-			context.beginPath()
-			context.strokeStyle = "rgba(120,120,120,#{@lastOutput[t]})"
-			context.arc(0, 0, @size/2+8+3*@fitness, a[0], a[1]);
-			context.stroke()
-		context.restore()
+	render: (context) ->
+
+		radius = @size/2+8+2*@fitness
+		opacity = (@lastOutput[0]-@lastOutput[1])*10
+		painter.drawCrown(context,@position,radius,[-Math.PI,0],@angle, {width:2, color:"rgba(0,0,0,#{mm(0,-opacity,1)})"})
+		painter.drawCrown(context,@position,radius,[0,Math.PI], @angle, {width:2, color:"rgba(0,0,0,#{mm(0,opacity,1)})"})
+
 		# Draw line to nearest food item.
 		if @closestFood
-			painter.drawLine(context, @position, @closestFood.position, {width:1, color:'grey'})
+			width = 100/Math.sqrt(Math.pow(@closestFood.position.x-@position.x,2)+Math.pow(@closestFood.position.y-@position.y,2))
+			painter.drawLine(context, @position, @closestFood.position, {width:mm(0,width,1), color:'grey'})
+		super
 		# Draw middle triangle
 		@p1 = {x: @size/2, y: 0}
 		@p2 = {x: -@size*2/3, y: @size/3}
@@ -315,7 +310,7 @@ class Bot extends _Bot
 		color = @color
 		if @inEvidence
 			painter.drawCircle(context, @position, @size+10, {color:'grey', fill:true})
-		if stats.topBot is @ then color = 'black'
+		if game.board.stats.topBot is @ then color = 'black'
 		else if @isElite then color = '#088'
 		super(context, color)
 
@@ -344,7 +339,7 @@ class Board
 		popSize: 20
 		crossoverRate: 0.7
 		maxMutationFactor: 0.3
-		nInputs: 2
+		nInputs: 1
 		speed: 50
 		layersConf: [5,2]
 		numWeights: null # calcNumWeights(this.layersConf) # Initialized in constructor
@@ -456,7 +451,7 @@ class Board
 		# painter.drawRectangle(context, {x:0,y:0},
 		# {x:canvas.width,y:canvas.height}, 0, {color:"rgba(255,255,255,.3)", fill:true})
 		
-		bestBot = stats.topBot or @pop[0]
+		bestBot = @stats.topBot or @pop[0]
 		if ++@tics < @params.ticsPerGen
 			for bot in @pop
 				bot.tic(step)
@@ -465,7 +460,7 @@ class Board
 					++bot.fitness
 					++@stats.foodEaten
 		else @reset()
-		stats.topBot = bestBot
+		@stats.topBot = bestBot
 
 		item.tic(step) for item in @food
 
@@ -477,8 +472,8 @@ class Board
 	reset: ->
 		++@stats.genCount
 		console.log("Ending generation #{@stats.genCount}. #{(@stats.foodEaten/@params.popSize).toFixed(2)}")
-		$("#flags #stats").html("Last generation ate: "+(@stats.foodEaten/@params.popSize).toFixed(2))
-		$("#flags #generation").html("generation: "+@stats.genCount)
+		$("#flags #lastEat").html("Last generation ate: "+(@stats.foodEaten/@params.popSize).toFixed(2))
+		$("#flags #generation").html(@stats.genCount)
 		
 		foodCount = Math.round(@params.foodDensity*canvas.height*canvas.width/10000)
 		console.log("Making #{foodCount} of food for generation #{@stats.genCount}.")

@@ -12,11 +12,12 @@ class Game
 		fpsOut = document.getElementById('fps')
 		tpsOut = document.getElementById('tps')
 		tics = document.getElementById('tics')
+		stopeed = document.getElementById('stopped')
 		setInterval =>
-			fpsOut.innerHTML = 'fps:'+fps.toFixed(1)
-			$("#flags #stopped").html(if window.canvasStop then "Stopped" else "")
-			tpsOut.innerHTML = 'tps:'+tps.toFixed(1)
-			tics.innerHTML = "tic: #{game.board.tics}/#{game.board.params.ticsPerGen}"
+			fpsOut.innerHTML = fps.toFixed(1)
+			stopped.innerHTML  = if window.canvasStop then "Stopped" else ""
+			tpsOut.innerHTML = tps.toFixed(1)
+			tics.innerHTML = "#{game.board.tics}/#{game.board.params.ticsPerGen}"
 		, 500
 
 	resetFpsCounter = ->
@@ -30,7 +31,7 @@ class Game
 	constructor: ->
 		@canvas = document.querySelector "canvas#nnaive"
 		window.canvas = @canvas
-		$(".wrapper").height($(document).height()-20)
+		$(".wrapper").height($(document).height()-3)
 		@canvas.width = $('.wrapper').width()  # window.innerWidth
 		@canvas.height = $('.wrapper').height() # window.innerHeight
 		context = @canvas.getContext("2d")
@@ -58,7 +59,6 @@ class Game
 		lastTic = now * 1 - 1
 
 	loopRender: ->
-		# if not window.canvasStop
 		@board.render(context)
 		window.AnimateOnFrameRate(=>@loopRender())
 		# Synchronise fps

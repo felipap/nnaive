@@ -17,16 +17,17 @@ Game = (function() {
   context = null;
 
   addFpsCounter = function() {
-    var fpsOut, tics, tpsOut,
+    var fpsOut, stopeed, tics, tpsOut,
       _this = this;
     fpsOut = document.getElementById('fps');
     tpsOut = document.getElementById('tps');
     tics = document.getElementById('tics');
+    stopeed = document.getElementById('stopped');
     return setInterval(function() {
-      fpsOut.innerHTML = 'fps:' + fps.toFixed(1);
-      $("#flags #stopped").html(window.canvasStop ? "Stopped" : "");
-      tpsOut.innerHTML = 'tps:' + tps.toFixed(1);
-      return tics.innerHTML = "tic: " + game.board.tics + "/" + game.board.params.ticsPerGen;
+      fpsOut.innerHTML = fps.toFixed(1);
+      stopped.innerHTML = window.canvasStop ? "Stopped" : "";
+      tpsOut.innerHTML = tps.toFixed(1);
+      return tics.innerHTML = "" + game.board.tics + "/" + game.board.params.ticsPerGen;
     }, 500);
   };
 
@@ -47,7 +48,7 @@ Game = (function() {
     var _this = this;
     this.canvas = document.querySelector("canvas#nnaive");
     window.canvas = this.canvas;
-    $(".wrapper").height($(document).height() - 20);
+    $(".wrapper").height($(document).height() - 3);
     this.canvas.width = $('.wrapper').width();
     this.canvas.height = $('.wrapper').height();
     context = this.canvas.getContext("2d");

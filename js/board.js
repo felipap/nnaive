@@ -78,6 +78,25 @@ painter = {
     }
     return context.restore();
   },
+  drawCrown: function(context, center, radius, angles, angle, options) {
+    if (angles == null) {
+      angles = [0, Math.PI * 2];
+    }
+    if (angle == null) {
+      angle = 0;
+    }
+    if (options == null) {
+      options = {};
+    }
+    this.applyCanvasOptions(context, options);
+    context.save();
+    context.translate(center.x, center.y);
+    context.rotate(angle);
+    context.beginPath();
+    context.arc(0, 0, radius, angles[0], angles[1]);
+    context.stroke();
+    return context.restore();
+  },
   drawPolygon: function(context, points, options) {
     var point, _i, _len, _ref;
     if (options == null) {
@@ -355,45 +374,32 @@ _Bot = (function(_super) {
       }
     }
     this.closestFood.color = '#F22';
-    this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x), this.angle]);
+    this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x) - this.angle]);
     this.angle += this.lastOutput[0] - this.lastOutput[1];
-    this.position.x += this.speed * Math.cos(this.angle) * step;
-    this.position.y += this.speed * Math.sin(this.angle) * step;
-    this.position.x = mod(this.position.x, window.canvas.width);
-    this.position.y = mod(this.position.y, window.canvas.height);
-    if (window.leftPressed) {
-      this.angle += 0.2;
-    }
-    if (window.rightPressed) {
-      return this.angle -= 0.2;
-    }
+    this.position.x = mod(this.position.x + this.speed * Math.cos(this.angle) * step, window.canvas.width);
+    return this.position.y = mod(this.position.y + this.speed * Math.sin(this.angle) * step, window.canvas.height);
   };
 
   _Bot.prototype.render = function(context) {
-    var a, angles, t;
-    _Bot.__super__.render.apply(this, arguments);
-    context.lineWidth = 2;
-    angles = {
-      0: [-Math.PI, 0],
-      1: [0, Math.PI]
-    };
-    context.save();
-    context.translate(this.position.x, this.position.y);
-    context.rotate(this.angle);
-    for (t in angles) {
-      a = angles[t];
-      context.beginPath();
-      context.strokeStyle = "rgba(120,120,120," + this.lastOutput[t] + ")";
-      context.arc(0, 0, this.size / 2 + 8 + 3 * this.fitness, a[0], a[1]);
-      context.stroke();
-    }
-    context.restore();
+    var opacity, radius, width;
+    radius = this.size / 2 + 8 + 2 * this.fitness;
+    opacity = (this.lastOutput[0] - this.lastOutput[1]) * 10;
+    painter.drawCrown(context, this.position, radius, [-Math.PI, 0], this.angle, {
+      width: 2,
+      color: "rgba(0,0,0," + (mm(0, -opacity, 1)) + ")"
+    });
+    painter.drawCrown(context, this.position, radius, [0, Math.PI], this.angle, {
+      width: 2,
+      color: "rgba(0,0,0," + (mm(0, opacity, 1)) + ")"
+    });
     if (this.closestFood) {
+      width = 100 / Math.sqrt(Math.pow(this.closestFood.position.x - this.position.x, 2) + Math.pow(this.closestFood.position.y - this.position.y, 2));
       painter.drawLine(context, this.position, this.closestFood.position, {
-        width: 1,
+        width: mm(0, width, 1),
         color: 'grey'
       });
     }
+    _Bot.__super__.render.apply(this, arguments);
     this.p1 = {
       x: this.size / 2,
       y: 0
@@ -607,7 +613,7 @@ Bot = (function(_super) {
         fill: true
       });
     }
-    if (stats.topBot === this) {
+    if (game.board.stats.topBot === this) {
       color = 'black';
     } else if (this.isElite) {
       color = '#088';
@@ -652,7 +658,7 @@ Board = (function() {
     popSize: 20,
     crossoverRate: 0.7,
     maxMutationFactor: 0.3,
-    nInputs: 2,
+    nInputs: 1,
     speed: 50,
     layersConf: [5, 2],
     numWeights: null
@@ -821,7 +827,7 @@ Board = (function() {
 
   Board.prototype.tic = function(step) {
     var bestBot, bot, item, _i, _j, _len, _len1, _ref4, _ref5, _results;
-    bestBot = stats.topBot || this.pop[0];
+    bestBot = this.stats.topBot || this.pop[0];
     if (++this.tics < this.params.ticsPerGen) {
       _ref4 = this.pop;
       for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
@@ -838,7 +844,7 @@ Board = (function() {
     } else {
       this.reset();
     }
-    stats.topBot = bestBot;
+    this.stats.topBot = bestBot;
     _ref5 = this.food;
     _results = [];
     for (_j = 0, _len1 = _ref5.length; _j < _len1; _j++) {
@@ -869,8 +875,8 @@ Board = (function() {
     var foodCount, i;
     ++this.stats.genCount;
     console.log("Ending generation " + this.stats.genCount + ". " + ((this.stats.foodEaten / this.params.popSize).toFixed(2)));
-    $("#flags #stats").html("Last generation ate: " + (this.stats.foodEaten / this.params.popSize).toFixed(2));
-    $("#flags #generation").html("generation: " + this.stats.genCount);
+    $("#flags #lastEat").html("Last generation ate: " + (this.stats.foodEaten / this.params.popSize).toFixed(2));
+    $("#flags #generation").html(this.stats.genCount);
     foodCount = Math.round(this.params.foodDensity * canvas.height * canvas.width / 10000);
     console.log("Making " + foodCount + " of food for generation " + this.stats.genCount + ".");
     this.food = (function() {
