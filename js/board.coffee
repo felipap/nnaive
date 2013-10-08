@@ -200,16 +200,16 @@ class _Bot extends Circle
 	render: (context) -> # Draw circle
 		super
 		# if @fitness
-		# 	painter.drawCircle(context, @position, @size+@fitnes s*4, {color: 'rgba(0,0,0,.4)'})
+		# 	painter.drawCircle(context, @position, @size+@fitness*4, {color: 'rgba(0,0,0,.4)'})
 		# Draw crown
-		context.lineWidth = 1
+		context.lineWidth = 2
 		angles = {0:[-Math.PI, 0], 1:[0,Math.PI]}
 		context.save() 
 		context.translate(@position.x, @position.y)
 		context.rotate(@angle)
 		for t, a of angles
 			context.beginPath()
-			context.strokeStyle = "rgba(0,0,0,#{@lastOutput[t]})"
+			context.strokeStyle = "rgba(120,120,120,#{@lastOutput[t]})"
 			context.arc(0, 0, @size/2+8+3*@fitness, a[0], a[1]);
 			context.stroke()
 		context.restore()

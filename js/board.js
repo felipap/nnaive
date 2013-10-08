@@ -372,7 +372,7 @@ _Bot = (function(_super) {
   _Bot.prototype.render = function(context) {
     var a, angles, t;
     _Bot.__super__.render.apply(this, arguments);
-    context.lineWidth = 1;
+    context.lineWidth = 2;
     angles = {
       0: [-Math.PI, 0],
       1: [0, Math.PI]
@@ -383,7 +383,7 @@ _Bot = (function(_super) {
     for (t in angles) {
       a = angles[t];
       context.beginPath();
-      context.strokeStyle = "rgba(0,0,0," + this.lastOutput[t] + ")";
+      context.strokeStyle = "rgba(120,120,120," + this.lastOutput[t] + ")";
       context.arc(0, 0, this.size / 2 + 8 + 3 * this.fitness, a[0], a[1]);
       context.stroke();
     }

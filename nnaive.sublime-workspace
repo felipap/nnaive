@@ -4,6 +4,74 @@
 		"selected_items":
 		[
 			[
+				"in",
+				"inEvidence"
+			],
+			[
+				"dist",
+				"dist2"
+			],
+			[
+				"food",
+				"closestFood"
+			],
+			[
+				"ge",
+				"genRandBot"
+			],
+			[
+				"gen",
+				"genCount"
+			],
+			[
+				"last",
+				"lastWeight"
+			],
+			[
+				"num",
+				"numWeights"
+			],
+			[
+				"pop",
+				"popSize"
+			],
+			[
+				"lae",
+				"layersConf"
+			],
+			[
+				"layers",
+				"layersConf"
+			],
+			[
+				"Neuron",
+				"NeuronLayer"
+			],
+			[
+				"laye",
+				"layersConf"
+			],
+			[
+				"neurons",
+				"neuronsPerLayer"
+			],
+			[
+				"Ge",
+				"GeneticAlgorithm"
+			],
+			[
+				"crossover",
+				"crossoverRate"
+			],
+			[
+				"getC",
+				"getChromoRoulette"
+			],
+			[
+				"get",
+				"getChromoRoulette"
+			],
+			[
 				"lay",
 				"layersConf"
 			],
@@ -22,10 +90,6 @@
 			[
 				"angle",
 				"angularSpeed"
-			],
-			[
-				"ge",
-				"getMultiplier"
 			],
 			[
 				"ANGLE",
@@ -94,10 +158,6 @@
 			[
 				"time",
 				"timestep"
-			],
-			[
-				"get",
-				"getContext"
 			],
 			[
 				"alig",
@@ -216,10 +276,6 @@
 				"simplify-parts"
 			],
 			[
-				"in",
-				"instantiates"
-			],
-			[
 				"initial",
 				"initialPop"
 			],
@@ -250,10 +306,6 @@
 			[
 				"board",
 				"boardState"
-			],
-			[
-				"last",
-				"lastHoveredSquare"
 			],
 			[
 				"detect",
@@ -462,58 +514,6 @@
 			[
 				"print",
 				"printMatrix"
-			],
-			[
-				"lo",
-				"loadPageTable"
-			],
-			[
-				"cheap",
-				"cheap_table"
-			],
-			[
-				"we",
-				"white-space"
-			],
-			[
-				"update",
-				"updateTweetBox"
-			],
-			[
-				"wrap",
-				"wrap-right"
-			],
-			[
-				"disable",
-				"disableTweet"
-			],
-			[
-				"ine",
-				"inline-block"
-			],
-			[
-				"sub",
-				"substituteHash"
-			],
-			[
-				"lyrics",
-				"lyrics-box"
-			],
-			[
-				"border",
-				"border-top"
-			],
-			[
-				"music",
-				"music-info-wrapper"
-			],
-			[
-				"rende",
-				"renderHTML"
-			],
-			[
-				"scrollTo",
-				"scrollToContent"
 			]
 		]
 	},
@@ -523,7 +523,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 3016,
+				"buffer_size": 4600,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "js/game.coffee",
 			"settings":
 			{
-				"buffer_size": 2627,
+				"buffer_size": 2773,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,7 +539,15 @@
 			"file": "js/board.coffee",
 			"settings":
 			{
-				"buffer_size": 10267,
+				"buffer_size": 14611,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 362,
 				"line_ending": "Unix"
 			}
 		}
@@ -635,15 +643,18 @@
 	},
 	"file_history":
 	[
+		"/home/felipe/Projects/nnaive/js/game.js",
+		"/home/felipe/Projects/nnaive/nnaive.run",
+		"/home/felipe/Projects/nnaive/js/board.coffee",
+		"/home/felipe/Projects/heroku-tc/turmacidada/static/watch.sh",
+		"/home/felipe/Projects/magnet-project/css/watch.sh",
 		"/home/felipe/Projects/nnaive/js/board.js",
 		"/home/felipe/Projects/magnet-project/js/stiffexperimentation2.js",
 		"/home/felipe/Projects/magnet-project/js/magnetic.js",
-		"/home/felipe/Projects/nnaive/js/board.coffee",
 		"/home/felipe/Projects/nnaive/js/painter.coffee",
 		"/home/felipe/Projects/nnaive/js/vendor/bootstrap.js",
 		"/home/felipe/Projects/nnaive/js/bots.coffee",
 		"/home/felipe/.config/sublime-text-3/Packages/Emmet/Emmet.sublime-settings",
-		"/home/felipe/Projects/nnaive/nnaive.run",
 		"/home/felipe/Projects/nnaive/js/bots.js",
 		"/home/felipe/Projects/nnaive/css/main.less",
 		"/home/felipe/Projects/heroku-tc/turmacidada/templates/footer.html",
@@ -759,10 +770,7 @@
 		"/home/felipe/Projects/decrypter/mapObj.h",
 		"/home/felipe/Projects/Tumblr content/update-two-papers.md",
 		"/home/felipe/Projects/pi.is/js/main.js",
-		"/home/felipe/Projects/pi.is/css/normalize.css",
-		"/home/felipe/Projects/pi.is/js/pi.js",
-		"/home/felipe/Projects/pi.is/main.css",
-		"/home/felipe/Projects/pi.is/pi.js"
+		"/home/felipe/Projects/pi.is/css/normalize.css"
 	],
 	"find":
 	{
@@ -780,134 +788,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			" ",
-			"0.1",
-			"i",
-			"..",
-			"n",
-			"factor",
-			"mass",
-			"mm",
-			"context",
-			"context.",
-			"game",
-			"mod",
-			"foods",
-			"foods ",
-			"@angle*",
-			"@angle",
-			"#",
-			"%",
-			"Math.abs",
-			"x",
-			"M",
-			"r",
-			"rx",
-			"Math",
-			"#",
-			"*rx",
-			" 0.2",
-			"@position.",
-			"acc",
-			"0.2",
-			")*",
-			"0.99",
-			"10",
-			"@thrusts",
-			"thrust",
-			"step*(",
-			"step*",
-			"step",
-			"x",
-			"console.log",
-			"b",
-			"c",
-			"b",
-			"then ",
-			" then",
-			"if ",
-			"a",
-			"leftPressed",
 			"0",
-			"@thrust",
-			"thrust",
-			",@thrust",
-			"@thrust",
-			"thrust",
-			"thursts",
-			"thurst",
-			"thrust",
-			"		context.beginPath()\n",
-			"false",
-			"4",
-			"true",
-			"# ",
-			"fill",
-			"context.arc(",
-			"context.fillStyle",
-			"20",
-			"ctx",
-			"; ",
-			"// ",
-			"Create",
-			"          // Create",
-			"// ",
-			"true",
-			"= true",
-			"Down ",
-			"4000",
-			"distDecay",
-			"50000",
-			"1",
-			" distDecay",
-			"window.vars.rest",
-			"100",
-			"*  Math.pow((@acc.angle-@angle)/2/Math.PI,2)",
-			"10000",
-			"Math.max(",
-			"5000",
-			"m.size+5",
-			"m.size*2",
-			"*2",
-			"0.1",
-			"2*",
-			"Pi",
-			")/",
-			"/",
-			"100",
-			"100 ",
+			"@fitness",
+			"this.divisor",
+			"A",
+			"44",
+			"color",
+			"22F",
+			"blue",
+			"50",
+			"0",
+			"fitness",
+			"_.reduce",
+			"'",
+			"speed",
+			"50",
+			"10;",
 			"10",
-			"100",
-			"1000",
-			"10000",
-			"distDecay",
-			"Math.pow(1000,distDecay)",
-			"Math.pow(1000,distDecay",
-			"))",
-			"10000000",
-			"10,",
+			"window.",
+			"params",
+			"new Bot",
+			"new Ne",
+			"nn",
+			"window.nIn",
+			"window.lay",
+			"window.num",
+			"window",
+			"genRandBot()",
+			"genRandBot",
+			"window.game.board",
+			"game",
+			"new Bot",
+			"window.nInputs",
+			"nInputs",
+			"getElementById",
+			"getElementById ",
+			"fps",
+			"lastUpdate",
+			"lastTpsUpdate",
+			"lastUpdate",
+			"thisFrameFPS",
+			"FPS",
+			"fps",
+			"thisFrameFPS",
+			"Render",
+			"speed",
+			"mod",
 			"10",
-			"1000000000",
-			"10000000",
-			"10",
-			"10000",
-			"size",
-			"velocity",
-			"drawCenteredPolygon",
-			"endPoint",
-			"100",
-			"10",
-			"0.99",
-			"00",
-			"@size",
-			"\n",
-			" 100",
-			"10000",
-			"@.",
-			"m",
-			"y",
-			"5",
-			" :"
+			"canvas.height*canvas.width",
+			"canvas.width",
+			"'",
+			"params",
+			"0.3",
+			"mm",
+			"closestFood.position",
+			"isBest",
+			"topBot",
+			"topFitness",
+			"isTop",
+			"food",
+			"crossover",
+			"mutate",
+			" =",
+			"params.",
+			"stats.",
+			"stats",
+			"#A",
+			"#0",
+			"#",
+			"0A",
+			"isTop",
+			"][",
+			"genRandBot",
+			"fitness 0'",
+			"NumWeights",
+			"numWeights",
+			"makeNew",
+			"parameters",
+			"################################################################################\n",
+			"mutationRate",
+			"ticsPerGen",
+			"params",
+			"parameters.crossoverRate",
+			"parameters.popSize",
+			"popSize",
+			"foodCount",
+			"stats",
+			"genCount",
+			"getChromoRoulette",
+			"population",
+			"window.fps",
+			"fps",
+			"canvasStop",
+			"console.log",
+			"mutationRate",
+			"paramenters",
+			"parameters",
+			"genCount",
+			"window.stats.genCount",
+			"stats.genCount",
+			"genCount",
+			"window",
+			"window.tics",
+			"window.pop",
+			"=",
+			"genEng",
+			"context",
+			"canvas",
+			"parameters",
+			"'blue'",
+			"@position.y-",
+			"@position.y",
+			"sigm",
+			"'",
+			"tics",
+			"tic:",
+			"$",
+			"generation",
+			"genCount",
+			"generation",
+			"console.log",
+			"stats",
+			"window.genCount",
+			"genCount",
+			"window.tics",
+			"numTics",
+			"tics",
+			"Tics",
+			"tics"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1062,15 +1070,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3016,
+						"buffer_size": 4600,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								755,
-								755
+								3714,
+								3714
 							]
 						],
 						"settings":
@@ -1080,7 +1088,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 152.0,
+						"translation.y": 1243.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1091,15 +1099,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2627,
+						"buffer_size": 2773,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1681,
-								1681
+								429,
+								429
 							]
 						],
 						"settings":
@@ -1108,7 +1116,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 836.0,
+						"translation.y": 1080.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1119,20 +1127,48 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10267,
+						"buffer_size": 14611,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								369,
-								387
+								4811,
+								4811
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2896.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 362,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								337,
+								337
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
@@ -1220,7 +1256,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 256.0,
+	"side_bar_width": 185.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
