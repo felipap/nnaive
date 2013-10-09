@@ -37,23 +37,23 @@
 
 				<div class="control">
 					<label>Velocidade</label>
-					<input type="range" min="1" max="200" value="50" data-param="speed">
-					<span class="label label-primary">50</span>
+					<input type="range" min="1" max="200" value="0" data-param="speed">
+					<span class="label label-primary"></span>
 				</div>
 				<div class="control">
 					<label>Tics por Geração</label>
-					<input type="range" min="1" max="2000" value="2000" data-param="ticsPerGen">
-					<span class="label label-primary">2000</span>
+					<input type="range" min="1" max="2000" value="0" data-param="ticsPerGen">
+					<span class="label label-primary"></span>
 				</div>
 				<div class="control">
 					<label>Comida por 100²cm²</label>
-					<input type="range" min="1" max="2000" value="400" data-divisor="1000" data-param="foodDensity">
-					<span class="label label-primary">0.4</span>
+					<input type="range" min="1" max="2000" value="0" data-divisor="1000" data-param="foodDensity">
+					<span class="label label-primary"></span>
 				</div>
 				<div class="control">
 					<label>População</label>
-					<input type="range" min="1" max="100" value="20" data-param="popSize">
-					<span class="label label-primary">10</span>
+					<input type="range" min="1" max="100" value="0" data-param="popSize">
+					<span class="label label-primary"></span>
 				</div>
 			</div>
 		</div> <!-- /container --> <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
@@ -69,14 +69,20 @@
 
 				<script>
 					$(function(){
-						var controls = $("#panel .control input[type=range]");
-						for (var i=0,e=controls[i]; i<controls.length; i++, e=controls[i]) {
-							$(e).bind('change', function(event) {
-								var value = this.value/(this.dataset.divisor || 1);
-								game.board.params[this.dataset.param] = value;
-								this.parentElement.querySelector('.label').innerHTML = value;
-							});
-						}
+						setTimeout(function() {
+							var controls = $("#panel .control input[type=range]");
+							for (var i=0,e=controls[i]; i<controls.length; i++, e=controls[i]) {
+								$(e).bind('change', function(event) {
+									var value = this.value/(this.dataset.divisor || 1);
+									game.board.params[this.dataset.param] = value;
+									this.parentElement.querySelector('.label').innerHTML = value;
+								});
+								var val = game.board.params[e.dataset.param];
+								var input = e.parentElement.querySelector('input[type=range]');
+								input.value = val*(input.dataset.divisor||1);
+								e.parentElement.querySelector('.label').innerHTML = val;
+							}
+						},400); // Let game load.
 					});
 				</script>
 

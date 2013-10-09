@@ -113,10 +113,10 @@ painter =
 ##########################################################################################
 ##########################################################################################
 
-mod  = (a,n) -> ((a%n)+n)%n
-dist2= (a,b) -> Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2)
-dist = (a,b) -> Math.sqrt(dist2(a,b))
-mm = (a,num,b) -> Math.max(a,Math.min(num,b))
+mod  = (a,n) -> ((a%n)+n)%n 					# Modulo for javascript (not remainder)
+dist2= (a,b) -> Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2) # Squared distance between a and b
+dist = (a,b) -> Math.sqrt(dist2(a,b)) 					# Distance between a and b
+mm = (a,num,b) -> Math.max(a,Math.min(num,b)) # Return number within (a,b) (make sure a<b)
 
 class Drawable
 	type: 'Drawable'
@@ -196,8 +196,12 @@ class _Bot extends Circle
 				@closestFood = food
 		@closestFood.color = '#F22'
 		# Get output from Neural Network and update
-		@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x)-@angle])
-		@angle += @lastOutput[0]-@lastOutput[1]
+		if window.invert
+			@lastOutput = @nn.fire([Math.atan2(@closestFood.position.y-@position.y,@position.x-@closestFood.position.x),@angle])
+			@angle += @lastOutput[1]-@lastOutput[0]
+		else
+			@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
+			@angle += @lastOutput[0]-@lastOutput[1]
 		# Limit particle to canvas bounds.
 		@position.x = mod(@position.x+@speed*Math.cos(@angle)*step,window.canvas.width)
 		@position.y = mod(@position.y+@speed*Math.sin(@angle)*step,window.canvas.height)
@@ -338,11 +342,11 @@ class Board
 		activationResponse: 1 					# for the sigmoid function
 		ticsPerGen: 2000							# num of tics per generation
 		mutationRate: 0.1 						# down to 0.05
-		foodDensity: 0.4						# per 100x100 px² squares
+		foodDensity: 0.3						# per 100x100 px² squares
 		popSize: 20
 		crossoverRate: 0.7
 		maxMutationFactor: 0.3
-		nInputs: 1
+		nInputs: 2
 		speed: 50
 		layersConf: [5,2]
 		numWeights: null # calcNumWeights(this.layersConf) # Initialized in constructor

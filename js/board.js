@@ -377,8 +377,13 @@ _Bot = (function(_super) {
       }
     }
     this.closestFood.color = '#F22';
-    this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x) - this.angle]);
-    this.angle += this.lastOutput[0] - this.lastOutput[1];
+    if (window.invert) {
+      this.lastOutput = this.nn.fire([Math.atan2(this.closestFood.position.y - this.position.y, this.position.x - this.closestFood.position.x), this.angle]);
+      this.angle += this.lastOutput[1] - this.lastOutput[0];
+    } else {
+      this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x), this.angle]);
+      this.angle += this.lastOutput[0] - this.lastOutput[1];
+    }
     this.position.x = mod(this.position.x + this.speed * Math.cos(this.angle) * step, window.canvas.width);
     return this.position.y = mod(this.position.y + this.speed * Math.sin(this.angle) * step, window.canvas.height);
   };
@@ -657,11 +662,11 @@ Board = (function() {
     activationResponse: 1,
     ticsPerGen: 2000,
     mutationRate: 0.1,
-    foodDensity: 0.4,
+    foodDensity: 0.3,
     popSize: 20,
     crossoverRate: 0.7,
     maxMutationFactor: 0.3,
-    nInputs: 1,
+    nInputs: 2,
     speed: 50,
     layersConf: [5, 2],
     numWeights: null

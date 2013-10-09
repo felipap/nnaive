@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"text-",
+				"text-align"
+			],
+			[
 				"in",
 				"inEvidence"
 			],
@@ -110,10 +114,6 @@
 			[
 				"turma",
 				"turmacidadabrasil"
-			],
-			[
-				"text-",
-				"text-transform"
 			],
 			[
 				"font",
@@ -523,7 +523,15 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 4600,
+				"buffer_size": 3817,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "css/main.less",
+			"settings":
+			{
+				"buffer_size": 734,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +539,7 @@
 			"file": "js/game.coffee",
 			"settings":
 			{
-				"buffer_size": 2773,
+				"buffer_size": 2765,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,15 +547,7 @@
 			"file": "js/board.coffee",
 			"settings":
 			{
-				"buffer_size": 14611,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
-			"settings":
-			{
-				"buffer_size": 362,
+				"buffer_size": 14725,
 				"line_ending": "Unix"
 			}
 		}
@@ -643,8 +643,10 @@
 	},
 	"file_history":
 	[
-		"/home/felipe/Projects/nnaive/js/game.js",
+		"/home/felipe/Projects/nnaive/css/watch.sh",
 		"/home/felipe/Projects/nnaive/nnaive.run",
+		"/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/felipe/Projects/nnaive/js/game.js",
 		"/home/felipe/Projects/nnaive/js/board.coffee",
 		"/home/felipe/Projects/heroku-tc/turmacidada/static/watch.sh",
 		"/home/felipe/Projects/magnet-project/css/watch.sh",
@@ -665,7 +667,6 @@
 		"/media/hdd/Backup/tumblr-custom-css.jun23.css",
 		"/home/felipe/Projects/heroku-tc/turmacidada/static/home.css",
 		"/home/felipe/Projects/heroku-tc/turmacidada/static/home_fblikebox.css",
-		"/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
 		"/home/felipe/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
 		"/home/felipe/Projects/heroku-tc/Procfile",
 		"/home/felipe/Projects/heroku-tc/turmacidada/website/models.py",
@@ -769,8 +770,7 @@
 		"/home/felipe/Projects/decrypter/mapObj.c",
 		"/home/felipe/Projects/decrypter/mapObj.h",
 		"/home/felipe/Projects/Tumblr content/update-two-papers.md",
-		"/home/felipe/Projects/pi.is/js/main.js",
-		"/home/felipe/Projects/pi.is/css/normalize.css"
+		"/home/felipe/Projects/pi.is/js/main.js"
 	],
 	"find":
 	{
@@ -788,6 +788,33 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"label\"",
+			"label",
+			"badge",
+			"<div",
+			";",
+			"</span",
+			" #",
+			"#",
+			"context.",
+			"stats.",
+			"per",
+			"html",
+			"div ",
+			"div",
+			"<div",
+			"div",
+			"				<div",
+			"<div",
+			" id=\"step",
+			"120",
+			"@size/2+8+3*@fitness",
+			" ",
+			"\\",
+			"@position",
+			"context.",
+			"onChange",
+			"e",
 			"0",
 			"@fitness",
 			"this.divisor",
@@ -888,34 +915,7 @@
 			"window.stats.genCount",
 			"stats.genCount",
 			"genCount",
-			"window",
-			"window.tics",
-			"window.pop",
-			"=",
-			"genEng",
-			"context",
-			"canvas",
-			"parameters",
-			"'blue'",
-			"@position.y-",
-			"@position.y",
-			"sigm",
-			"'",
-			"tics",
-			"tic:",
-			"$",
-			"generation",
-			"genCount",
-			"generation",
-			"console.log",
-			"stats",
-			"window.genCount",
-			"genCount",
-			"window.tics",
-			"numTics",
-			"tics",
-			"Tics",
-			"tics"
+			"window"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1061,7 +1061,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -1070,15 +1070,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4600,
+						"buffer_size": 3817,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3714,
-								3714
+								609,
+								609
 							]
 						],
 						"settings":
@@ -1088,54 +1088,54 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1243.0,
+						"translation.y": 260.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "js/game.coffee",
+					"file": "css/main.less",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2773,
+						"buffer_size": 734,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								429,
-								429
+								211,
+								185
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"syntax": "Packages/LESS/LESS.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1080.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "js/board.coffee",
+					"file": "js/game.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14611,
+						"buffer_size": 2765,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4811,
-								4811
+								1101,
+								1101
 							]
 						],
 						"settings":
@@ -1144,35 +1144,35 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2896.0,
+						"translation.y": 475.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+					"file": "js/board.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 362,
+						"buffer_size": 14725,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								337,
-								337
+								14279,
+								14279
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": 21.0,
+						"translation.y": 4966.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
