@@ -376,7 +376,9 @@ _Bot = (function(_super) {
         this.closestFood = food;
       }
     }
+    if (this.position.y === this.closestFood.position.y) { console.log('fuck you', this.position, this.closestFood.position); }
     this.closestFood.color = '#F22';
+<<<<<<< HEAD
     if (window.invert) {
       this.lastOutput = this.nn.fire([Math.atan2(this.closestFood.position.y - this.position.y, this.position.x - this.closestFood.position.x) - this.angle || 1]);
       this.angle += this.lastOutput[1] - this.lastOutput[0];
@@ -384,6 +386,10 @@ _Bot = (function(_super) {
       this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x) - this.angle || 1]);
       this.angle += this.lastOutput[0] - this.lastOutput[1];
     }
+=======
+    this.lastOutput = this.nn.fire([Math.atan2((this.position.y - this.closestFood.position.y) || 1, this.position.x - this.closestFood.position.x) - this.angle]);
+    this.angle += this.lastOutput[0] - this.lastOutput[1];
+>>>>>>> c42b4e902bcea866251caefba24f4dab03949448
     this.position.x = mod(this.position.x + this.speed * Math.cos(this.angle) * step, window.canvas.width);
     return this.position.y = mod(this.position.y + this.speed * Math.sin(this.angle) * step, window.canvas.height);
   };
