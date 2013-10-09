@@ -378,10 +378,10 @@ _Bot = (function(_super) {
     }
     this.closestFood.color = '#F22';
     if (window.invert) {
-      this.lastOutput = this.nn.fire([Math.atan2(this.closestFood.position.y - this.position.y, this.position.x - this.closestFood.position.x), this.angle]);
+      this.lastOutput = this.nn.fire([Math.atan2(this.closestFood.position.y - this.position.y, this.position.x - this.closestFood.position.x) - this.angle || 1]);
       this.angle += this.lastOutput[1] - this.lastOutput[0];
     } else {
-      this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x), this.angle]);
+      this.lastOutput = this.nn.fire([Math.atan2(this.position.y - this.closestFood.position.y, this.position.x - this.closestFood.position.x) - this.angle || 1]);
       this.angle += this.lastOutput[0] - this.lastOutput[1];
     }
     this.position.x = mod(this.position.x + this.speed * Math.cos(this.angle) * step, window.canvas.width);
@@ -391,7 +391,11 @@ _Bot = (function(_super) {
   _Bot.prototype.render = function(context) {
     var opacity, radius, width;
     radius = this.size / 2 + 8 + 2 * this.fitness;
-    opacity = (this.lastOutput[0] - this.lastOutput[1]) * 10;
+    opacity = (this.lastOutput[0] - this.lastOutput[1]) * 2;
+    painter.drawCircle(context, this.position, radius, {
+      width: 1,
+      color: 'grey'
+    });
     painter.drawCrown(context, this.position, radius, [-Math.PI, 0], this.angle, {
       width: 2,
       color: "rgba(0,0,0," + (mm(0, -opacity, 1)) + ")"
@@ -666,9 +670,9 @@ Board = (function() {
     popSize: 20,
     crossoverRate: 0.7,
     maxMutationFactor: 0.3,
-    nInputs: 2,
-    speed: 50,
-    layersConf: [5, 2],
+    nInputs: 1,
+    speed: 100,
+    layersConf: [5, 3, 2],
     numWeights: null
   };
 
@@ -781,12 +785,15 @@ Board = (function() {
   };
 
   Board.prototype.epoch = function(oldpop) {
-    var baby1, baby2, father, g, mother, newpop, sorted, _i, _len, _ref4, _ref5;
+    var baby1, baby2, father, g, mother, newpop, sorted, _i, _len, _ref4, _ref5,
+      _this = this;
     sorted = _.sortBy(oldpop, function(a) {
       return a.fitness;
     }).reverse();
     newpop = [];
-    console.log('sorted: (%s)', sorted.length, _.pluck(sorted, 'fitness'));
+    console.log('sorted: (%s)', sorted.length, _.map(sorted, function(e) {
+      return (e.fitness / _this.params.foodDensity / e.speed / _this.params.ticsPerGen * _this.params.popSize * 10000).toFixed(1);
+    }));
     _ref4 = sorted.slice(0, 6);
     for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
       g = _ref4[_i];
@@ -800,8 +807,8 @@ Board = (function() {
     newpop.push(new Bot(this.crossover(sorted[0].weights.slice(0), sorted[2].weights.slice(0))[1], this.params, 'yellow'));
     this.stats.mutated = 0;
     while (newpop.length < this.params.popSize) {
-      mother = getChromoRoulette(sorted);
-      father = getChromoRoulette(sorted);
+      mother = getChromoRoulette(oldpop);
+      father = getChromoRoulette(oldpop);
       if (mother.fitness === 0 || father.fitness === 0) {
         console.log('fitness 0. making random');
         mother = this.genRandBot();
@@ -812,7 +819,7 @@ Board = (function() {
       newpop.push(new Bot(baby1, this.params));
       newpop.push(new Bot(baby2, this.params));
     }
-    console.log('mutated:', this.stats.mutated);
+    console.log("mutated: " + this.stats.mutated + "/" + this.params.popSize);
     return newpop;
   };
 

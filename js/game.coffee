@@ -18,7 +18,7 @@ class Game
 			stopped.innerHTML  = if window.canvasStop then "Stopped" else ""
 			tpsOut.innerHTML = tps.toFixed(1)
 			tics.innerHTML = "#{game.board.tics}/#{game.board.params.ticsPerGen}"
-		, 500
+		, 100
 
 	resetFpsCounter = ->
 		fps = 0

@@ -28,7 +28,7 @@ Game = (function() {
       stopped.innerHTML = window.canvasStop ? "Stopped" : "";
       tpsOut.innerHTML = tps.toFixed(1);
       return tics.innerHTML = "" + game.board.tics + "/" + game.board.params.ticsPerGen;
-    }, 500);
+    }, 100);
   };
 
   resetFpsCounter = function() {

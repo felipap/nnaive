@@ -197,19 +197,19 @@ class _Bot extends Circle
 		@closestFood.color = '#F22'
 		# Get output from Neural Network and update
 		if window.invert
-			@lastOutput = @nn.fire([Math.atan2(@closestFood.position.y-@position.y,@position.x-@closestFood.position.x),@angle])
+			@lastOutput = @nn.fire([Math.atan2(@closestFood.position.y-@position.y,@position.x-@closestFood.position.x)-@angle || 1])
 			@angle += @lastOutput[1]-@lastOutput[0]
 		else
-			@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x),@angle])
+			@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x)-@angle || 1])
 			@angle += @lastOutput[0]-@lastOutput[1]
 		# Limit particle to canvas bounds.
 		@position.x = mod(@position.x+@speed*Math.cos(@angle)*step,window.canvas.width)
 		@position.y = mod(@position.y+@speed*Math.sin(@angle)*step,window.canvas.height)
 		
 	render: (context) ->
-
 		radius = @size/2+8+2*@fitness
-		opacity = (@lastOutput[0]-@lastOutput[1])*10
+		opacity = (@lastOutput[0]-@lastOutput[1])*2
+		painter.drawCircle(context, @position, radius, {width:1, color:'grey'})
 		painter.drawCrown(context,@position,radius,[-Math.PI,0],@angle, {width:2, color:"rgba(0,0,0,#{mm(0,-opacity,1)})"})
 		painter.drawCrown(context,@position,radius,[0,Math.PI], @angle, {width:2, color:"rgba(0,0,0,#{mm(0,opacity,1)})"})
 
@@ -340,15 +340,15 @@ class Board
 
 	params:
 		activationResponse: 1 					# for the sigmoid function
-		ticsPerGen: 2000							# num of tics per generation
+		ticsPerGen: 2000						# num of tics per generation
 		mutationRate: 0.1 						# down to 0.05
 		foodDensity: 0.3						# per 100x100 px² squares
 		popSize: 20
 		crossoverRate: 0.7
 		maxMutationFactor: 0.3
-		nInputs: 2
-		speed: 50
-		layersConf: [5,2]
+		nInputs: 1
+		speed: 100
+		layersConf: [5,3,2]
 		numWeights: null # calcNumWeights(this.layersConf) # Initialized in constructor
 
 	stats:
@@ -416,7 +416,8 @@ class Board
 	epoch: (oldpop) ->
 		sorted = _.sortBy(oldpop, (a) -> a.fitness).reverse()
 		newpop = []
-		console.log('sorted: (%s)', sorted.length, _.pluck(sorted,'fitness'))
+		console.log('sorted: (%s)', sorted.length, _.map(sorted,
+			(e)=>((e.fitness/@params.foodDensity/e.speed/ @params.ticsPerGen*@params.popSize*10000).toFixed(1))))
 		
 		for g in sorted[..5] # Use parameters
 			g.reset(@params)
@@ -432,8 +433,8 @@ class Board
 		@stats.mutated = 0
 		# Generate until population cap is reached.
 		while newpop.length < @params.popSize
-			mother = getChromoRoulette(sorted)
-			father = getChromoRoulette(sorted)
+			mother = getChromoRoulette(oldpop)
+			father = getChromoRoulette(oldpop)
 			if mother.fitness is 0 or father.fitness is 0
 				console.log('fitness 0. making random')
 				mother = @genRandBot()
@@ -442,7 +443,7 @@ class Board
 			@mutate(baby2)
 			newpop.push(new Bot(baby1,@params))
 			newpop.push(new Bot(baby2,@params))
-		console.log('mutated:',@stats.mutated)
+		console.log("mutated: #{@stats.mutated}/#{@params.popSize}")
 		return newpop
 
 	constructor: ->
