@@ -62,7 +62,12 @@ Game = (function() {
     $(document).keydown(function(event) {
       if (event.keyCode === 32) {
         console.log('spacebar hit');
-        return window.canvasStop = !window.canvasStop;
+        window.canvasStop = !window.canvasStop;
+        if (window.canvasStop) {
+          return _this.panel.fadeIn();
+        } else {
+          return _this.panel.fadeOut();
+        }
       }
     });
   }

@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"tics",
+				"ticsPerGen"
+			],
+			[
 				"text-",
 				"text-align"
 			],
@@ -510,28 +514,24 @@
 			[
 				"M",
 				"printMatrix"
-			],
-			[
-				"print",
-				"printMatrix"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "index.html",
-			"settings":
-			{
-				"buffer_size": 3817,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "css/main.less",
 			"settings":
 			{
 				"buffer_size": 734,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 4114,
 				"line_ending": "Unix"
 			}
 		},
@@ -547,7 +547,15 @@
 			"file": "js/board.coffee",
 			"settings":
 			{
-				"buffer_size": 14725,
+				"buffer_size": 15269,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/felipe/Projects/felip/index.html",
+			"settings":
+			{
+				"buffer_size": 4211,
 				"line_ending": "Unix"
 			}
 		}
@@ -643,6 +651,13 @@
 	},
 	"file_history":
 	[
+		"/home/felipe/Projects/felip/coffee/painter.coffee",
+		"/home/felipe/Projects/nnaive/index.html",
+		"/home/felipe/Projects/felip/coffee/dispatcher.coffee",
+		"/home/felipe/Projects/felip/coffee/board.coffee",
+		"/home/felipe/Projects/heroku-tc/turmacidada/templates/base.html",
+		"/home/felipe/Projects/sicp-code/code/1A.scm",
+		"/home/felipe/Projects/felip/index.html",
 		"/home/felipe/Projects/nnaive/css/watch.sh",
 		"/home/felipe/Projects/nnaive/nnaive.run",
 		"/home/felipe/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
@@ -683,7 +698,6 @@
 		"/home/felipe/Projects/magnet-project/css/macros.less",
 		"/home/felipe/Projects/magnet-project/index.html",
 		"/home/felipe/Projects/heroku-tc/turmacidada/static/base.less",
-		"/home/felipe/Projects/heroku-tc/turmacidada/templates/base.html",
 		"/home/felipe/Projects/game-of-life/index.html",
 		"/home/felipe/Cpp/unix-source/chapter12/main3.cc",
 		"/home/felipe/Cpp/unix-source/chapter12/main2.cc",
@@ -764,13 +778,7 @@
 		"/home/felipe/Projects/decrypter/src/basic.c",
 		"/home/felipe/Projects/decrypter/src/basic.h",
 		"/home/felipe/Projects/decrypter/src/helper.c",
-		"/home/felipe/Projects/decrypter/src/dumbpy",
-		"/home/felipe/Projects/decrypter/basic.h",
-		"/home/felipe/Projects/decrypter/basic.c",
-		"/home/felipe/Projects/decrypter/mapObj.c",
-		"/home/felipe/Projects/decrypter/mapObj.h",
-		"/home/felipe/Projects/Tumblr content/update-two-papers.md",
-		"/home/felipe/Projects/pi.is/js/main.js"
+		"/home/felipe/Projects/decrypter/src/dumbpy"
 	],
 	"find":
 	{
@@ -788,6 +796,23 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"settings",
+			"TERMINA",
+			"TERMINA ",
+			"TERMINA",
+			"board",
+			"pop",
+			"space",
+			"key",
+			"||",
+			"fire",
+			"sorted",
+			"'",
+			"value",
+			"span>",
+			"span",
+			"@angle])",
+			"3",
 			"label\"",
 			"label",
 			"badge",
@@ -898,24 +923,7 @@
 			"params",
 			"parameters.crossoverRate",
 			"parameters.popSize",
-			"popSize",
-			"foodCount",
-			"stats",
-			"genCount",
-			"getChromoRoulette",
-			"population",
-			"window.fps",
-			"fps",
-			"canvasStop",
-			"console.log",
-			"mutationRate",
-			"paramenters",
-			"parameters",
-			"genCount",
-			"window.stats.genCount",
-			"stats.genCount",
-			"genCount",
-			"window"
+			"popSize"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1061,40 +1069,11 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "index.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3817,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								609,
-								609
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 260.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "css/main.less",
 					"semi_transient": false,
 					"settings":
@@ -1106,13 +1085,41 @@
 						"selection":
 						[
 							[
-								211,
-								185
+								47,
+								47
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/LESS/LESS.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4114,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7,
+								7
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
@@ -1134,8 +1141,8 @@
 						"selection":
 						[
 							[
-								1101,
-								1101
+								552,
+								552
 							]
 						],
 						"settings":
@@ -1144,7 +1151,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 475.0,
+						"translation.y": 1134.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1155,15 +1162,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14725,
+						"buffer_size": 15269,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								14279,
-								14279
+								7826,
+								7826
 							]
 						],
 						"settings":
@@ -1171,8 +1178,36 @@
 							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 21.0,
-						"translation.y": 4966.0,
+						"translation.x": 0.0,
+						"translation.y": 4156.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/home/felipe/Projects/felip/index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4211,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								550,
+								550
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

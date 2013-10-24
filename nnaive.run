@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd ~/Projects/nnaive
-# nautilus . & disown
-gnome-terminal -x sh -c "python -m SimpleHTTPServer" # & disown
-sleep 3
-gnome-terminal -x sh -c "cd ~/Projects/nnaive/js && coffee -bcw *.coffee" 2>&- # & disown
-gnome-terminal -x sh -c "cd css && bash watch.sh"

@@ -48,6 +48,10 @@ class Game
 			if event.keyCode == 32
 				console.log('spacebar hit')
 				window.canvasStop = !window.canvasStop
+				if window.canvasStop
+					@panel.fadeIn()
+				else
+					@panel.fadeOut()
 
 	loopTic: ->
 		if not window.canvasStop

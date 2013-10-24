@@ -4,3 +4,9 @@ body{font-family:'Open Sans';}
 #panel{position:fixed;right:0;top:0;bottom:0;border:1px solid #DDD;width:220px;box-sizing:border-box;background:#EEE;color:#444;padding:10px;box-shadow:5px 5px 5px rgba(0, 0, 0, 0.4);}#panel .control{box-sizing:border-box;padding:10px;border-bottom:1px solid #DDD;}#panel .control label{display:block;}
 #panel .control input[type=range]{vertical-align:top;}
 #panel .control .label{float:right;}
+#panel .bottom{position:absolute;bottom:0;}
+#panel #legenda{font-size:13px;}#panel #legenda .square{background:black;width:10px;height:10px;display:inline-block;}#panel #legenda .square[data-bot=top]{background:black;}
+#panel #legenda .square[data-bot=elite]{background:#088;}
+#panel #legenda .square[data-bot=bmutation]{background:green;}
+#panel #legenda .square[data-bot=bcrossover]{background:yellow;}
+#panel #legenda .square[data-bot=ordinary]{background:#F5A;}

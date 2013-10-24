@@ -48,4 +48,27 @@ body {
 		padding: 10px;
 		border-bottom: 1px solid #DDD;
 	}
+
+	.bottom {
+		position: absolute;
+		bottom: 0;
+	}
+
+	#legenda {
+		font-size:13px;
+
+		.square {
+			background: black;
+			width: 10px;
+			height: 10px;
+			display: inline-block;
+		
+			&[data-bot=top] { background: black; }
+			&[data-bot=elite] { background: #088; }
+			&[data-bot=bmutation] { background: green; }
+			&[data-bot=bcrossover] { background: yellow; }
+			&[data-bot=ordinary] { background: #F5A; }
+		}
+	}
+
 }

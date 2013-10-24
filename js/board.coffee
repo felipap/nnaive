@@ -59,7 +59,7 @@ painter =
 		context.translate(center.x, center.y)
 		context.rotate(angle)
 		context.beginPath()
-		context.arc(0, 0, radius, angles[0], angles[1]);
+		context.arc(0, 0, radius, angles[0], angles[1])
 		context.stroke()
 		context.restore()
 
@@ -176,9 +176,17 @@ class Food extends Triangle
 	eat: (eater) -> # reset position.
 		@position = {x: Math.random()*canvas.width,	y: Math.random()*canvas.height}
 
+colorConfig = {
+	bot: '#F5A'
+	eliteBot: '#088',
+	bestBot: 'black',
+	food: '#25A',
+	selectedFood: '#F22',
+}
+
 class _Bot extends Circle
 	
-	color: '#F5A'
+	color: colorConfig.bot
 	size: 10
 	closestFood: null
 
@@ -190,18 +198,18 @@ class _Bot extends Circle
 	tic: (step) ->
 		# Set @closestFood
 		@closestFood = @closestFood or game.board.food[0]
-		@closestFood.color = '#25A'
-		for food in game.board.food[1..]
+		@closestFood.color = colorConfig.food
+		for food in game.board.food
 			if dist2(@position,food.position) < dist2(@position,@closestFood.position)
 				@closestFood = food
-		@closestFood.color = '#F22'
+		@closestFood.color = colorConfig.selectedFood
 		# Get output from Neural Network and update
-		if window.invert
-			@lastOutput = @nn.fire([Math.atan2(@closestFood.position.y-@position.y,@position.x-@closestFood.position.x)-@angle || 1])
-			@angle += @lastOutput[1]-@lastOutput[0]
-		else
-			@lastOutput = @nn.fire([Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x)-@angle || 1])
-			@angle += @lastOutput[0]-@lastOutput[1]
+		if Math.abs(@position.y-@closestFood.position.y) < 5
+			foodAngle = Math.atan2(5,@position.x-@closestFood.position.x)
+		else 
+			foodAngle = Math.atan2(@position.y-@closestFood.position.y,@position.x-@closestFood.position.x)
+		@lastOutput = @nn.fire([foodAngle-@angle or 1])
+		@angle += @lastOutput[0]-@lastOutput[1]
 		# Limit particle to canvas bounds.
 		@position.x = mod(@position.x+@speed*Math.cos(@angle)*step,window.canvas.width)
 		@position.y = mod(@position.y+@speed*Math.sin(@angle)*step,window.canvas.height)
@@ -317,8 +325,8 @@ class Bot extends _Bot
 		color = @color
 		if @inEvidence
 			painter.drawCircle(context, @position, @size+10, {color:'grey', fill:true})
-		if game.board.stats.topBot is @ then color = 'black'
-		else if @isElite then color = '#088'
+		if game.board.stats.topBot is @ then color = colorConfig.bestBot
+		else if @isElite then color = colorConfig.eliteBot
 		super(context, color)
 
 
@@ -348,7 +356,7 @@ class Board
 		maxMutationFactor: 0.3
 		nInputs: 1
 		speed: 100
-		layersConf: [5,3,2]
+		layersConf: [5,2]
 		numWeights: null # calcNumWeights(this.layersConf) # Initialized in constructor
 
 	stats:

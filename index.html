@@ -55,6 +55,30 @@
 					<input type="range" min="1" max="100" value="0" data-param="popSize">
 					<span class="label label-primary"></span>
 				</div>
+
+				<div class="bottom" id="legenda">
+					Legenda das cores:
+					<div>
+						<span class="square" data-bot="best"></span>
+						O robô que mais comeu na geração atual, até agora.
+					</div>
+					<div>
+						<span class="square" data-bot="elite"></span>
+						Os melhores robôs da geração anterior, passados direto para essa.
+					</div>
+					<div>
+						<span class="square" data-bot="bmutation"></span>
+						Mutação dos 3 melhores robôs da geração anterior.
+					</div>
+					<div>
+						<span class="square" data-bot="bcrossover"></span>
+						Crossover dos 3 melhores robôs da geração anterior.
+					</div>
+					<div>
+						<span class="square" data-bot="ordinary"></span>
+						Robôs comuns. Alguém tem que trabalhar.
+					</div>
+				</div>
 			</div>
 		</div> <!-- /container --> <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 				<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
