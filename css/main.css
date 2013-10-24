@@ -1,6 +1,6 @@
-body{font-family:'Open Sans';}
+body{font-family:Lato;}
 .wrapper{width:100%;}
-#flags{position:fixed;right:left;font-family:Ubuntu, Arial;}#flags>div{width:200px;position:relative;border:1px solid #DDD;}#flags>div>span{position:absolute;width:80px;right:5px;text-align:right;color:blue;}
+#flags{position:fixed;right:left;bottom:0;font-family:Lato, Arial;}#flags>div{width:200px;position:relative;border:1px solid #DDD;}#flags>div>span{position:absolute;width:80px;right:5px;text-align:right;color:blue;}
 #panel{position:fixed;right:0;top:0;bottom:0;border:1px solid #DDD;width:220px;box-sizing:border-box;background:rgba(200, 200, 200, 0.8);color:#444;padding:10px;box-shadow:5px 5px 5px rgba(0, 0, 0, 0.4);}#panel .control{box-sizing:border-box;padding:10px;border-bottom:1px solid #DDD;}#panel .control label{display:block;}
 #panel .control input[type=range]{vertical-align:top;}
 #panel .control .label{float:right;}

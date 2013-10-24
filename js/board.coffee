@@ -482,6 +482,7 @@ class Board
 
 	render: (context) ->
 		painter.clearRect(context, {x:0,y:0}, {x:canvas.width,y:canvas.height})
+		# painter.drawRectangle(context, {x:0,y:0}, {x:canvas.width,y:canvas.height}, 0, {color:"#444",fill:true})
 		item.render(context) for item in @food
 		item.render(context) for item in @pop
 
