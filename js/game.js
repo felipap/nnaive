@@ -25,7 +25,15 @@ Game = (function() {
     stopeed = document.getElementById('stopped');
     return setInterval(function() {
       fpsOut.innerHTML = fps.toFixed(1);
-      stopped.innerHTML = window.canvasStop ? "Stopped" : "";
+      if (window.canvasStop) {
+        $(stopped).find('i.fa').addClass('fa-pause');
+        $(stopped).find('i.fa').removeClass('fa-play');
+        $(stopped).fadeIn();
+      } else {
+        $(stopped).find('i.fa').addClass('fa-play');
+        $(stopped).find('i.fa').removeClass('fa-pause');
+        $(stopped).fadeOut();
+      }
       tpsOut.innerHTML = tps.toFixed(1);
       return tics.innerHTML = "" + game.board.tics + "/" + game.board.params.ticsPerGen;
     }, 100);
@@ -75,15 +83,18 @@ Game = (function() {
   Game.prototype.loopTic = function() {
     var now, thisFrameTPS,
       _this = this;
+    now = new Date();
     if (!window.canvasStop) {
       this.board.tic(1 / 50);
+      thisFrameTPS = 1000 / (now - lastTic);
+      tps += (thisFrameTPS - tps) / 30;
+    } else {
+      tps = 0;
     }
-    window.setTimeout((function() {
+    lastTic = now * 1 - 1;
+    return window.setTimeout((function() {
       return _this.loopTic();
     }), 1);
-    thisFrameTPS = 1000 / ((now = new Date) - lastTic);
-    tps += (thisFrameTPS - tps) / 30;
-    return lastTic = now * 1 - 1;
   };
 
   Game.prototype.loopRender = function() {

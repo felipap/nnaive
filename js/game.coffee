@@ -15,7 +15,14 @@ class Game
 		stopeed = document.getElementById('stopped')
 		setInterval =>
 			fpsOut.innerHTML = fps.toFixed(1)
-			stopped.innerHTML  = if window.canvasStop then "Stopped" else ""
+			if window.canvasStop
+				$(stopped).find('i.fa').addClass('fa-pause')
+				$(stopped).find('i.fa').removeClass('fa-play')
+				$(stopped).fadeIn()
+			else
+				$(stopped).find('i.fa').addClass('fa-play')
+				$(stopped).find('i.fa').removeClass('fa-pause')
+				$(stopped).fadeOut()
 			tpsOut.innerHTML = tps.toFixed(1)
 			tics.innerHTML = "#{game.board.tics}/#{game.board.params.ticsPerGen}"
 		, 100
@@ -54,13 +61,18 @@ class Game
 					@panel.fadeOut()
 
 	loopTic: ->
+		now = new Date()
+
 		if not window.canvasStop
 			@board.tic(1/50)
-		window.setTimeout((=> @loopTic()), 1)
-		# Synchronise tps
-		thisFrameTPS = 1000 / ((now=new Date) - lastTic)
-		tps += (thisFrameTPS - tps) / 30;
+			# Synchronise tps
+			thisFrameTPS = 1000 / (now - lastTic)
+			tps += (thisFrameTPS - tps) / 30;
+		else
+			tps = 0
+		
 		lastTic = now * 1 - 1
+		window.setTimeout((=> @loopTic()), 1)
 
 	loopRender: ->
 		@board.render(context)
